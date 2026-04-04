@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwEyg9UPQrxOgNVhkzGWRZAULMkjE4rCQhAKuYUoAoPEG1bCr0xU74X8dRRuyV53ARk/exec";
-const googleSheetsDataUrl = import.meta.env.VITE_SHEETS_URL || DEFAULT_SHEETS_URL;
+const googleSheetsDataUrl = import.meta.env.VITE_SHEETS_API_URL || DEFAULT_SHEETS_URL;
 const tabs = [
   { id: 'dashboard', icon: LayoutDashboard, label: 'COMMAND' },
   { id: 'reputation', icon: ShieldCheck, label: 'REPUTATION' },
