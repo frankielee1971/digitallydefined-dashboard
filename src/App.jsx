@@ -1,320 +1,325 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Star, 
-  MessageSquare, 
-  TrendingUp, 
-  AlertCircle, 
-  Send, 
-  Users, 
-  CheckCircle, 
-  Settings,
-  BarChart2,
-  Zap,
-  Loader2,
-  Mail,
-  Smartphone,
-  DollarSign,
-  Lock,
-  Unlock,
-  UserPlus,
-  Facebook,
-  RefreshCw,
-  CreditCard
+  LayoutDashboard, FolderHeart, Settings,
+  DollarSign, X, RefreshCw,
+  BarChart3, MessageSquare, ShieldCheck, ArrowUpRight, 
+  BrainCircuit, Star, ShieldAlert, Users,
+  TrendingUp, Magnet
 } from 'lucide-react';
 
-// ==========================================
-// CEO CONFIGURATION VAULT
-// ==========================================
-const API_CONFIG = {
-  automationWebhook: import.meta.env.VITE_AUTOMATION_WEBHOOK || "",
-  sentimentWebhook: import.meta.env.VITE_SENTIMENT_WEBHOOK || "",
-  googleSheetsDataUrl: import.meta.env.VITE_SHEETS_URL || "https://script.google.com/macros/s/AKfycbzBb4TMzdu_L90o9mNm3pKUxFZUMbFZJIx0MQG0_IbDGxT4ieCMly-6RvHInP2OZtLj/exec",
-  nurtureWebhook: import.meta.env.VITE_NURTURE_WEBHOOK || "",
-  fbScraperWebhook: import.meta.env.VITE_FB_SCRAPER_WEBHOOK || "",
-  paymentLink: "https://gumroad.com/l/your-product-id",
-  accessCode: import.meta.env.VITE_ACCESS_CODE || "LEGACY2024"
-};
+const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwEyg9UPQrxOgNVhkzGWRZAULMkjE4rCQhAKuYUoAoPEG1bCr0xU74X8dRRuyV53ARk/exec";
+const googleSheetsDataUrl = import.meta.env.VITE_SHEETS_URL || DEFAULT_SHEETS_URL;
+const tabs = [
+  { id: 'dashboard', icon: LayoutDashboard, label: 'COMMAND' },
+  { id: 'reputation', icon: ShieldCheck, label: 'REPUTATION' },
+  { id: 'intel', icon: BarChart3, label: 'INTEL' },
+  { id: 'brain', icon: BrainCircuit, label: 'THE BRAIN' },
+];
 
-const BrandColors = {
-  orange: '#F18B25',
-  blue: '#47B7D4',
-  red: '#C20F0A',
-  bg: '#FFFCF9',
-  card: '#FFFFFF',
-  text: '#2D3748',
-  black: '#000000'
-};
-
-export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [inputCode, setInputCode] = useState("");
+const App = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [reviews, setReviews] = useState([]);
-  const [leads, setLeads] = useState([]);
-  const [fbLeads, setFbLeads] = useState([]);
-  const [payments, setPayments] = useState([]);
+  const [showSettings, setShowSettings] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [error, setError] = useState(null);
+  const [lastSync, setLastSync] = useState(null);
+  const [syncError, setSyncError] = useState('');
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    if (inputCode.toUpperCase() === API_CONFIG.accessCode) {
-      setIsAuthenticated(true);
-    } else {
-      alert("Invalid Access Code. Check your Gumroad receipt.");
-    }
+  // --- DATA STATE (MAPPED TO YOUR SCREENSHOT) ---
+  const [rawData, setRawData] = useState({ 
+    reviews: [], 
+    competitors: [], 
+    community: [], 
+    leadMagnets: [],
+    payments: [],
+    campaigns: [] 
+  });
+
+  const [stats, setStats] = useState({
+    assetValue: "$0",
+    activeLeads: "0",
+    siteHealth: "100%",
+    avgSentiment: "Stable"
+  });
+
+  // --- STORAGE ---
+  const getStored = (key) => localStorage.getItem(key) || '';
+  const [openRouterKey, setOpenRouterKey] = useState(getStored('openRouterKey'));
+
+  const parseCurrencyAmount = (value) => {
+    const normalized = String(value ?? '').replace(/[^0-9.-]/g, '');
+    return Number.parseFloat(normalized) || 0;
   };
 
-  const fetchLiveStats = async () => {
-    if (!isAuthenticated || !API_CONFIG.googleSheetsDataUrl) return;
+  // --- THE DATA ENGINE ---
+  const syncEmpireData = async () => {
     setIsSyncing(true);
-    setError(null);
+    setSyncError('');
     try {
-      const response = await fetch(API_CONFIG.googleSheetsDataUrl);
-      if (!response.ok) throw new Error('Vault unreachable.');
+      const response = await fetch(googleSheetsDataUrl);
+      if (!response.ok) {
+        throw new Error(`Vault sync failed with status ${response.status}`);
+      }
       const data = await response.json();
-      if (data.reviews) setReviews(data.reviews);
-      if (data.leads) setLeads(data.leads);
-      if (data.fbLeads) setFbLeads(data.fbLeads);
-      if (data.payments) setPayments(data.payments);
+      setRawData(data);
+      
+      // Calculate real-time stats from the vault
+      const totalRev = data.payments?.reduce((acc, curr) => acc + parseCurrencyAmount(curr.amount), 0) || 0;
+      const totalLeads = (data.community?.length || 0) + (data.leadMagnets?.length || 0);
+      
+      setStats({
+        assetValue: `$${totalRev.toLocaleString()}`,
+        activeLeads: totalLeads.toLocaleString(),
+        siteHealth: "100%",
+        avgSentiment: data.reviews?.length > 0 ? "Positive" : "Stable"
+      });
+
+      setLastSync(new Date().toLocaleTimeString());
     } catch (error) {
-      console.error("Vault Sync Failed", error);
-      setError("Sync Interrupted. Ensure the Apps Script is deployed to 'Anyone'.");
-    } finally {
-      setIsSyncing(false);
+      console.error("Vault Connection Failed:", error);
+      setSyncError('Sync interrupted. Check the Sheets URL or Apps Script permissions.');
     }
+    setIsSyncing(false);
   };
 
-  useEffect(() => {
-    fetchLiveStats();
-  }, [isAuthenticated]);
+  useEffect(() => { syncEmpireData(); }, []);
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: BrandColors.bg }}>
-        <div className="max-w-md w-full border-[1px] border-black p-10 bg-white">
-          <h1 className="text-3xl font-bold mb-2 uppercase font-heading tracking-tighter text-black">
-            Digitally<span className="italic" style={{ color: BrandColors.orange }}>Defined.</span>
-          </h1>
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-10 opacity-60 text-black text-center">Private Access: Authorized Personnel Only</p>
-          <form onSubmit={handleLogin} className="space-y-8">
-            <input 
-              type="text" 
-              className="w-full border-[1px] border-black p-4 text-sm font-medium uppercase focus:outline-none focus:border-orange-500" 
-              value={inputCode}
-              onChange={(e) => setInputCode(e.target.value)}
-              placeholder="ENTER ACCESS CODE"
-            />
-            <button type="submit" className="w-full py-4 bg-black text-white font-bold uppercase tracking-widest border-[1px] border-black hover:bg-[#F18B25] transition-colors">
-              Unlock Empire
-            </button>
-          </form>
-        </div>
-      </div>
-    );
-  }
+  const style = {
+    card: "bg-white border-[1px] border-black p-6 md:p-8 rounded-none h-full transition-all hover:bg-[#F18B25]/5",
+    input: "border-[1px] border-black p-4 focus:outline-none focus:border-[#F18B25] rounded-none text-lg w-full font-medium bg-white",
+    btnPrimary: "bg-[#F18B25] text-white border-[1px] border-black hover:bg-black transition-all font-bold rounded-none text-sm px-6 py-3 uppercase tracking-[0.2em]",
+    headline: { fontFamily: "'Inter', sans-serif" }
+  };
 
-  return (
-    <div className="min-h-screen font-body flex flex-col md:flex-row" style={{ backgroundColor: BrandColors.bg, color: BrandColors.text }}>
-      <style dangerouslySetInnerHTML={{__html: `
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Inter:wght@700;800&display=swap');
-        .font-heading { font-family: 'Inter', sans-serif; font-weight: 800; }
-        .font-body { font-family: 'DM Sans', sans-serif; }
-        .thin-frame { border: 1px solid #000000; background-color: #FFFFFF; border-radius: 0px; }
-        .action-btn { border: 1px solid #000000; transition: all 0.2s ease; font-weight: 700; text-transform: uppercase; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; border-radius: 0px; padding: 0.75rem 1.5rem; font-size: 10px; tracking: 0.1em; }
-        .action-btn:hover { background-color: #000; color: #fff; }
-        .nav-active { background-color: #000 !important; color: white !important; }
-      `}} />
-
-      <aside className="w-full md:w-80 border-r-[1px] border-black p-10 flex flex-col bg-white">
-        <div className="mb-16">
-          <h1 className="text-2xl font-heading tracking-tighter leading-none uppercase text-black">
-            Digitally<span className="italic" style={{ color: BrandColors.orange }}>Defined.</span>
-          </h1>
-          <div className="mt-6 p-4 border-[1px] border-black bg-gray-50 flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-               <span className={`h-2 w-2 rounded-full ${isSyncing ? 'bg-orange-500 animate-pulse' : 'bg-green-500'}`}></span>
-               <span className="text-[9px] font-bold uppercase tracking-widest">{isSyncing ? 'Syncing' : 'Live'}</span>
-            </div>
-            <button onClick={fetchLiveStats} className={`transition-transform duration-500 ${isSyncing ? 'animate-spin' : ''}`}>
-              <RefreshCw size={12} />
-            </button>
+  // --- SUB-COMPONENT: MARKET INTEL ---
+  const MarketIntel = () => (
+    <div className="space-y-8 animate-in slide-in-from-bottom duration-500">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className={style.card}>
+          <h3 className="text-xl font-black uppercase italic mb-8 flex items-center gap-3">
+            <TrendingUp size={24} className="text-[#47B7D4]" /> Market Positioning
+          </h3>
+          <div className="space-y-4">
+            {rawData.competitors?.length > 0 ? rawData.competitors.map((comp, i) => (
+              <div key={i} className="border-[1px] border-black p-4 flex justify-between items-center">
+                <div>
+                  <p className="font-bold uppercase text-sm">{comp.businessName || comp.name}</p>
+                  <p className="text-[10px] opacity-50 uppercase tracking-widest">{comp.reviewCount || 0} Reviews</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-black text-[#F18B25]">{comp.marketShare || 'N/A'}</p>
+                  <p className="text-[9px] font-bold uppercase opacity-30">Share</p>
+                </div>
+              </div>
+            )) : <p className="opacity-40 italic text-sm">No competitor intel logged yet.</p>}
           </div>
         </div>
 
-        <nav className="flex-1 space-y-2">
-          <NavItem active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={<BarChart2 size={18} />} label="Operational Overview" />
-          <NavItem active={activeTab === 'fb-leads'} onClick={() => setActiveTab('fb-leads')} icon={<Facebook size={18} />} label="FB Group Vault" />
-          <NavItem active={activeTab === 'leads'} onClick={() => setActiveTab('leads')} icon={<Users size={18} />} label="Sales Pipeline" />
-          <NavItem active={activeTab === 'sentiment'} onClick={() => setActiveTab('sentiment')} icon={<MessageSquare size={18} />} label="Reputation" />
-          <NavItem active={activeTab === 'revenue'} onClick={() => setActiveTab('revenue')} icon={<CreditCard size={18} />} label="Revenue" />
-        </nav>
+        <div className={style.card}>
+          <h3 className="text-xl font-black uppercase italic mb-8 flex items-center gap-3">
+            <Magnet size={24} className="text-[#F18B25]" /> Asset Attraction
+          </h3>
+          <div className="space-y-4">
+            {rawData.leadMagnets?.length > 0 ? rawData.leadMagnets.map((magnet, i) => (
+              <div key={i} className="border-[1px] border-black p-4 flex justify-between items-center bg-gray-50">
+                <div>
+                  <p className="font-bold uppercase text-sm">{magnet.prospectName || magnet.name}</p>
+                  <p className="text-[10px] font-medium text-[#47B7D4] uppercase">{magnet.assetDownloaded || magnet.asset}</p>
+                </div>
+                <span className={`text-[9px] font-bold px-2 py-1 border border-black uppercase ${magnet.nurtureLevel === 'Hot' ? 'bg-red-500 text-white' : 'bg-orange-200'}`}>
+                  {magnet.nurtureLevel || 'New'}
+                </span>
+              </div>
+            )) : <p className="opacity-40 italic text-sm">No lead magnet data synced.</p>}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
-        <div className="mt-auto pt-10 border-t-[1px] border-black">
-          <p className="text-[9px] font-bold uppercase opacity-30 mb-4">Operator: F. LaVigne</p>
-          <button onClick={() => setIsAuthenticated(false)} className="w-full py-3 action-btn text-[10px]">Logout</button>
+  // --- SUB-COMPONENT: REPUTATION MANAGER ---
+  const ReputationManager = () => (
+    <div className="space-y-8 animate-in slide-in-from-bottom duration-500">
+      <div className={style.card}>
+        <h3 className="text-xl font-black uppercase italic mb-8 flex items-center gap-3">
+          <ShieldAlert size={24} className="text-[#C20F0A]" /> Reputation Triage
+        </h3>
+        <div className="space-y-4">
+          {rawData.reviews?.length > 0 ? rawData.reviews.map((rev, i) => (
+            <div key={i} className="border-[1px] border-black p-6 flex flex-col md:flex-row justify-between gap-6 hover:bg-gray-50">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <Star size={14} className="text-yellow-500 fill-yellow-500" />
+                  <span className="font-bold uppercase text-xs">{rev.name}</span>
+                  <span className={`text-[9px] px-2 py-0.5 border border-black uppercase font-bold ${rev.sentiment === 'Negative' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
+                    {rev.sentiment || 'Analyzing'}
+                  </span>
+                </div>
+                <p className="text-sm italic text-gray-600 mb-4">"{rev.reviewText || rev.text}"</p>
+                <div className="bg-gray-100 p-4 border-l-4 border-[#F18B25]">
+                  <p className="text-[10px] font-bold uppercase mb-1">AI Strategic Reply:</p>
+                  <p className="text-sm font-medium">{rev.aiDraftedResponse || "Awaiting Analysis..."}</p>
+                </div>
+              </div>
+              <button className={style.btnPrimary + " h-fit self-center"}>Deploy Reply</button>
+            </div>
+          )) : <p className="text-center py-12 opacity-40">No reviews found in your Vault.</p>}
+        </div>
+      </div>
+    </div>
+  );
+
+  // --- SUB-COMPONENT: DASHBOARD / COMMAND ---
+  const CommandTab = () => (
+    <div className="space-y-10 animate-in fade-in duration-500">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: "Asset Value", val: stats.assetValue, icon: DollarSign, color: "bg-green-50" },
+          { label: "Community", val: stats.activeLeads, icon: Users, color: "bg-[#47B7D4]/10" },
+          { label: "System Health", val: stats.siteHealth, icon: ShieldCheck, color: "bg-[#F18B25]/10" },
+          { label: "Sent. Index", val: stats.avgSentiment, icon: MessageSquare, color: "bg-red-50" },
+        ].map((s, i) => (
+          <div key={i} className={style.card}>
+            <div className="flex justify-between items-start mb-6">
+              <div className={`p-2 border-[1px] border-black ${s.color}`}>
+                <s.icon size={18} />
+              </div>
+              <ArrowUpRight size={14} className="opacity-30" />
+            </div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#2D3748]/50 mb-1">{s.label}</p>
+            <p className="font-bold text-4xl text-[#2D3748]" style={style.headline}>{s.val}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          <div className={style.card}>
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-lg font-bold uppercase italic flex items-center gap-3"><FolderHeart size={20} /> Live Community Feed</h3>
+              <button onClick={syncEmpireData} className="text-[10px] font-bold border-b-[1px] border-black pb-1 uppercase flex items-center gap-2">
+                <RefreshCw size={10} className={isSyncing ? "animate-spin" : ""} />
+                {isSyncing ? "Syncing..." : `Last Sync: ${lastSync || 'Now'}`}
+              </button>
+            </div>
+            <div className="space-y-3">
+              {rawData.community?.length > 0 ? rawData.community.slice(0, 5).map((member, i) => (
+                <div key={i} className="border-[1px] border-black p-4 flex items-center justify-between group hover:bg-[#2D3748] hover:text-white transition-all">
+                  <div className="flex items-center gap-4">
+                    <span className="text-xs font-bold opacity-30 italic">0{i+1}</span>
+                    <div>
+                      <p className="font-bold uppercase text-sm">{member.memberName || member.name || "Anonymous"}</p>
+                      <p className="text-[10px] opacity-60 uppercase tracking-widest">{member.joinedDate || "Recent Join"}</p>
+                    </div>
+                  </div>
+                  <span className="text-[9px] font-bold px-2 py-1 border-[1px] border-black group-hover:border-white uppercase">{member.status || "Syncing"}</span>
+                </div>
+              )) : <p className="opacity-40 italic text-sm py-8 text-center uppercase tracking-widest">Awaiting Community Sync...</p>}
+            </div>
+          </div>
+        </div>
+        <div className="bg-[#2D3748] text-white p-8 border-[1px] border-black flex flex-col justify-between">
+           <h4 className="font-bold uppercase text-[10px] tracking-[0.3em] text-[#F18B25] mb-4">Strategic Intel</h4>
+           <div className="mb-8">
+              {rawData.campaigns?.length > 0 ? (
+                <div>
+                  <p className="text-xl font-black italic uppercase text-[#47B7D4]">{rawData.campaigns[0].campaignName}</p>
+                  <p className="text-sm opacity-70 mt-2">Conversion: <span className="text-white font-bold">{rawData.campaigns[0].conversionRate}</span></p>
+                </div>
+              ) : (
+                <p className="text-lg font-medium italic">"Your campaigns are being prepared. No excuses. Keep building."</p>
+              )}
+           </div>
+           <button onClick={() => setActiveTab('intel')} className="text-[10px] font-bold border-b border-white/30 uppercase tracking-widest hover:text-[#F18B25] w-fit">Full Intel Briefing →</button>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="flex h-screen w-full bg-[#FFFCF9] text-[#2D3748] overflow-hidden font-sans">
+      <div className="fixed top-0 inset-x-0 z-30 border-b-[1px] border-black bg-white p-4 md:hidden">
+        <div className="flex items-center justify-between gap-4">
+          <div className="text-sm font-black tracking-tighter">
+            DIGITALLY<span className="text-[#F18B25] italic uppercase">DEFINED</span>
+          </div>
+          <button
+            onClick={() => setShowSettings(true)}
+            className="flex items-center gap-2 border-[1px] border-black px-3 py-2 text-[10px] font-bold uppercase tracking-widest"
+          >
+            <Settings size={14} /> Keys
+          </button>
+        </div>
+        <nav className="mt-4 grid grid-cols-2 gap-2">
+          {tabs.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`flex items-center justify-center gap-2 px-3 py-3 font-bold border-[1px] uppercase text-[10px] tracking-widest ${
+                activeTab === item.id ? "bg-[#2D3748] text-white border-black" : "border-black bg-white"
+              }`}
+            >
+              <item.icon size={14} /> {item.label}
+            </button>
+          ))}
+        </nav>
+      </div>
+      <aside className="w-64 border-r-[1px] border-black flex flex-col justify-between bg-white z-20 hidden md:flex">
+        <div className="p-6">
+          <div className="text-lg font-black tracking-tighter border-[1px] border-black p-4 bg-white mb-12">
+            DIGITALLY<span className="text-[#F18B25] italic uppercase">DEFINED</span>
+          </div>
+          <nav className="space-y-1">
+            {tabs.map((item) => (
+              <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-4 px-5 py-4 font-bold border-[1px] transition-all uppercase text-[10px] tracking-widest ${activeTab === item.id ? "bg-[#2D3748] text-white border-black" : "border-transparent hover:border-black"}`}>
+                <item.icon size={16} /> {item.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+        <div className="p-6 border-t-[1px] border-black">
+          <button onClick={() => setShowSettings(true)} className="w-full flex items-center gap-4 px-4 py-3 font-bold border-[1px] border-black hover:bg-black hover:text-white transition-all uppercase text-[10px] tracking-widest">
+            <Settings size={14} /> System Keys
+          </button>
         </div>
       </aside>
 
-      <main className="flex-1 p-8 md:p-20 overflow-y-auto">
-        {error && (
-          <div className="mb-8 p-4 border-[1px] border-red-600 bg-red-50 text-red-600 text-xs font-bold uppercase flex items-center space-x-3">
-            <AlertCircle size={16} />
-            <span>{error}</span>
-          </div>
-        )}
-        {activeTab === 'dashboard' && <DashboardView reviews={reviews} fbLeads={fbLeads} payments={payments} />}
-        {activeTab === 'fb-leads' && <FBLeadsView fbLeads={fbLeads} />}
-        {activeTab === 'leads' && <LeadsView leads={leads} />}
-        {activeTab === 'sentiment' && <SentimentView reviews={reviews} />}
-        {activeTab === 'revenue' && <RevenueView payments={payments} />}
-      </main>
-    </div>
-  );
-}
-
-function NavItem({ active, icon, label, onClick }) {
-  return (
-    <button onClick={onClick} className={`w-full flex items-center space-x-4 px-6 py-4 border-[1px] border-transparent font-heading uppercase text-[11px] tracking-[0.15em] transition-all text-left ${active ? 'nav-active' : 'hover:border-black'}`}>
-      {icon} <span>{label}</span>
-    </button>
-  );
-}
-
-function DashboardView({ reviews, fbLeads, payments }) {
-  const totalRev = payments.reduce((acc, curr) => {
-    const val = curr.amount ? String(curr.amount).replace(/[^0-9.]/g, '') : '0';
-    return acc + (parseFloat(val) || 0);
-  }, 0);
-
-  return (
-    <div className="space-y-16 animate-in fade-in duration-700">
-      <div className="thin-frame p-12">
-        <h2 className="text-6xl font-heading uppercase italic tracking-tighter mb-4 text-black leading-none">Market Assets.</h2>
-        <p className="text-xl opacity-70 font-medium">Real-time intelligence for the Digitally Defined legacy.</p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-black">
-        <StatCard label="Community Growth" value={fbLeads.length} sub="Group Members" />
-        <StatCard label="Sales Pipeline" value={reviews.length} sub="Customer Reviews" />
-        <StatCard label="Managed Revenue" value={`$${totalRev.toLocaleString()}`} sub="Gross Volume" />
-      </div>
-    </div>
-  );
-}
-
-function StatCard({ label, value, sub }) {
-  return (
-    <div className="p-10 thin-frame">
-      <h4 className="text-[9px] font-bold uppercase tracking-[0.3em] mb-4 opacity-40">{label}</h4>
-      <span className="text-6xl font-heading tracking-tighter leading-none">{value}</span>
-      <p className="text-[10px] font-bold uppercase mt-4 opacity-60 tracking-widest">{sub}</p>
-    </div>
-  );
-}
-
-function FBLeadsView({ fbLeads }) {
-  return (
-    <div className="space-y-12">
-      <h2 className="text-4xl font-heading uppercase italic tracking-tighter text-black">FB Group Vault</h2>
-      <div className="space-y-4">
-        {fbLeads.length === 0 ? <EmptyState text="No community data detected in Master Vault." /> : 
-          fbLeads.map((l, i) => (
-            <div key={i} className="p-8 thin-frame flex justify-between items-center bg-white hover:bg-gray-50 transition-colors">
-              <div>
-                <p className="font-heading text-xl uppercase mb-1 text-black">{l.memberName || l.name}</p>
-                <p className="text-[10px] font-bold opacity-50 uppercase tracking-widest">{l.email || "No Email Provided"}</p>
-                <p className="text-xs italic mt-2 opacity-70">"Struggle: {l.answeredQuestions || 'General'}"</p>
-              </div>
-              <div className="flex space-x-3">
-                <button className="action-btn">Welcome SMS</button>
-                <button className="action-btn bg-black text-white px-4"><Zap size={14} /></button>
-              </div>
+      <main className="flex-1 overflow-y-auto p-8 pt-44 md:p-12 md:pt-12 lg:p-16">
+        <header className="max-w-6xl mx-auto mb-16">
+          <p className="text-[9px] font-bold text-[#F18B25] uppercase tracking-[0.4em] mb-2">Proprietary OS v1.5</p>
+          <h2 className="text-5xl font-black tracking-tighter uppercase italic text-[#2D3748]">
+            {activeTab === 'dashboard' ? 'Own Your Power.' : activeTab.toUpperCase()}
+          </h2>
+        </header>
+        <div className="max-w-6xl mx-auto">
+          {syncError && (
+            <div className="mb-8 border-[1px] border-[#C20F0A] bg-red-50 px-4 py-3 text-[11px] font-bold uppercase tracking-[0.15em] text-[#C20F0A]">
+              {syncError}
             </div>
-          ))
-        }
-      </div>
-    </div>
-  );
-}
-
-function LeadsView({ leads }) {
-  return (
-    <div className="space-y-12">
-       <h2 className="text-4xl font-heading uppercase italic tracking-tighter text-black">Sales Pipeline</h2>
-       <div className="space-y-4">
-         {leads.length === 0 ? <EmptyState text="Waiting for Lead Magnet trigger..." /> : 
-           leads.map((l, i) => (
-           <div key={i} className="p-8 thin-frame flex justify-between items-center hover:bg-gray-50">
-             <div>
-               <p className="font-heading text-2xl uppercase tracking-tight mb-1 text-black">{l.prospectName || l.name}</p>
-               <p className="text-[10px] font-bold opacity-50 uppercase tracking-widest">{l.email}</p>
-               <p className="text-[10px] mt-2 font-bold uppercase text-orange-500">{l.assetDownloaded || "Digital Asset Interest"}</p>
+          )}
+          {activeTab === 'dashboard' && <CommandTab />}
+          {activeTab === 'reputation' && <ReputationManager />}
+          {activeTab === 'intel' && <MarketIntel />}
+          {activeTab === 'brain' && (
+             <div className="py-20 text-center border-2 border-dashed border-black">
+                <p className="uppercase font-black italic text-4xl opacity-10 mb-4">The Brain</p>
+                <p className="text-xs uppercase tracking-widest font-bold">Automation Logic Under Construction</p>
              </div>
-             <button className="action-btn">Nurture Flow</button>
-           </div>
-         ))}
-       </div>
+          )}
+        </div>
+      </main>
+
+      {showSettings && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/90 backdrop-blur-sm">
+          <div className="bg-white border-[1px] border-black p-8 md:p-12 max-w-xl w-full relative">
+            <button onClick={() => setShowSettings(false)} className="absolute top-6 right-6 hover:rotate-90 transition-all"><X size={24}/></button>
+            <h3 className="text-2xl font-black uppercase mb-8 italic">Configuration</h3>
+            <label className="text-[9px] font-bold uppercase mb-1 block tracking-widest text-gray-400">OpenRouter AI Key</label>
+            <input type="password" value={openRouterKey} onChange={(e) => setOpenRouterKey(e.target.value)} className={style.input} placeholder="sk-..." />
+            <button onClick={() => { localStorage.setItem('openRouterKey', openRouterKey); setShowSettings(false); }} className={style.btnPrimary + " w-full mt-6"}>Save System Keys</button>
+          </div>
+        </div>
+      )}
     </div>
   );
-}
+};
 
-function SentimentView({ reviews }) {
-  return (
-    <div className="space-y-12">
-       <h2 className="text-4xl font-heading uppercase italic tracking-tighter text-black">Reputation Intelligence</h2>
-       <div className="space-y-8">
-         {reviews.length === 0 ? <EmptyState text="No reviews found in vault." /> : 
-           reviews.map((r, i) => (
-           <div key={i} className="p-10 thin-frame">
-             <div className="flex justify-between items-start mb-6">
-               <p className="font-heading text-xl uppercase text-black">{r.name}</p>
-               <span className="text-[10px] font-bold uppercase tracking-widest border-b-[1px] border-black">Verified {r.rating}/5 Rating</span>
-             </div>
-             <p className="text-lg italic font-medium border-l-[1px] border-black pl-8 py-2 opacity-80 leading-relaxed text-black">"{r.reviewText || r.text}"</p>
-             <button className="action-btn mt-8">Draft AI Sentinel Reply</button>
-           </div>
-         ))}
-       </div>
-    </div>
-  );
-}
-
-function RevenueView({ payments }) {
-  return (
-    <div className="space-y-12">
-      <h2 className="text-4xl font-heading uppercase italic tracking-tighter text-black">Revenue Vault</h2>
-      <div className="thin-frame overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-black text-white text-[10px] font-bold uppercase tracking-widest">
-            <tr>
-              <th className="p-6">Client</th>
-              <th className="p-6">Asset</th>
-              <th className="p-6">Amount</th>
-              <th className="p-6">Status</th>
-            </tr>
-          </thead>
-          <tbody className="text-[11px] font-bold uppercase tracking-tight text-black">
-            {payments.length === 0 ? (
-                <tr><td colSpan="4" className="p-10 text-center opacity-30">No payments recorded.</td></tr>
-            ) : payments.map((p, i) => (
-              <tr key={i} className="border-t-[1px] border-black hover:bg-gray-50 transition-colors">
-                <td className="p-6 font-bold">{p.customer || "Anonymous"}</td>
-                <td className="p-6 opacity-70">{p.product || "Legacy Package"}</td>
-                <td className="p-6 text-orange-600 font-bold tracking-tighter">{p.amount}</td>
-                <td className="p-6">
-                    <span className="px-3 py-1 bg-black text-white text-[9px] font-bold uppercase tracking-widest">
-                        {p.status || "PAID"}
-                    </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-function EmptyState({ text }) {
-  return <p className="opacity-30 uppercase text-[11px] font-bold tracking-[0.2em]">{text}</p>;
-}
+export default App;
