@@ -202,11 +202,28 @@ export const CONFIG = {
   },
   contact: {
     // Change the primary contact email.
-    email: "hello@digitallydefined.online",
-    // Change the primary website URL.
+    email: "francesca@digitallydefined.online",    // Change the primary website URL.
     website: "https://digitallydefined.online",
     // Change the Gumroad product or storefront URL.
     gumroadUrl: "https://digitallydefined.gumroad.com",
+  },
+
+    owner: {
+    // Change the owner/creator name.
+    name: "Francesca LaVigne",
+    // Change the owner title and credentials.
+    title: "Certified Digital Marketer & Keyword Researcher",
+    // Change the owner email.
+    email: "francesca@digitallydefined.online",
+  },
+
+    integrations: {
+    // Change the Google Sheets Apps Script execution URL.
+    googleSheetsUrl: "https://script.google.com/macros/s/AKfycbwEyg9UPQrxOgNVhkzGWRZAULMkjE4rCQhAKuYUoAoPEG1bCr0xU74X8dRRuyV53ARk/exec",
+    // Change the Slack incoming webhook URL for notifications.
+    slackWebhookUrl: "YOUR_SLACK_WEBHOOK_URL",
+    // Change the Gumloop flow execution URL.
+    gumloopFlowUrl: "YOUR_GUMLOOP_FLOW_URL",
   },
   routes: {
     // Change the public landing page route.
