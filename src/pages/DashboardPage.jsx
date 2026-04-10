@@ -89,39 +89,34 @@ const DashboardPage = () => {
   const syncEmpireData = async () => {
     setIsSyncing(true);
     setSyncError("");
+
     try {
-      const response = await fetch(googleSheetsDataUrl);
-      if (!response.ok) {
-        throw new Error(
-          `${dashboardConfig.syncFailurePrefix} ${response.status}`,
-        );
-      }
-      const data = await response.json();
-      setRawData(data);
+      // 1. Google Analytics Realtime
+      const analyticsRes = await fetch("/api/analytics/realtime");
+      const analytics = await analyticsRes.json();
 
-      const totalRev =
-        data.payments?.reduce(
-          (acc, curr) => acc + parseCurrencyAmount(curr.amount),
-          0,
-        ) || 0;
-      const totalLeads =
-        (data.community?.length || 0) + (data.leadMagnets?.length || 0);
+      // 2. Facebook Group Stats
+      const fbRes = await fetch("/api/facebook/group");
+      const fb = await fbRes.json();
 
+      // 3. Firestore Asset Value (example doc)
+      const assetRes = await fetch("/api/firestore/get?collection=assets&id=dashboard");
+      const assetDoc = await assetRes.json();
+
+      // 4. Update dashboard stats
       setStats({
-        assetValue: `$${totalRev.toLocaleString()}`,
-        activeLeads: totalLeads.toLocaleString(),
+        assetValue: assetDoc?.data?.value || "$0",
+        activeLeads: fb?.member_count?.toLocaleString() || "0",
         siteHealth: CONFIG.metrics.systemHealth,
-        avgSentiment:
-          data.reviews?.length > 0
-            ? CONFIG.metrics.sentimentIndex
-            : dashboardConfig.communityFallbackStatus,
+        avgSentiment: analytics?.rows?.[0]?.metricValues?.[0]?.value || "0",
       });
 
       setLastSync(new Date().toLocaleTimeString());
     } catch (error) {
-      console.error(dashboardConfig.syncConsoleLabel, error);
-      setSyncError(dashboardConfig.syncError);
+      console.error("SYNC ERROR:", error);
+      setSyncError("Failed to sync live data");
     }
+
     setIsSyncing(false);
   };
 
