@@ -8,12 +8,12 @@ export function getGoogleAuth(scopes: string[]) {
 
   const serviceAccount = JSON.parse(serviceAccountJson);
 
-  const jwt = new google.auth.JWT(
-    serviceAccount.client_email,
-    undefined,
-    serviceAccount.private_key,
+  // NEW Google API JWT constructor (v140+)
+  const jwt = new google.auth.JWT({
+    email: serviceAccount.client_email,
+    key: serviceAccount.private_key,
     scopes
-  );
+  });
 
   return jwt;
 }
