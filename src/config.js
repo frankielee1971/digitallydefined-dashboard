@@ -205,12 +205,10 @@ export const CONFIG = {
     email: "francesca@digitallydefined.online",    // Change the primary website URL.
     website: "https://digitallydefined.online",
     // Change the Gumroad product or storefront URL.
-    gumroadUrl: "https://digitallydefined.gumroad.com",
+    gumroadUrl: "https://francescaonline.gumroad.com/l/digital-business-os",
   },
 
     owner: {
-    // Change the owner/creator name.
-    name: "Francesca LaVigne",
     // Change the owner title and credentials.
     title: "Certified Digital Marketer & Keyword Researcher",
     // Change the owner email.
