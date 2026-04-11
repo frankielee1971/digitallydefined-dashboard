@@ -1,28 +1,33 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { google } from 'googleapis';
-import { getGoogleAuth } from '../_utils/googleAuth';
+import { getGoogleAuth } from '../_utils/googleAuth.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    const { spreadsheetId, range } = req.query;
+    const { sheetId, range } = req.query;
 
-    if (!spreadsheetId || !range || typeof spreadsheetId !== 'string' || typeof range !== 'string') {
-      return res.status(400).json({ error: 'Missing spreadsheetId or range' });
+    if (!sheetId || !range) {
+      return res.status(400).json({ error: 'Missing sheetId or range' });
     }
 
-    const scopes = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
-    const auth = getGoogleAuth(scopes);
+    // Authenticate using service account
+    const auth = getGoogleAuth([
+      'https://www.googleapis.com/auth/spreadsheets.readonly'
+    ]);
 
     const sheets = google.sheets({ version: 'v4', auth });
 
+    // Fetch data from Google Sheets
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range,
+      spreadsheetId: String(sheetId),
+      range: String(range)
     });
 
-    return res.status(200).json(response.data);
+    return res.status(200).json({
+      values: response.data.values || []
+    });
   } catch (error: any) {
-    console.error('Sheets read error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error('Sheets API error:', error);
+    return res.status(500).json({ error: error.message || 'Internal server error' });
   }
 }
