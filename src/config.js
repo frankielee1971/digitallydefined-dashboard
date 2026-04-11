@@ -1,4 +1,4 @@
-export const CONFIG = {
+const CONFIG = {
   brand: {
     // Set a logo filename from /public to render an image logo. Leave empty to use logoText.
     logoImage: "",
