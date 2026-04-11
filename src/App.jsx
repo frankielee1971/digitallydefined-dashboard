@@ -7,10 +7,20 @@ import ComingSoon from "./pages/ComingSoon";
 
 const App = () => (
   <Routes>
-    <Route path={CONFIG.routes.landing} element={<LandingPage />} />
-    <Route path={CONFIG.routes.dashboard} element={<DashboardPage />} />
+    {/* Homepage now shows ComingSoon */}
+    <Route path="/" element={<ComingSoon />} />
+
+    {/* Keep this so you can still access the old landing page manually */}
+    <Route path="/landing" element={<LandingPage />} />
+
+    {/* Coming Soon page still works at /coming-soon */}
     <Route path="/coming-soon" element={<ComingSoon />} />
-    <Route path="*" element={<Navigate to={CONFIG.routes.landing} replace />} />
+
+    {/* Dashboard stays the same */}
+    <Route path={CONFIG.routes.dashboard} element={<DashboardPage />} />
+
+    {/* Wildcard fallback */}
+    <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 );
 
