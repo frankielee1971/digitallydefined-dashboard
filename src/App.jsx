@@ -3,7 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import CONFIG from "./config";
 import DashboardPage from "./pages/DashboardPage";
 import LandingPage from "./pages/LandingPage";
-import ComingSoon from "./pages/comingsoon";
+import ComingSoon from "./pages/ComingSoon";
 
 const App = () => (
   <Routes>
