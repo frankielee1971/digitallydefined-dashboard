@@ -1,4 +1,4 @@
- import { useState } from "react";
+import { useState } from "react";
 
 export default function ComingSoon() {
   const [form, setForm] = useState({
@@ -24,7 +24,10 @@ export default function ComingSoon() {
       const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form)
+        body: JSON.stringify({
+          prospect_name: form.prospect_name,
+          email: form.email
+        })
       });
 
       const data = await res.json();
@@ -127,7 +130,7 @@ export default function ComingSoon() {
           name="email"
           placeholder="Your email"
           value={form.email}
-         onChange={handleChange}
+          onChange={handleChange}
           required
           style={{
             padding: "14px 20px",
@@ -138,24 +141,38 @@ export default function ComingSoon() {
           }}
         />
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={{
-                    marginTop: "16px",
-                    padding: "14px 32px",
-                    fontSize: "16px",
-                    fontWeight: 600,
-                    backgroundColor: "#000",
-                    color: "#FFF",
-                    border: "none",
-                    cursor: loading ? "not-allowed" : "pointer",
-                    opacity: loading ? 0.6 : 1
-                  }}
-                >
-                  {loading ? "Submitting..." : "Join Waitlist"}
-                </button>
-              </form>
-            </main>
-          );
-        }
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            marginTop: "16px",
+            padding: "14px 32px",
+            fontSize: "16px",
+            fontWeight: 600,
+            backgroundColor: "#000",
+            color: "#FFF",
+            border: "none",
+            cursor: loading ? "not-allowed" : "pointer",
+            opacity: loading ? 0.6 : 1
+          }}
+        >
+          {loading ? "Submitting..." : "Join Waitlist"}
+        </button>
+      </form>
+
+      {status && (
+        <p
+          style={{
+            marginTop: "16px",
+            fontFamily: "Inter, sans-serif",
+            fontSize: "16px",
+            color: "#000"
+          }}
+        >
+          {status}
+        </p>
+      )}
+    </main>
+  );
+}
+ 
