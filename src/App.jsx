@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import CONFIG from "./config";
 import DashboardPage from "./pages/DashboardPage";
-import FreeRoiCalculator from "./FreeRoiCalculator";
+import FreeRoiCalculator from "../FreeRoiCalculator";
 
 const App = () => (
   <Routes>
