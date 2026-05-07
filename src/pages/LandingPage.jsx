@@ -19,8 +19,53 @@ const LandingPage = () => {
   const { colors, contact, landing, routes, seo } = CONFIG;
   const fullCalculatorUrl = contact.fullCalculatorUrl || contact.gumroadUrl;
 
+  const facelessAssets = [
+    "SEO Content",
+    "Review Authority",
+    "Digital Templates",
+    "Automated Funnels",
+    "AI Content Engines",
+    "Email Courses",
+    "Notion Systems",
+    "PDF Playbooks",
+    "Reputation Signals",
+    "Digital Calculators",
+  ];
+
+  const realEstateSteps = [
+    {
+      number: "01",
+      title: "Claim It",
+      text: "Identify every digital property you already own or have a right to: Google Business, social profiles, content, reviews, listings, and search results.",
+    },
+    {
+      number: "02",
+      title: "Optimize It",
+      text: "Keyword-optimize every digital property. Turn low-performing assets into lead generators and fix visibility gaps that cost money.",
+    },
+    {
+      number: "03",
+      title: "Expand It",
+      text: "Add new digital properties systematically. Build a portfolio of income-producing assets that grows in value every month.",
+    },
+    {
+      number: "04",
+      title: "Monetize It",
+      text: "Convert digital real estate into recurring revenue through affiliate links, digital products, service packages, and passive income streams.",
+    },
+  ];
+
+  const fullCalculatorFeatures = [
+    "Revenue projections by channel",
+    "Lead flow modeling and conversion rates",
+    "Digital asset valuation score",
+    "Competitor benchmarks in your niche",
+    "Visibility scoring and gap analysis",
+    "Opportunity forecasting for 30, 60, and 90 days",
+  ];
+
   useEffect(() => {
-    document.title = "DigitallyDefined | Free 10x ROI Calculator";
+    document.title = "DigitallyDefined | Build Your Digital Empire";
     let metaDescription = document.querySelector('meta[name="description"]');
 
     if (!metaDescription) {
@@ -31,7 +76,7 @@ const LandingPage = () => {
 
     metaDescription.setAttribute(
       "content",
-      "Use the free DigitallyDefined 10x ROI Calculator to estimate how much revenue your digital property could be leaving on the table.",
+      "For Gen X women reinventing themselves digitally. Build faceless digital assets, grow passive income, and multiply your digital reputation 10x.",
     );
   }, [seo.description, seo.title]);
 
@@ -130,7 +175,7 @@ const LandingPage = () => {
           <div className="dd-hero-grid" style={container}>
             <div style={{ display: "grid", gap: "24px" }}>
               <p style={{ ...brutalEyebrow, color: colors.textMuted }}>
-                Digital real estate yield engine / built for Gen X women
+                For Gen X women reinventing themselves, digitally
               </p>
               <div style={{ minWidth: 0 }}>
                 <h1
@@ -143,8 +188,8 @@ const LandingPage = () => {
                     color: colors.text,
                   }}
                 >
-                  <span>Digitally</span>
-                  <span style={{ color: colors.accent }}>Defined</span>
+                  <span>Define Your&nbsp;</span>
+                  <span style={{ color: colors.accent }}>Digital Power.</span>
                 </h1>
                 <p
                   style={{
@@ -155,8 +200,10 @@ const LandingPage = () => {
                     color: colors.textMuted,
                   }}
                 >
-                  See what your website, reviews, and local visibility could be worth
-                  before you buy another ad, rebuild another funnel, or keep guessing.
+                  Your digital reputation is your most valuable asset. This is a
+                  clear, confident system for Gen X women who want to build digital
+                  real estate, grow faceless income streams, and unlock 10x ROI
+                  from their online presence.
                 </p>
               </div>
               <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
@@ -172,6 +219,18 @@ const LandingPage = () => {
                   Join the community <Users size={16} />
                 </a>
               </div>
+              <p
+                style={{
+                  margin: 0,
+                  color: colors.textMuted,
+                  fontSize: "0.82rem",
+                  fontWeight: 900,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                }}
+              >
+                You're not starting from scratch. You're starting from experience.
+              </p>
               <div className="dd-proof-grid">
                 {[
                   "Quick revenue signal",
@@ -225,7 +284,7 @@ const LandingPage = () => {
               />
               <div style={{ position: "relative" }}>
                 <p style={{ ...brutalEyebrow, color: colors.primary }}>
-                  Reputation + revenue
+                  Reputation + digital real estate
                 </p>
                 <h2
                   style={{
@@ -249,8 +308,9 @@ const LandingPage = () => {
                   maxWidth: "520px",
                 }}
               >
-                The free calculator is the front door. The paid full 10x ROI
-                calculator lives on Gumroad with the deeper validation levers.
+                Every review, listing, article, search result, and piece of
+                content is a digital property. Most Gen X women already own more
+                than they realize.
               </p>
             </div>
           </div>
@@ -260,7 +320,7 @@ const LandingPage = () => {
           <div style={{ ...container, display: "grid", gap: "24px" }}>
             <div style={{ maxWidth: "780px" }}>
               <p style={{ ...brutalEyebrow, color: colors.warning }}>
-                Start with the free ROI snapshot
+                Free tool
               </p>
               <h2
                 style={{
@@ -270,8 +330,11 @@ const LandingPage = () => {
                   lineHeight: 1.05,
                 }}
               >
-                What is your digital property already capable of producing?
+                Your digital presence is already generating value.
               </h2>
+              <p style={{ margin: "10px 0 0", color: colors.textMuted }}>
+                This calculator shows you how much, instantly.
+              </p>
             </div>
             <RoiCalculator
               onFullCalculatorClick={() => {
@@ -312,6 +375,258 @@ const LandingPage = () => {
           </div>
         </section>
 
+        <section style={section}>
+          <div
+            style={{
+              ...container,
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: "28px",
+              alignItems: "start",
+            }}
+          >
+            <div style={{ display: "grid", gap: "18px" }}>
+              <p style={{ ...brutalEyebrow, color: colors.primary }}>
+                Faceless digital marketing
+              </p>
+              <h2
+                style={{
+                  ...brutalHeading,
+                  margin: 0,
+                  fontSize: "clamp(1.9rem, 4vw, 3rem)",
+                  lineHeight: 1.05,
+                }}
+              >
+                You don't need to be an influencer to win online.
+              </h2>
+              <p style={{ margin: 0, color: colors.textMuted, lineHeight: 1.65 }}>
+                DigitallyDefined teaches you how to build faceless digital assets
+                that work even when you're offline. No camera. No performance. No
+                hustle.
+              </p>
+              <p style={{ margin: 0, color: colors.textMuted, lineHeight: 1.65 }}>
+                Perfect for Gen X women who want privacy, freedom, and income that
+                compounds over time.
+              </p>
+              <div style={{ display: "grid", gap: "10px" }}>
+                {[
+                  "Privacy: build without revealing your identity",
+                  "Freedom: assets that run on autopilot",
+                  "Passive visibility: found without being on 24/7",
+                  "Automated lead flow: systems that work while you sleep",
+                ].map((item) => (
+                  <div key={item} style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                    <CheckCircle2 size={18} color={colors.primary} style={{ marginTop: "3px", flexShrink: 0 }} />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+              <a
+                href={contact.facebookCommunityUrl}
+                target="_blank"
+                rel="noreferrer"
+                style={{ ...brutalButtonPrimary, width: "fit-content" }}
+              >
+                Learn faceless digital marketing <Users size={16} />
+              </a>
+            </div>
+
+            <div style={{ ...brutalCard, padding: "28px" }}>
+              <p style={{ ...brutalEyebrow, color: colors.primary }}>
+                Faceless asset types
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "10px",
+                  marginTop: "20px",
+                }}
+              >
+                {facelessAssets.map((asset, index) => (
+                  <span
+                    key={asset}
+                    style={{
+                      border: brutalBorder,
+                      padding: "8px 12px",
+                      backgroundColor:
+                        index % 4 === 0
+                          ? colors.primary
+                          : index % 4 === 2
+                            ? colors.accent
+                            : colors.surface,
+                      color: index % 4 === 2 ? colors.surface : colors.text,
+                      fontSize: "0.72rem",
+                      fontWeight: 900,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {asset}
+                  </span>
+                ))}
+              </div>
+              <p
+                style={{
+                  borderTop: brutalBorder,
+                  margin: "24px 0 0",
+                  paddingTop: "20px",
+                  color: colors.textMuted,
+                }}
+              >
+                Every one of these earns without your face, your voice, or your
+                constant attention.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section style={{ ...section, backgroundColor: colors.dark, color: colors.bone }}>
+          <div style={{ ...container, display: "grid", gap: "28px" }}>
+            <div>
+              <p style={{ ...brutalEyebrow, color: colors.warning }}>
+                Digital real estate
+              </p>
+              <h2
+                style={{
+                  ...brutalHeading,
+                  margin: "10px 0 0",
+                  color: colors.bone,
+                  fontSize: "clamp(1.9rem, 4vw, 3rem)",
+                  lineHeight: 1.05,
+                }}
+              >
+                Your digital footprint is real estate. Let's increase its value.
+              </h2>
+              <p style={{ margin: "14px 0 0", maxWidth: "760px", color: colors.boneMuted }}>
+                Every review, listing, article, search result, and piece of content
+                is a digital property. Most Gen X women already own more than they
+                realize.
+              </p>
+            </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                gap: "0",
+                border: `1px solid ${colors.whiteBorderSoft}`,
+              }}
+            >
+              {realEstateSteps.map((step) => (
+                <article
+                  key={step.number}
+                  style={{
+                    padding: "24px",
+                    border: `1px solid ${colors.whiteBorderSoft}`,
+                    backgroundColor: "rgba(255,255,255,0.03)",
+                  }}
+                >
+                  <div
+                    style={{
+                      color: colors.primary,
+                      fontSize: "2.4rem",
+                      fontWeight: 900,
+                      lineHeight: 1,
+                      opacity: 0.55,
+                      marginBottom: "16px",
+                    }}
+                  >
+                    {step.number}
+                  </div>
+                  <h3 style={{ margin: "0 0 10px", color: colors.bone }}>
+                    {step.title}
+                  </h3>
+                  <p style={{ margin: 0, color: colors.boneMuted, lineHeight: 1.6 }}>
+                    {step.text}
+                  </p>
+                </article>
+              ))}
+            </div>
+            <a
+              href={fullCalculatorUrl}
+              target="_blank"
+              rel="noreferrer"
+              style={{ ...brutalButtonSecondary, width: "fit-content" }}
+            >
+              See your digital real estate map <ArrowRight size={16} />
+            </a>
+          </div>
+        </section>
+
+        <section id="community" style={section}>
+          <div
+            style={{
+              ...container,
+              ...brutalCard,
+              backgroundColor: colors.dark,
+              color: colors.bone,
+              padding: "clamp(32px, 6vw, 64px)",
+              textAlign: "center",
+              display: "grid",
+              justifyItems: "center",
+              gap: "22px",
+            }}
+          >
+            <p style={{ ...brutalEyebrow, color: colors.primary }}>
+              DigitallyDefined community
+            </p>
+            <h2
+              style={{
+                ...brutalHeading,
+                margin: 0,
+                color: colors.bone,
+                fontSize: "clamp(1.9rem, 4vw, 3rem)",
+                lineHeight: 1.05,
+              }}
+            >
+              Clarity, confidence, and control. Together.
+            </h2>
+            <p style={{ margin: 0, maxWidth: "760px", color: colors.boneMuted }}>
+              Inside, you'll find Gen X women building businesses, pivoting
+              careers, launching new ideas, and reclaiming their digital identity
+              without the noise of traditional social media.
+            </p>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+                gap: "18px",
+                width: "100%",
+                maxWidth: "680px",
+              }}
+            >
+              {[
+                { value: "100%", label: "Faceless friendly" },
+                { value: "Gen X", label: "Women focused" },
+                { value: "Free", label: "To join" },
+              ].map((stat) => (
+                <div key={stat.label}>
+                  <strong
+                    style={{
+                      display: "block",
+                      color: colors.primary,
+                      fontSize: "clamp(1.6rem, 3vw, 2.4rem)",
+                    }}
+                  >
+                    {stat.value}
+                  </strong>
+                  <span style={{ ...brutalEyebrow, color: colors.boneFaint, fontSize: "0.62rem" }}>
+                    {stat.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <a
+              href={contact.facebookCommunityUrl}
+              target="_blank"
+              rel="noreferrer"
+              style={brutalButtonPrimary}
+            >
+              Join the community <Users size={16} />
+            </a>
+          </div>
+        </section>
+
         <section style={{ ...section, backgroundColor: colors.dark, color: colors.bone }}>
           <div style={{ ...container, display: "grid", gap: "20px" }}>
             <p style={{ ...brutalEyebrow, color: colors.primary }}>Next step</p>
@@ -329,9 +644,17 @@ const LandingPage = () => {
             <p style={{ margin: 0, maxWidth: "720px", color: colors.boneMuted }}>
               Buy the paid calculator on Gumroad when you want a clearer business
               case for paid traffic, reputation management, or a digital real
-              estate upgrade. Join the Facebook community for prompts, visibility
-              strategy, and practical digital growth support.
+              estate upgrade. The full version shows your revenue projections,
+              visibility gaps, digital asset value, and competitor benchmarks.
             </p>
+            <div style={{ display: "grid", gap: "10px", maxWidth: "760px" }}>
+              {fullCalculatorFeatures.map((feature) => (
+                <div key={feature} style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                  <CheckCircle2 size={18} color={colors.primary} style={{ marginTop: "3px", flexShrink: 0 }} />
+                  <span>{feature}</span>
+                </div>
+              ))}
+            </div>
             <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
               <a
                 href={fullCalculatorUrl}
