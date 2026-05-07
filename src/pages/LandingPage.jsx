@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { ArrowRight, CheckCircle2, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowRight, CheckCircle2, Sparkles, TrendingUp, Users } from "lucide-react";
 import CONFIG from "../config";
 import Footer from "../components/Footer";
 import Logo from "../components/Logo";
@@ -16,9 +15,9 @@ import {
 } from "../theme";
 
 const LandingPage = () => {
-  const navigate = useNavigate();
   const year = new Date().getFullYear();
-  const { brand, colors, contact, landing, routes, seo } = CONFIG;
+  const { colors, contact, landing, routes, seo } = CONFIG;
+  const fullCalculatorUrl = contact.fullCalculatorUrl || contact.gumroadUrl;
 
   useEffect(() => {
     document.title = "DigitallyDefined | Free 10x ROI Calculator";
@@ -56,9 +55,16 @@ const LandingPage = () => {
       <style>{`
         .dd-hero-grid {
           display: grid;
-          grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+          grid-template-columns: minmax(0, 1fr) minmax(320px, 0.82fr);
           gap: clamp(28px, 5vw, 48px);
           align-items: center;
+        }
+
+        .dd-brand-hero {
+          display: flex;
+          flex-wrap: wrap;
+          column-gap: 0;
+          row-gap: 0;
         }
 
         .dd-proof-grid {
@@ -108,13 +114,14 @@ const LandingPage = () => {
           }}
         >
           <Logo as="div" style={{ fontSize: "clamp(1.1rem, 2vw, 1.45rem)" }} />
-          <button
-            type="button"
-            onClick={() => navigate(routes.fullCalculator)}
+          <a
+            href={fullCalculatorUrl}
+            target="_blank"
+            rel="noreferrer"
             style={brutalButtonSecondary}
           >
             Full calculator <ArrowRight size={16} />
-          </button>
+          </a>
         </div>
       </header>
 
@@ -125,17 +132,18 @@ const LandingPage = () => {
               <p style={{ ...brutalEyebrow, color: colors.textMuted }}>
                 Digital real estate yield engine / built for Gen X women
               </p>
-              <div>
+              <div style={{ minWidth: 0 }}>
                 <h1
+                  className="dd-brand-hero"
                   style={{
                     ...brutalHeading,
                     margin: 0,
-                    fontSize: "clamp(3.25rem, 8vw, 6.75rem)",
-                    lineHeight: 0.9,
+                    fontSize: "clamp(2.6rem, 5vw, 4rem)",
+                    lineHeight: 0.98,
                     color: colors.text,
                   }}
                 >
-                  Digitally
+                  <span>Digitally</span>
                   <span style={{ color: colors.accent }}>Defined</span>
                 </h1>
                 <p
@@ -155,13 +163,14 @@ const LandingPage = () => {
                 <a href="#free-calculator" style={brutalButtonPrimary}>
                   Run the free calculator <TrendingUp size={16} />
                 </a>
-                <button
-                  type="button"
-                  onClick={() => navigate(routes.dashboard)}
+                <a
+                  href={contact.facebookCommunityUrl}
+                  target="_blank"
+                  rel="noreferrer"
                   style={brutalButtonSecondary}
                 >
-                  View dashboard <ArrowRight size={16} />
-                </button>
+                  Join the community <Users size={16} />
+                </a>
               </div>
               <div className="dd-proof-grid">
                 {[
@@ -195,7 +204,7 @@ const LandingPage = () => {
                 backgroundColor: colors.dark,
                 color: colors.bone,
                 padding: "clamp(24px, 4vw, 38px)",
-                minHeight: "430px",
+                minHeight: "340px",
                 display: "grid",
                 alignContent: "space-between",
                 gap: "28px",
@@ -223,8 +232,8 @@ const LandingPage = () => {
                     ...brutalHeading,
                     margin: "14px 0 0",
                     color: colors.bone,
-                    fontSize: "clamp(2.2rem, 5vw, 4.8rem)",
-                    lineHeight: 0.94,
+                    fontSize: "clamp(1.9rem, 3.8vw, 3.1rem)",
+                    lineHeight: 1.02,
                   }}
                 >
                   Turn trust into a measurable asset.
@@ -240,9 +249,8 @@ const LandingPage = () => {
                   maxWidth: "520px",
                 }}
               >
-                The free calculator is the front door. The full 10x ROI calculator
-                inside the site adds the deeper levers: retention, reputation lift,
-                annualized upside, and campaign-readiness.
+                The free calculator is the front door. The paid full 10x ROI
+                calculator lives on Gumroad with the deeper validation levers.
               </p>
             </div>
           </div>
@@ -258,14 +266,18 @@ const LandingPage = () => {
                 style={{
                   ...brutalHeading,
                   margin: "10px 0 0",
-                  fontSize: "clamp(2rem, 5vw, 4rem)",
-                  lineHeight: 0.98,
+                  fontSize: "clamp(1.9rem, 4vw, 3rem)",
+                  lineHeight: 1.05,
                 }}
               >
                 What is your digital property already capable of producing?
               </h2>
             </div>
-            <RoiCalculator onFullCalculatorClick={() => navigate(routes.fullCalculator)} />
+            <RoiCalculator
+              onFullCalculatorClick={() => {
+                window.open(fullCalculatorUrl, "_blank", "noopener,noreferrer");
+              }}
+            />
           </div>
         </section>
 
@@ -308,24 +320,35 @@ const LandingPage = () => {
                 ...brutalHeading,
                 margin: 0,
                 color: colors.bone,
-                fontSize: "clamp(2rem, 5vw, 4rem)",
-                lineHeight: 0.98,
+                fontSize: "clamp(1.9rem, 4vw, 3rem)",
+                lineHeight: 1.05,
               }}
             >
               Ready for the full 10x ROI calculator?
             </h2>
             <p style={{ margin: 0, maxWidth: "720px", color: colors.boneMuted }}>
-              Use the deeper version when you want a clearer business case for paid
-              traffic, reputation management, or a digital real estate upgrade.
+              Buy the paid calculator on Gumroad when you want a clearer business
+              case for paid traffic, reputation management, or a digital real
+              estate upgrade. Join the Facebook community for prompts, visibility
+              strategy, and practical digital growth support.
             </p>
-            <div>
-              <button
-                type="button"
-                onClick={() => navigate(routes.fullCalculator)}
+            <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
+              <a
+                href={fullCalculatorUrl}
+                target="_blank"
+                rel="noreferrer"
                 style={brutalButtonPrimary}
               >
-                Open full calculator <ArrowRight size={16} />
-              </button>
+                Buy on Gumroad <ArrowRight size={16} />
+              </a>
+              <a
+                href={contact.facebookCommunityUrl}
+                target="_blank"
+                rel="noreferrer"
+                style={brutalButtonSecondary}
+              >
+                Join Facebook community <Users size={16} />
+              </a>
             </div>
           </div>
         </section>
@@ -335,11 +358,11 @@ const LandingPage = () => {
         colors={colors}
         containerStyle={container}
         footerStyle={section}
-        navigate={navigate}
         routes={routes}
         landing={landing}
         contact={contact}
         year={year}
+        showDashboardLink={false}
       />
     </div>
   );

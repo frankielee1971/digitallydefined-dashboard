@@ -34,9 +34,9 @@ export const brutalCard = {
 export const brutalHeading = {
   fontFamily: theme.fonts.heading,
   fontWeight: theme.geometry ? tokens.typography.headings.weight : 900,
-  fontStyle: tokens.typography.headings.style,
+  fontStyle: "normal",
   textTransform: tokens.typography.headings.transform,
-  letterSpacing: tokens.typography.headings.letterSpacing,
+  letterSpacing: "0",
 };
 
 export const brutalEyebrow = {

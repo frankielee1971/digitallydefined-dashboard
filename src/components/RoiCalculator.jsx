@@ -300,11 +300,12 @@ const RoiCalculator = ({ mode = "free", onFullCalculatorClick }) => {
           }}
         >
           <p style={{ margin: 0, color: colors.textMuted, maxWidth: "620px" }}>
-            This free version gives the quick signal. The full calculator adds retention,
-            reputation lift, annualized upside, and the numbers you need for a serious decision.
+            This free version gives the quick signal. The paid full calculator on
+            Gumroad adds retention, reputation lift, annualized upside, and the
+            numbers you need for a serious decision.
           </p>
           <button type="button" onClick={onFullCalculatorClick} style={brutalButtonPrimary}>
-            Unlock the full calculator <ArrowRight size={16} />
+            Buy the full calculator <ArrowRight size={16} />
           </button>
         </div>
       )}

@@ -12,6 +12,7 @@ const Footer = ({
   landing,
   contact,
   year,
+  showDashboardLink = true,
 }) => (
   <footer style={footerStyle}>
     <div style={{ ...containerStyle, display: "grid", gap: theme.layout.spacing }}>
@@ -34,22 +35,24 @@ const Footer = ({
           fontWeight: 800,
         }}
       >
-        <button
-          type="button"
-          onClick={() => navigate(routes.dashboard)}
-          style={{
-            background: "none",
-            border: "none",
-            padding: 0,
-            cursor: "pointer",
-            color: colors.text,
-            textTransform: "inherit",
-            letterSpacing: "inherit",
-            font: "inherit",
-          }}
-        >
-          {landing.footerDashboard}
-        </button>
+        {showDashboardLink && (
+          <button
+            type="button"
+            onClick={() => navigate(routes.dashboard)}
+            style={{
+              background: "none",
+              border: "none",
+              padding: 0,
+              cursor: "pointer",
+              color: colors.text,
+              textTransform: "inherit",
+              letterSpacing: "inherit",
+              font: "inherit",
+            }}
+          >
+            {landing.footerDashboard}
+          </button>
+        )}
         <a href={`#${landing.featuresAnchor}`} style={{ color: colors.text, textDecoration: "none" }}>
           {landing.footerFeatures}
         </a>

@@ -37,9 +37,9 @@ const CONFIG = {
         headings: {
           font: "Inter",
           weight: 900,
-          style: "italic",
+          style: "normal",
           transform: "uppercase",
-          letterSpacing: "-0.05em",
+          letterSpacing: "0",
         },
         body: {
           font: "DM Sans",
@@ -206,6 +206,10 @@ const CONFIG = {
     website: "https://digitallydefined.online",
     // Change the Gumroad product or storefront URL.
     gumroadUrl: "https://francescaonline.gumroad.com/l/digital-business-os",
+    // Change the paid full 10x ROI calculator purchase URL.
+    fullCalculatorUrl: "https://francescaonline.gumroad.com/l/digital-business-os",
+    // Change the public Facebook community URL.
+    facebookCommunityUrl: "https://facebook.com/groups/digitallydefined",
   },
 
     owner: {
@@ -226,8 +230,6 @@ const CONFIG = {
   routes: {
     // Change the public landing page route.
     landing: "/",
-    // Change the public full ROI calculator route.
-    fullCalculator: "/tools/roi-calculator",
     // Change the private dashboard route.
     dashboard: "/dashboard",
   },
@@ -426,7 +428,7 @@ const CONFIG = {
       },
     ],
     // Change the features section anchor id.
-    featuresAnchor: "features",
+    featuresAnchor: "free-calculator",
     // Change the features eyebrow label.
     featuresEyebrow: "THE SOLUTION",
     // Change the first features heading line.
@@ -624,7 +626,7 @@ const CONFIG = {
     // Change the footer dashboard link label.
     footerDashboard: "Dashboard",
     // Change the footer features link label.
-    footerFeatures: "Features",
+    footerFeatures: "Free Calculator",
     // Change the footer contact link label.
     footerContact: "Contact",
     // Change the copyright suffix text.
