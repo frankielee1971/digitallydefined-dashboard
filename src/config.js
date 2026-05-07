@@ -209,7 +209,7 @@ const CONFIG = {
     // Change the paid full 10x ROI calculator purchase URL.
     fullCalculatorUrl: "https://francescaonline.gumroad.com/l/digital-business-os",
     // Change the public Facebook community URL.
-    facebookCommunityUrl: "https://facebook.com/groups/digitallydefined",
+    facebookCommunityUrl: "https://www.facebook.com/groups/digitallydefind",
   },
 
     owner: {
