@@ -2,16 +2,15 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import CONFIG from "./config";
 import DashboardPage from "./pages/DashboardPage";
-import LandingPage from "./pages/LandingPage";
+import FreeRoiCalculator from "./FreeRoiCalculator";
 
 const App = () => (
   <Routes>
-    <Route path="/" element={<LandingPage />} />
-    <Route path="/landing" element={<LandingPage />} />
+    <Route path="/" element={<FreeRoiCalculator />} />
+    <Route path="/landing" element={<FreeRoiCalculator />} />
     <Route path={CONFIG.routes.dashboard} element={<DashboardPage />} />
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 );
 
 export default App;
-
