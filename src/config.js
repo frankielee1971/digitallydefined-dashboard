@@ -226,6 +226,8 @@ const CONFIG = {
   routes: {
     // Change the public landing page route.
     landing: "/",
+    // Change the public full ROI calculator route.
+    fullCalculator: "/tools/roi-calculator",
     // Change the private dashboard route.
     dashboard: "/dashboard",
   },
