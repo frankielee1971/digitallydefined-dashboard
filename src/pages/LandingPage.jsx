@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { ArrowRight, CheckCircle2, Sparkles, TrendingUp, Users } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { ArrowRight, CheckCircle2, Sparkles, TrendingUp, Users, AlertCircle, X } from "lucide-react";
 import CONFIG from "../config";
 import Footer from "../components/Footer";
 import Logo from "../components/Logo";
@@ -15,6 +15,7 @@ import {
 } from "../theme";
 
 const LandingPage = () => {
+  const [showUnderConstruction, setShowUnderConstruction] = useState(true);
   const year = new Date().getFullYear();
   const { colors, contact, landing, routes, seo } = CONFIG;
   const fullCalculatorUrl = contact.fullCalculatorUrl || contact.gumroadUrl;
@@ -138,14 +139,66 @@ const LandingPage = () => {
         }
       `}</style>
 
+      {showUnderConstruction && (
+        <div
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 25,
+            backgroundColor: colors.warning,
+            color: colors.surface,
+            padding: "12px 16px",
+            borderBottom: `2px solid ${colors.text}`,
+            transition: "all 0.3s ease",
+          }}
+        >
+          <div
+            style={{
+              ...container,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "16px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <AlertCircle size={20} strokeWidth={2.5} />
+              <span style={{ fontWeight: 700, fontSize: "0.95rem" }}>
+                🚧 Under Construction - New features coming soon!
+              </span>
+            </div>
+            <button
+              onClick={() => setShowUnderConstruction(false)}
+              aria-label="Dismiss under construction banner"
+              style={{
+                background: "none",
+                border: "none",
+                color: colors.surface,
+                cursor: "pointer",
+                padding: "4px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "opacity 0.2s",
+              }}
+              onMouseEnter={(e) => (e.target.style.opacity = "0.7")}
+              onMouseLeave={(e) => (e.target.style.opacity = "1")}
+            >
+              <X size={20} strokeWidth={2.5} />
+            </button>
+          </div>
+        </div>
+      )}
+
       <header
         style={{
           position: "sticky",
-          top: 0,
+          top: showUnderConstruction ? "46px" : 0,
           zIndex: 20,
           borderBottom: brutalBorder,
           backgroundColor: colors.surface,
           padding: `18px ${theme.layout.spacing}`,
+          transition: "top 0.3s ease",
         }}
       >
         <div
