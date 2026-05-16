@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dashboard": "vite --open /dashboard",
     "build": "vite build",
     "preview": "vite preview",
     "export:zip": "node scripts/export.js",

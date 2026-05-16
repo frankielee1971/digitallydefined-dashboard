@@ -9,6 +9,13 @@ const App = () => (
     <Route path="/" element={<LandingPage />} />
     <Route path="/landing" element={<LandingPage />} />
     <Route path={CONFIG.routes.dashboard} element={<DashboardPage />} />
+    {CONFIG.routes.dashboardAliases.map((route) => (
+      <Route
+        key={route}
+        path={route}
+        element={<Navigate to={CONFIG.routes.dashboard} replace />}
+      />
+    ))}
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 );

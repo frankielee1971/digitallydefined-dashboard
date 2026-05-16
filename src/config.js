@@ -232,6 +232,8 @@ const CONFIG = {
     landing: "/",
     // Change the private dashboard route.
     dashboard: "/dashboard",
+    // Change or add friendly internal shortcuts that should open the dashboard.
+    dashboardAliases: ["/command", "/internal", "/app"],
   },
   seo: {
     // Change the browser title and SEO title.
