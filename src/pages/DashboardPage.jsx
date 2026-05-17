@@ -91,33 +91,73 @@ const DashboardPage = () => {
     setSyncError("");
 
     try {
-      // 1. Google Analytics Realtime
-      const analyticsRes = await fetch("/api/analytics/realtime");
-      const analytics = await analyticsRes.json();
+      // 1. Google Sheets Master Vault
+      const sheetsRes = await fetch(googleSheetsDataUrl);
 
-      // 2. Facebook Group Stats
-      const fbRes = await fetch("/api/facebook/group");
-      const fb = await fbRes.json();
+      if (!sheetsRes.ok) {
+        throw new Error(`${dashboardConfig.syncFailurePrefix} ${sheetsRes.status}`);
+      }
 
-      // 3. Firestore Asset Value (example doc)
-      const assetRes = await fetch("/api/firestore/get?collection=assets&id=dashboard");
-      const assetDoc = await assetRes.json();
+      const sheetsData = await sheetsRes.json();
 
-      // 4. Update dashboard stats
+      // 2. Notion (if token available)
+      const notionToken = localStorage.getItem("notionToken");
+      const notionDbId = localStorage.getItem("notionDbId");
+      let notionData = null;
+
+      if (notionToken && notionDbId) {
+        const notionRes = await fetch(
+          `https://api.notion.com/v1/databases/${notionDbId}/query`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${notionToken}`,
+              "Notion-Version": "2022-06-28",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({}),
+          },
+        );
+
+        notionData = await notionRes.json();
+      }
+
+      setRawData((currentData) => ({
+        ...currentData,
+        reviews: sheetsData?.reviews || currentData.reviews,
+        competitors: sheetsData?.competitors || currentData.competitors,
+        community: sheetsData?.community || currentData.community,
+        leadMagnets: sheetsData?.leadMagnets || currentData.leadMagnets,
+        payments: sheetsData?.payments || currentData.payments,
+        campaigns: sheetsData?.campaigns || currentData.campaigns,
+        notion: notionData?.results || currentData.notion,
+      }));
+
       setStats({
-        assetValue: assetDoc?.data?.value || "$0",
-        activeLeads: fb?.member_count?.toLocaleString() || "0",
+        assetValue: sheetsData?.assetValue || CONFIG.metrics.assetValue,
+        activeLeads: sheetsData?.communityCount || CONFIG.metrics.communityCount,
         siteHealth: CONFIG.metrics.systemHealth,
-        avgSentiment: analytics?.rows?.[0]?.metricValues?.[0]?.value || "0",
+        avgSentiment: sheetsData?.sentiment || CONFIG.metrics.sentimentIndex,
       });
 
       setLastSync(new Date().toLocaleTimeString());
+
+      // 3. Ping Slack on successful sync
+      const slackUrl =
+        localStorage.getItem("slackWebhookUrl") || CONFIG.integrations.slackWebhookUrl;
+
+      if (slackUrl && !slackUrl.startsWith("YOUR_")) {
+        await fetch(slackUrl, {
+          method: "POST",
+          body: JSON.stringify({ text: "DigitallyDefined dashboard synced." }),
+        });
+      }
     } catch (error) {
       console.error("SYNC ERROR:", error);
       setSyncError("Failed to sync live data");
+    } finally {
+      setIsSyncing(false);
     }
-
-    setIsSyncing(false);
   };
 
   useEffect(() => {
