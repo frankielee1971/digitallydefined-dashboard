@@ -41,6 +41,21 @@ const tabIcons = {
 const formatConversion = (value) =>
   `${(Number(value || 0) * 100).toFixed(1)}%`;
 
+const formatAssetValue = (value) => {
+  if (typeof value === "number") return `$${value.toLocaleString()}`;
+  if (typeof value === "string" && value.trim() !== "") return value;
+  return CONFIG.metrics.assetValue;
+};
+
+const formatSiteHealth = (value) => {
+  if (typeof value === "number") {
+    if (value <= 1) return `${Math.round(value * 100)}%`;
+    return `${Math.round(value)}%`;
+  }
+  if (typeof value === "string" && value.trim() !== "") return value;
+  return CONFIG.metrics.systemHealth;
+};
+
 const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [showSettings, setShowSettings] = useState(false);
@@ -150,9 +165,10 @@ const DashboardPage = () => {
       }));
 
       setStats({
-        assetValue: sheetsData?.assetValue || CONFIG.metrics.assetValue,
-        activeLeads: sheetsData?.communityCount || CONFIG.metrics.communityCount,
-        siteHealth: sheetsData?.siteHealth || CONFIG.metrics.systemHealth,
+        assetValue: formatAssetValue(sheetsData?.assetValue),
+        activeLeads:
+          sheetsData?.communityCount || CONFIG.metrics.communityCount,
+        siteHealth: formatSiteHealth(sheetsData?.siteHealth),
         avgSentiment: sheetsData?.sentiment || CONFIG.metrics.sentimentIndex,
       });
 
@@ -170,7 +186,7 @@ const DashboardPage = () => {
       }
     } catch (error) {
       console.error("SYNC ERROR:", error);
-      setSyncError("Failed to sync live data");
+      setSyncError(dashboardConfig.syncError || "Failed to sync live data");
     } finally {
       setIsSyncing(false);
     }
