@@ -99,7 +99,13 @@ const DashboardPage = () => {
     setSyncError("");
 
     try {
-      const sheetsRes = await fetch(googleSheetsDataUrl);
+      const freshUrl = `${googleSheetsDataUrl}${
+        googleSheetsDataUrl.includes("?") ? "&" : "?"
+      }t=${Date.now()}`;
+
+      const sheetsRes = await fetch(freshUrl, {
+        cache: "no-store",
+      });
 
       if (!sheetsRes.ok) {
         throw new Error(`${dashboardConfig.syncFailurePrefix} ${sheetsRes.status}`);
