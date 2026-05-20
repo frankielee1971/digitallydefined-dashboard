@@ -38,7 +38,8 @@ const tabIcons = {
   brain: BrainCircuit,
 };
 
-const formatConversion = (value) => `${(Number(value || 0) * 100).toFixed(1)}%`;
+const formatConversion = (value) =>
+  `${(Number(value || 0) * 100).toFixed(1)}%`;
 
 const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -53,6 +54,7 @@ const DashboardPage = () => {
     leadMagnets: [],
     payments: [],
     campaigns: [],
+    notion: [],
   });
   const [stats, setStats] = useState({
     assetValue: CONFIG.metrics.assetValue,
@@ -78,20 +80,25 @@ const DashboardPage = () => {
         ...tab,
         icon: tabIcons[tab.id],
       })),
-    [],
+    []
   );
 
-  const parseCurrencyAmount = (value) => {
-    const normalized = String(value ?? "").replace(/[^0-9.-]/g, "");
-    return Number.parseFloat(normalized) || 0;
-  };
+  const normalizeReview = (review = {}) => ({
+    ...review,
+    name: review.name || review.reviewerName || "Anonymous",
+    reviewText: review.reviewText || review.text || "",
+    aiDraftedResponse:
+      review.aiDraftedResponse ||
+      review.aIDraftedResponse ||
+      review.aiResponse ||
+      "",
+  });
 
   const syncEmpireData = async () => {
     setIsSyncing(true);
     setSyncError("");
 
     try {
-      // 1. Google Sheets Master Vault
       const sheetsRes = await fetch(googleSheetsDataUrl);
 
       if (!sheetsRes.ok) {
@@ -100,7 +107,6 @@ const DashboardPage = () => {
 
       const sheetsData = await sheetsRes.json();
 
-      // 2. Notion (if token available)
       const notionToken = localStorage.getItem("notionToken");
       const notionDbId = localStorage.getItem("notionDbId");
       let notionData = null;
@@ -116,15 +122,19 @@ const DashboardPage = () => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({}),
-          },
+          }
         );
 
-        notionData = await notionRes.json();
+        if (notionRes.ok) {
+          notionData = await notionRes.json();
+        }
       }
 
       setRawData((currentData) => ({
         ...currentData,
-        reviews: sheetsData?.reviews || currentData.reviews,
+        reviews: Array.isArray(sheetsData?.reviews)
+          ? sheetsData.reviews.map(normalizeReview)
+          : currentData.reviews,
         competitors: sheetsData?.competitors || currentData.competitors,
         community: sheetsData?.community || currentData.community,
         leadMagnets: sheetsData?.leadMagnets || currentData.leadMagnets,
@@ -136,19 +146,19 @@ const DashboardPage = () => {
       setStats({
         assetValue: sheetsData?.assetValue || CONFIG.metrics.assetValue,
         activeLeads: sheetsData?.communityCount || CONFIG.metrics.communityCount,
-        siteHealth: CONFIG.metrics.systemHealth,
+        siteHealth: sheetsData?.siteHealth || CONFIG.metrics.systemHealth,
         avgSentiment: sheetsData?.sentiment || CONFIG.metrics.sentimentIndex,
       });
 
       setLastSync(new Date().toLocaleTimeString());
 
-      // 3. Ping Slack on successful sync
       const slackUrl =
         localStorage.getItem("slackWebhookUrl") || CONFIG.integrations.slackWebhookUrl;
 
       if (slackUrl && !slackUrl.startsWith("YOUR_")) {
         await fetch(slackUrl, {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text: "DigitallyDefined dashboard synced." }),
         });
       }
@@ -222,7 +232,10 @@ const DashboardPage = () => {
                     <p className="text-sm font-bold uppercase">
                       {comp.businessName || comp.name}
                     </p>
-                    <p className="text-[10px] uppercase tracking-widest" style={{ color: CONFIG.colors.textMuted }}>
+                    <p
+                      className="text-[10px] uppercase tracking-widest"
+                      style={{ color: CONFIG.colors.textMuted }}
+                    >
                       {comp.reviewCount || 0} {dashboardConfig.reviewsLabel}
                     </p>
                   </div>
@@ -230,7 +243,10 @@ const DashboardPage = () => {
                     <p className="font-black" style={{ color: CONFIG.colors.warning }}>
                       {comp.marketShare || dashboardConfig.notAvailableLabel}
                     </p>
-                    <p className="text-[9px] font-bold uppercase" style={{ color: CONFIG.colors.textMuted }}>
+                    <p
+                      className="text-[9px] font-bold uppercase"
+                      style={{ color: CONFIG.colors.textMuted }}
+                    >
                       {dashboardConfig.shareLabel}
                     </p>
                   </div>
@@ -261,7 +277,10 @@ const DashboardPage = () => {
                     <p className="text-sm font-bold uppercase">
                       {magnet.prospectName || magnet.name}
                     </p>
-                    <p className="text-[10px] font-medium uppercase" style={{ color: CONFIG.colors.info }}>
+                    <p
+                      className="text-[10px] font-medium uppercase"
+                      style={{ color: CONFIG.colors.info }}
+                    >
                       {magnet.assetDownloaded || magnet.asset}
                     </p>
                   </div>
@@ -301,51 +320,81 @@ const DashboardPage = () => {
           <ShieldAlert size={24} style={{ color: CONFIG.colors.danger }} />
           {dashboardConfig.reputationTitle}
         </h3>
+
         <div className="space-y-4">
           {rawData.reviews?.length > 0 ? (
-            rawData.reviews.map((rev, i) => (
-              <div key={i} className="flex flex-col justify-between gap-6 p-6 md:flex-row" style={ui.lightCard}>
-                <div className="flex-1">
-                  <div className="mb-2 flex items-center gap-2">
-                    <Star size={14} style={{ color: CONFIG.colors.gold, fill: CONFIG.colors.gold }} />
-                    <span className="text-xs font-bold uppercase">{rev.name}</span>
-                    <span
-                      className="border px-2 py-0.5 text-[9px] font-bold uppercase"
+            rawData.reviews.map((rev, i) => {
+              const hasReply =
+                rev.aiDraftedResponse &&
+                rev.aiDraftedResponse !== dashboardConfig.aiReplyPlaceholder;
+
+              return (
+                <div
+                  key={i}
+                  className="flex flex-col justify-between gap-6 p-6 md:flex-row"
+                  style={ui.lightCard}
+                >
+                  <div className="flex-1">
+                    <div className="mb-2 flex items-center gap-2">
+                      <Star
+                        size={14}
+                        style={{ color: CONFIG.colors.gold, fill: CONFIG.colors.gold }}
+                      />
+                      <span className="text-xs font-bold uppercase">{rev.name}</span>
+
+                      <span
+                        className="border px-2 py-0.5 text-[9px] font-bold uppercase"
+                        style={{
+                          borderColor: CONFIG.colors.border,
+                          backgroundColor:
+                            rev.sentiment === dashboardConfig.negativeSentimentValue
+                              ? CONFIG.colors.danger
+                              : CONFIG.colors.success,
+                          color: CONFIG.colors.surface,
+                        }}
+                      >
+                        {rev.sentiment || dashboardConfig.analyzingLabel}
+                      </span>
+                    </div>
+
+                    <p
+                      className="mb-4 text-sm italic"
+                      style={{ color: CONFIG.colors.textMuted }}
+                    >
+                      "{rev.reviewText || rev.text}"
+                    </p>
+
+                    <div
+                      className="p-4"
                       style={{
-                        borderColor: CONFIG.colors.border,
-                        backgroundColor:
-                          rev.sentiment === dashboardConfig.negativeSentimentValue
-                            ? CONFIG.colors.danger
-                            : CONFIG.colors.success,
-                        color: CONFIG.colors.surface,
+                        backgroundColor: CONFIG.colors.panel,
+                        borderLeft: `4px solid ${CONFIG.colors.warning}`,
                       }}
                     >
-                      {rev.sentiment || dashboardConfig.analyzingLabel}
-                    </span>
+                      <p className="mb-1 text-[10px] font-bold uppercase">
+                        {dashboardConfig.aiReplyLabel}
+                      </p>
+                      <p className="text-sm font-medium">
+                        {rev.aiDraftedResponse || dashboardConfig.aiReplyPlaceholder}
+                      </p>
+                    </div>
                   </div>
-                  <p className="mb-4 text-sm italic" style={{ color: CONFIG.colors.textMuted }}>
-                    "{rev.reviewText || rev.text}"
-                  </p>
-                  <div
-                    className="p-4"
-                    style={{
-                      backgroundColor: CONFIG.colors.panel,
-                      borderLeft: `4px solid ${CONFIG.colors.warning}`,
-                    }}
+
+                  <button
+                    disabled={!hasReply}
+                    className="h-fit self-center px-6 py-3 text-sm font-bold uppercase tracking-[0.2em] transition-all disabled:cursor-not-allowed disabled:opacity-50"
+                    style={ui.buttonPrimary}
+                    title={
+                      hasReply
+                        ? "Deploy logic not connected yet"
+                        : "No drafted reply available"
+                    }
                   >
-                    <p className="mb-1 text-[10px] font-bold uppercase">
-                      {dashboardConfig.aiReplyLabel}
-                    </p>
-                    <p className="text-sm font-medium">
-                      {rev.aiDraftedResponse || dashboardConfig.aiReplyPlaceholder}
-                    </p>
-                  </div>
+                    {dashboardConfig.deployReplyLabel}
+                  </button>
                 </div>
-                <button className="h-fit self-center px-6 py-3 text-sm font-bold uppercase tracking-[0.2em] transition-all" style={ui.buttonPrimary}>
-                  {dashboardConfig.deployReplyLabel}
-                </button>
-              </div>
-            ))
+              );
+            })
           ) : (
             <p className="py-12 text-center" style={{ color: CONFIG.colors.textMuted }}>
               {dashboardConfig.reputationEmpty}
@@ -385,17 +434,23 @@ const DashboardPage = () => {
             color: CONFIG.colors.dangerTint,
           },
         ].map((s, i) => (
-              <div key={i} className="p-6 md:p-8" style={ui.lightCard}>
+          <div key={i} className="p-6 md:p-8" style={ui.lightCard}>
             <div className="mb-6 flex items-start justify-between">
               <div className="p-2" style={{ border: brutalBorder, backgroundColor: s.color }}>
                 <s.icon size={18} />
               </div>
               <ArrowUpRight size={14} style={{ color: CONFIG.colors.textMuted }} />
             </div>
-            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: CONFIG.colors.textMuted }}>
+            <p
+              className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em]"
+              style={{ color: CONFIG.colors.textMuted }}
+            >
               {s.label}
             </p>
-            <p className="text-4xl font-bold" style={{ color: CONFIG.colors.text, fontFamily: "'Inter', sans-serif" }}>
+            <p
+              className="text-4xl font-bold"
+              style={{ color: CONFIG.colors.text, fontFamily: "'Inter', sans-serif" }}
+            >
               {s.val}
             </p>
           </div>
@@ -417,46 +472,79 @@ const DashboardPage = () => {
                 <RefreshCw size={10} className={isSyncing ? "animate-spin" : ""} />
                 {isSyncing
                   ? dashboardConfig.syncingLabel
-                  : `${dashboardConfig.lastSyncPrefix} ${lastSync || dashboardConfig.lastSyncFallback}`}
+                  : `${dashboardConfig.lastSyncPrefix} ${
+                      lastSync || dashboardConfig.lastSyncFallback
+                    }`}
               </button>
             </div>
+
             <div className="space-y-3">
               {communityItems.length > 0 ? (
                 communityItems.map((member, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 transition-all" style={ui.lightCard}>
+                  <div
+                    key={i}
+                    className="flex items-center justify-between p-4 transition-all"
+                    style={ui.lightCard}
+                  >
                     <div className="flex items-center gap-4">
-                      <span className="text-xs font-bold italic" style={{ color: CONFIG.colors.textMuted }}>
+                      <span
+                        className="text-xs font-bold italic"
+                        style={{ color: CONFIG.colors.textMuted }}
+                      >
                         0{i + 1}
                       </span>
                       <div>
                         <p className="text-sm font-bold uppercase">{member.name}</p>
-                        <p className="text-[10px] uppercase tracking-widest" style={{ color: CONFIG.colors.textMuted }}>
+                        <p
+                          className="text-[10px] uppercase tracking-widest"
+                          style={{ color: CONFIG.colors.textMuted }}
+                        >
                           {member.date}
                         </p>
                       </div>
                     </div>
-                    <span className="px-2 py-1 text-[9px] font-bold uppercase" style={{ border: brutalBorder }}>
+                    <span
+                      className="px-2 py-1 text-[9px] font-bold uppercase"
+                      style={{ border: brutalBorder }}
+                    >
                       {member.status}
                     </span>
                   </div>
                 ))
               ) : (
-                <p className="py-8 text-center text-sm italic uppercase tracking-widest" style={{ color: CONFIG.colors.textMuted }}>
+                <p
+                  className="py-8 text-center text-sm italic uppercase tracking-widest"
+                  style={{ color: CONFIG.colors.textMuted }}
+                >
                   {dashboardConfig.communityFeedEmpty}
                 </p>
               )}
             </div>
           </div>
         </div>
-        <div className="flex flex-col justify-between border p-8" style={{ backgroundColor: CONFIG.colors.dark, color: CONFIG.colors.surface, borderColor: CONFIG.colors.border }}>
+
+        <div
+          className="flex flex-col justify-between border p-8"
+          style={{
+            backgroundColor: CONFIG.colors.dark,
+            color: CONFIG.colors.surface,
+            borderColor: CONFIG.colors.border,
+          }}
+        >
           <div>
-            <h4 className="mb-4 text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: CONFIG.colors.warning }}>
+            <h4
+              className="mb-4 text-[10px] font-bold uppercase tracking-[0.3em]"
+              style={{ color: CONFIG.colors.warning }}
+            >
               {dashboardConfig.intelTitle}
             </h4>
             <div className="mb-8">
               {campaigns.length > 0 ? (
                 <div>
-                  <p className="text-xl font-black uppercase italic" style={{ color: CONFIG.colors.info }}>
+                  <p
+                    className="text-xl font-black uppercase italic"
+                    style={{ color: CONFIG.colors.info }}
+                  >
                     {campaigns[0].name}
                   </p>
                   <p className="mt-2 text-sm" style={{ color: CONFIG.colors.bone }}>
@@ -473,10 +561,14 @@ const DashboardPage = () => {
               )}
             </div>
           </div>
+
           <button
             onClick={() => setActiveTab("intel")}
             className="w-fit border-b text-[10px] font-bold uppercase tracking-widest"
-            style={{ borderColor: CONFIG.colors.whiteBorderSoft, color: CONFIG.colors.surface }}
+            style={{
+              borderColor: CONFIG.colors.whiteBorderSoft,
+              color: CONFIG.colors.surface,
+            }}
           >
             {dashboardConfig.intelCta}
           </button>
@@ -487,13 +579,21 @@ const DashboardPage = () => {
 
   return (
     <div className="flex h-screen w-full overflow-hidden" style={ui.app}>
-      <div className="fixed inset-x-0 top-0 z-30 p-4 md:hidden" style={{ borderBottom: brutalBorder, backgroundColor: CONFIG.colors.surface }}>
+      <div
+        className="fixed inset-x-0 top-0 z-30 p-4 md:hidden"
+        style={{ borderBottom: brutalBorder, backgroundColor: CONFIG.colors.surface }}
+      >
         <div className="flex items-center justify-between gap-4">
           <Logo as="div" className="text-sm tracking-tighter" />
-          <button onClick={() => setShowSettings(true)} className="flex items-center gap-2 px-3 py-2 text-[10px] font-bold uppercase tracking-widest" style={ui.lightCard}>
+          <button
+            onClick={() => setShowSettings(true)}
+            className="flex items-center gap-2 px-3 py-2 text-[10px] font-bold uppercase tracking-widest"
+            style={ui.lightCard}
+          >
             <Settings size={14} /> {dashboardConfig.mobileKeysLabel}
           </button>
         </div>
+
         <nav className="mt-4 grid grid-cols-2 gap-2">
           {tabs.map((item) => (
             <button
@@ -507,9 +607,14 @@ const DashboardPage = () => {
           ))}
         </nav>
       </div>
-      <aside className="z-20 hidden w-64 flex-col justify-between md:flex" style={{ borderRight: brutalBorder, backgroundColor: CONFIG.colors.surface }}>
+
+      <aside
+        className="z-20 hidden w-64 flex-col justify-between md:flex"
+        style={{ borderRight: brutalBorder, backgroundColor: CONFIG.colors.surface }}
+      >
         <div className="p-6">
           <Logo as="div" className="mb-12 p-4 text-lg tracking-tighter" style={ui.lightCard} />
+
           <nav className="space-y-1">
             {tabs.map((item) => (
               <button
@@ -530,8 +635,18 @@ const DashboardPage = () => {
             ))}
           </nav>
         </div>
+
         <div className="p-6" style={{ borderTop: brutalBorder }}>
-          <button onClick={() => setShowSettings(true)} className="w-full px-4 py-3 text-[10px] font-bold uppercase tracking-widest transition-all" style={{ ...ui.lightCard, display: "flex", alignItems: "center", gap: "1rem" }}>
+          <button
+            onClick={() => setShowSettings(true)}
+            className="w-full px-4 py-3 text-[10px] font-bold uppercase tracking-widest transition-all"
+            style={{
+              ...ui.lightCard,
+              display: "flex",
+              alignItems: "center",
+              gap: "1rem",
+            }}
+          >
             <Settings size={14} /> {dashboardConfig.systemKeysLabel}
           </button>
         </div>
@@ -539,27 +654,45 @@ const DashboardPage = () => {
 
       <main className="flex-1 overflow-y-auto p-8 pt-44 md:p-12 md:pt-12 lg:p-16">
         <header className="mx-auto mb-16 max-w-6xl">
-          <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.4em]" style={{ color: CONFIG.colors.warning }}>
+          <p
+            className="mb-2 text-[9px] font-bold uppercase tracking-[0.4em]"
+            style={{ color: CONFIG.colors.warning }}
+          >
             {dashboardConfig.headerEyebrowPrefix} {CONFIG.brand.version}
           </p>
-          <h2 className="text-5xl tracking-tighter" style={{ ...brutalHeading, color: CONFIG.colors.text }}>
+          <h2
+            className="text-5xl tracking-tighter"
+            style={{ ...brutalHeading, color: CONFIG.colors.text }}
+          >
             {activeTab === "dashboard"
               ? dashboardConfig.dashboardTitle
               : tabs.find((tab) => tab.id === activeTab)?.label}
           </h2>
         </header>
+
         <div className="mx-auto max-w-6xl">
           {syncError && (
-            <div className="mb-8 px-4 py-3 text-[11px] font-bold uppercase tracking-[0.15em]" style={{ border: `1px solid ${CONFIG.colors.danger}`, backgroundColor: CONFIG.colors.dangerTint, color: CONFIG.colors.danger }}>
+            <div
+              className="mb-8 px-4 py-3 text-[11px] font-bold uppercase tracking-[0.15em]"
+              style={{
+                border: `1px solid ${CONFIG.colors.danger}`,
+                backgroundColor: CONFIG.colors.dangerTint,
+                color: CONFIG.colors.danger,
+              }}
+            >
               {syncError}
             </div>
           )}
+
           {activeTab === "dashboard" && <CommandTab />}
           {activeTab === "reputation" && <ReputationManager />}
           {activeTab === "intel" && <MarketIntel />}
           {activeTab === "brain" && (
             <div className="py-20 text-center" style={{ border: `2px dashed ${CONFIG.colors.border}` }}>
-              <p className="mb-4 text-4xl font-black uppercase italic" style={{ color: CONFIG.colors.ghostText }}>
+              <p
+                className="mb-4 text-4xl font-black uppercase italic"
+                style={{ color: CONFIG.colors.ghostText }}
+              >
                 {dashboardConfig.brainTitle}
               </p>
               <p className="text-xs font-bold uppercase tracking-widest">
@@ -571,17 +704,29 @@ const DashboardPage = () => {
       </main>
 
       {showSettings && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: CONFIG.colors.overlayLight }}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ backgroundColor: CONFIG.colors.overlayLight }}
+        >
           <div className="relative w-full max-w-xl p-8 md:p-12" style={ui.lightCard}>
-            <button onClick={() => setShowSettings(false)} className="absolute right-6 top-6 transition-all hover:rotate-90">
+            <button
+              onClick={() => setShowSettings(false)}
+              className="absolute right-6 top-6 transition-all hover:rotate-90"
+            >
               <X size={24} />
             </button>
+
             <h3 className="mb-8 text-2xl font-black uppercase italic">
               {dashboardConfig.settingsTitle}
             </h3>
-            <label className="mb-1 block text-[9px] font-bold uppercase tracking-widest" style={{ color: CONFIG.colors.textMuted }}>
+
+            <label
+              className="mb-1 block text-[9px] font-bold uppercase tracking-widest"
+              style={{ color: CONFIG.colors.textMuted }}
+            >
               {dashboardConfig.openRouterLabel}
             </label>
+
             <input
               type="password"
               value={openRouterKey}
@@ -590,6 +735,7 @@ const DashboardPage = () => {
               style={ui.input}
               placeholder={dashboardConfig.openRouterPlaceholder}
             />
+
             <button
               onClick={() => {
                 localStorage.setItem("openRouterKey", openRouterKey);
