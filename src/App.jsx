@@ -6,7 +6,7 @@ import LandingPage from "./pages/LandingPage";
 
 const App = () => (
   <Routes>
-    <Route path="/" element={<LandingPage />} />
+    <Route path="/" element={<Navigate to={CONFIG.routes.dashboard} replace />} />
     <Route path="/landing" element={<LandingPage />} />
     <Route path={CONFIG.routes.dashboard} element={<DashboardPage />} />
     {CONFIG.routes.dashboardAliases.map((route) => (
@@ -16,7 +16,7 @@ const App = () => (
         element={<Navigate to={CONFIG.routes.dashboard} replace />}
       />
     ))}
-    <Route path="*" element={<Navigate to="/" replace />} />
+    <Route path="*" element={<Navigate to={CONFIG.routes.dashboard} replace />} />
   </Routes>
 );
 
