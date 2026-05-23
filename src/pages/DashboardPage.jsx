@@ -28,6 +28,23 @@ import {
 } from "../theme";
 
 const dashboardConfig = CONFIG.dashboard;
+const dashboardLabels = {
+  syncButton: dashboardConfig.syncButtonLabel || "Sync Vault",
+  settings: dashboardConfig.settingsLabel || dashboardConfig.systemKeysLabel || "Settings",
+  navigation: dashboardConfig.navigationTitle || "Navigation",
+  noSync: dashboardConfig.noSyncLabel || "No sync yet",
+  saveSettings:
+    dashboardConfig.saveSettingsLabel || dashboardConfig.saveKeysLabel || "Save Settings",
+  metrics: {
+    revenue: dashboardConfig.metrics?.revenue || "Revenue",
+    leads: dashboardConfig.metrics?.leads || "Leads",
+    conversion: dashboardConfig.metrics?.conversion || "Conversion",
+    assetValue:
+      dashboardConfig.metrics?.assetValue ||
+      dashboardConfig.stats?.assetValue ||
+      "Asset Value",
+  },
+};
 
 // FIXED: env var + fallback
 const googleSheetsDataUrl =
@@ -283,12 +300,12 @@ const DashboardPage = () => {
         minHeight: "100vh",
         backgroundColor: CONFIG.colors.background,
         color: CONFIG.colors.text,
-        fontFamily: theme.fontFamily,
+        fontFamily: theme.fonts.app,
       }}
     >
       <header
         style={{
-          ...brutalBorder,
+          border: brutalBorder,
           borderBottomWidth: 2,
           padding: "1rem 1.5rem",
           backgroundColor: CONFIG.colors.panel,
@@ -344,13 +361,13 @@ const DashboardPage = () => {
             />
             {isSyncing
               ? dashboardConfig.syncingLabel
-              : dashboardConfig.syncButtonLabel}
+              : dashboardLabels.syncButton}
           </button>
 
           <button
             onClick={() => setShowSettings(true)}
             style={{
-              ...brutalBorder,
+              border: brutalBorder,
               backgroundColor: CONFIG.colors.background,
               padding: "0.4rem 0.6rem",
               borderRadius: 999,
@@ -361,7 +378,7 @@ const DashboardPage = () => {
             }}
           >
             <Settings size={16} />
-            <span>{dashboardConfig.settingsLabel}</span>
+            <span>{dashboardLabels.settings}</span>
           </button>
         </div>
       </header>
@@ -378,7 +395,6 @@ const DashboardPage = () => {
       >
         <aside
           style={{
-            ...brutalBorder,
             ...brutalCard,
             padding: "1rem",
             display: "flex",
@@ -395,7 +411,7 @@ const DashboardPage = () => {
                 marginBottom: "0.5rem",
               }}
             >
-              {dashboardConfig.navigationTitle}
+              {dashboardLabels.navigation}
             </h2>
             <nav
               style={{
@@ -412,7 +428,7 @@ const DashboardPage = () => {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     style={{
-                      ...brutalBorder,
+                      border: brutalBorder,
                       borderWidth: isActive ? 2 : 1,
                       backgroundColor: isActive
                         ? CONFIG.colors.accent
@@ -440,7 +456,7 @@ const DashboardPage = () => {
                     {tab.badge && (
                       <span
                         style={{
-                          ...brutalBorder,
+                          border: brutalBorder,
                           borderRadius: 999,
                           padding: "0.1rem 0.4rem",
                           fontSize: "0.7rem",
@@ -467,7 +483,7 @@ const DashboardPage = () => {
             <p style={{ margin: 0, marginBottom: "0.3rem" }}>
               {lastSync
                 ? `${dashboardConfig.lastSyncPrefix} ${lastSync}`
-                : dashboardConfig.noSyncLabel}
+                : dashboardLabels.noSync}
             </p>
             {syncError && (
               <p
@@ -491,7 +507,6 @@ const DashboardPage = () => {
         >
           <div
             style={{
-              ...brutalBorder,
               ...brutalCard,
               padding: "1rem",
               display: "grid",
@@ -501,25 +516,25 @@ const DashboardPage = () => {
           >
             <MetricCard
               icon={DollarSign}
-              label={dashboardConfig.metrics.revenue}
+              label={dashboardLabels.metrics.revenue}
               value={stats.revenue}
               trend={trendSymbol("up")}
             />
             <MetricCard
               icon={Users}
-              label={dashboardConfig.metrics.leads}
+              label={dashboardLabels.metrics.leads}
               value={stats.leads}
               trend={trendSymbol("up")}
             />
             <MetricCard
               icon={TrendingUp}
-              label={dashboardConfig.metrics.conversion}
+              label={dashboardLabels.metrics.conversion}
               value={stats.conversionRate}
               trend={trendSymbol("up")}
             />
             <MetricCard
               icon={FolderHeart}
-              label={dashboardConfig.metrics.assetValue}
+              label={dashboardLabels.metrics.assetValue}
               value={stats.assetValue}
               trend={trendSymbol("up")}
             />
@@ -529,7 +544,6 @@ const DashboardPage = () => {
               Keeping this minimal since your main error was syntax/env. */}
           <div
             style={{
-              ...brutalBorder,
               ...brutalCard,
               padding: "1rem",
               minHeight: 200,
@@ -566,7 +580,6 @@ const DashboardPage = () => {
         >
           <div
             style={{
-              ...brutalBorder,
               ...brutalCard,
               padding: "1rem",
               width: "min(420px, 90vw)",
@@ -622,7 +635,7 @@ const DashboardPage = () => {
                 onChange={(e) => setOpenRouterKey(e.target.value)}
                 placeholder={dashboardConfig.openRouterPlaceholder}
                 style={{
-                  ...brutalBorder,
+                  border: brutalBorder,
                   padding: "0.4rem 0.5rem",
                   borderRadius: 6,
                 }}
@@ -638,7 +651,7 @@ const DashboardPage = () => {
                 fontSize: "0.85rem",
               }}
             >
-              {dashboardConfig.saveSettingsLabel}
+              {dashboardLabels.saveSettings}
             </button>
           </div>
         </div>
@@ -650,7 +663,7 @@ const DashboardPage = () => {
 const MetricCard = ({ icon: Icon, label, value, trend }) => (
   <div
     style={{
-      ...brutalBorder,
+      border: brutalBorder,
       borderRadius: 10,
       padding: "0.75rem",
       backgroundColor: CONFIG.colors.panel,
