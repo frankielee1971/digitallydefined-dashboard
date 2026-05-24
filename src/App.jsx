@@ -1,55 +1,35 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
-import CONFIG from "./config";
-import DashboardPage from "./pages/DashboardPage";
-import LandingPage from "./pages/LandingPage";
+import NewsletterSignup from "./components/NewsletterSignup";
+import "./styles/newsletter.css"; // make sure this path matches your structure
 
-const hostname =
-  typeof window !== "undefined" ? window.location.hostname : "";
+function App() {
+  return (
+    <>
+      <SpeedInsights />
 
-const isDashboardHost =
-  hostname === "dashboard.digitallydefined.online" ||
-  hostname === "digitallydefined-reputation-dashboa-nine.vercel.app";
+      {/* DigitallyDefined Signup Section */}
+      <section className="dd-signup-wrapper">
+        <div className="dd-signup-container">
+          <h2 className="dd-signup-title">Become DigitallyDefined</h2>
+          <p className="dd-signup-subtitle">
+            Join thousands of Gen X women building digital freedom, passive income, and modern independence.
+          </p>
 
-const App = () => (
-  <>
-    <Routes>
-      <Route
-        path="/"
-        element={
-          isDashboardHost ? (
-            <Navigate to={CONFIG.routes.dashboard} replace />
-          ) : (
-            <LandingPage />
-          )
-        }
-      />
+          <NewsletterSignup />
+        </div>
+      </section>
 
-      <Route path="/landing" element={<LandingPage />} />
-      <Route path={CONFIG.routes.dashboard} element={<DashboardPage />} />
-
-      {CONFIG.routes.dashboardAliases.map((route) => (
-        <Route
-          key={route}
-          path={route}
-          element={<Navigate to={CONFIG.routes.dashboard} replace />}
-        />
-      ))}
-
-      <Route
-        path="*"
-        element={
-          isDashboardHost ? (
-            <Navigate to={CONFIG.routes.dashboard} replace />
-          ) : (
-            <Navigate to="/" replace />
-          )
-        }
-      />
-    </Routes>
-    <SpeedInsights />
-  </>
-);
+      {/* Your existing routes */}
+      <Routes>
+        <Route path="/" element={<Navigate to="/dashboard" />} />
+        <Route path="/dashboard" element={<div>Dashboard Page</div>} />
+        {/* Add your other routes here */}
+      </Routes>
+    </>
+  );
+}
 
 export default App;
+

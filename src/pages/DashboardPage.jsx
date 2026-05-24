@@ -318,9 +318,6 @@ const DashboardPage = () => {
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
           <Logo size={28} />
           <div>
-            <h1 style={{ ...brutalHeading, margin: 0, fontSize: "1.3rem" }}>
-              {CONFIG.brand.fullName}
-            </h1>
             <p
               style={{
                 margin: 0,
