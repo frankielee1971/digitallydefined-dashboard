@@ -1,0 +1,32 @@
+.dd-brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid #111111;
+  background: #fffcf9;
+  color: #111111;
+  line-height: 1;
+  white-space: nowrap;
+  width: fit-content;
+  box-sizing: border-box;
+}
+
+.dd-brand-logo__digitally,
+.dd-brand-logo__defined {
+  font-family: "Inter", "DM Sans", Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.dd-brand-logo__digitally {
+  color: #111111;
+  font-style: normal;
+}
+
+.dd-brand-logo__defined {
+  color: #f18b25;
+  font-style: italic;
+  margin-left: 0.08rem;
+}

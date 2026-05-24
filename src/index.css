@@ -1,6 +1,26 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* DigitallyDefined Global Theme */
+
+/* Sand background */
+body {
+  background: #F4EEDC !important;
+  font-family: Inter, "DM Sans", sans-serif;
+  color: #000;
+}
+
+/* Square edges everywhere */
+* {
+  border-radius: 0 !important;
+}
+
+/* White cards with black borders */
+.dd-card {
+  background: #fff;
+  border: 2px solid #000;
+  padding: 20px;
+}
 
 :root {
   --brand-background: #fffcf9;

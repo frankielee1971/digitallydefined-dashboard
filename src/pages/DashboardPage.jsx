@@ -1,24 +1,18 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  ArrowUpRight,
   BarChart3,
   BrainCircuit,
   DollarSign,
   FolderHeart,
   LayoutDashboard,
-  Magnet,
-  MessageSquare,
   RefreshCw,
   Settings,
-  ShieldAlert,
   ShieldCheck,
-  Star,
   TrendingUp,
   Users,
   X,
 } from "lucide-react";
 import CONFIG from "../config";
-import Logo from "../components/Logo";
 import {
   brutalBorder,
   brutalButtonPrimary,
@@ -28,13 +22,19 @@ import {
 } from "../theme";
 
 const dashboardConfig = CONFIG.dashboard;
+
 const dashboardLabels = {
   syncButton: dashboardConfig.syncButtonLabel || "Sync Vault",
-  settings: dashboardConfig.settingsLabel || dashboardConfig.systemKeysLabel || "Settings",
+  settings:
+    dashboardConfig.settingsLabel ||
+    dashboardConfig.systemKeysLabel ||
+    "Settings",
   navigation: dashboardConfig.navigationTitle || "Navigation",
   noSync: dashboardConfig.noSyncLabel || "No sync yet",
   saveSettings:
-    dashboardConfig.saveSettingsLabel || dashboardConfig.saveKeysLabel || "Save Settings",
+    dashboardConfig.saveSettingsLabel ||
+    dashboardConfig.saveKeysLabel ||
+    "Save Settings",
   metrics: {
     revenue: dashboardConfig.metrics?.revenue || "Revenue",
     leads: dashboardConfig.metrics?.leads || "Leads",
@@ -46,7 +46,6 @@ const dashboardLabels = {
   },
 };
 
-// FIXED: env var + fallback
 const googleSheetsDataUrl =
   import.meta.env.VITE_SHEETS_API_URL || dashboardConfig.defaultSheetsUrl;
 
@@ -75,42 +74,54 @@ const formatSiteHealth = (value) => {
   return CONFIG.metrics.systemHealth;
 };
 
-const statusColor = (status) => {
-  switch ((status || "").toLowerCase()) {
-    case "healthy":
-    case "success":
-    case "low":
-      return {
-        bg: CONFIG.colors.successTint,
-        text: CONFIG.colors.text,
-      };
-    case "watch":
-    case "warning":
-    case "medium":
-      return {
-        bg: CONFIG.colors.warningTint,
-        text: CONFIG.colors.text,
-      };
-    case "at-risk":
-    case "critical":
-    case "high":
-      return {
-        bg: CONFIG.colors.dangerTint,
-        text: CONFIG.colors.danger,
-      };
-    default:
-      return {
-        bg: CONFIG.colors.panel,
-        text: CONFIG.colors.text,
-      };
-  }
-};
-
 const trendSymbol = (trend) => {
   if (trend === "up") return "↑";
   if (trend === "down") return "↓";
   return "→";
 };
+
+function BrandLogo() {
+  return (
+    <div
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        border: "1px solid #111111",
+        padding: "0.5rem 0.75rem",
+        backgroundColor: "#fffcf9",
+        lineHeight: 1,
+        whiteSpace: "nowrap",
+      }}
+      aria-label="DigitallyDefined logo"
+    >
+      <span
+        style={{
+          fontFamily: "Inter, DM Sans, Arial, sans-serif",
+          fontWeight: 700,
+          fontSize: "1rem",
+          color: "#111111",
+          letterSpacing: "-0.03em",
+          fontStyle: "normal",
+        }}
+      >
+        Digitally
+      </span>
+      <span
+        style={{
+          fontFamily: "Inter, DM Sans, Arial, sans-serif",
+          fontWeight: 700,
+          fontSize: "1rem",
+          color: "#f18b25",
+          letterSpacing: "-0.03em",
+          fontStyle: "italic",
+          marginLeft: "0.06rem",
+        }}
+      >
+        Defined
+      </span>
+    </div>
+  );
+}
 
 const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -131,6 +142,7 @@ const DashboardPage = () => {
     alerts: [],
     aiBrief: null,
   });
+
   const [stats, setStats] = useState({
     assetValue: CONFIG.metrics.assetValue,
     activeLeads: CONFIG.metrics.activeLeads,
@@ -150,9 +162,7 @@ const DashboardPage = () => {
 
   useEffect(() => {
     document.title = `${CONFIG.brand.fullName} Dashboard`;
-    const metaDescription = document.querySelector(
-      'meta[name="description"]'
-    );
+    const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
       metaDescription.setAttribute("content", CONFIG.seo.description);
     }
@@ -192,9 +202,7 @@ const DashboardPage = () => {
       });
 
       if (!sheetsRes.ok) {
-        throw new Error(
-          `${dashboardConfig.syncFailurePrefix} ${sheetsRes.status}`
-        );
+        throw new Error(`${dashboardConfig.syncFailurePrefix} ${sheetsRes.status}`);
       }
 
       const sheetsData = await sheetsRes.json();
@@ -298,31 +306,31 @@ const DashboardPage = () => {
     <div
       style={{
         minHeight: "100vh",
-        backgroundColor: CONFIG.colors.background,
-        color: CONFIG.colors.text,
+        backgroundColor: "#fffcf9",
+        color: "#111111",
         fontFamily: theme.fonts.app,
       }}
     >
       <header
         style={{
-          border: brutalBorder,
-          borderBottomWidth: 2,
+          borderBottom: "1px solid #111111",
           padding: "1rem 1.5rem",
-          backgroundColor: CONFIG.colors.panel,
+          backgroundColor: "#fffaf5",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           gap: "1rem",
+          flexWrap: "wrap",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <Logo size={28} />
+        <div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
+          <BrandLogo />
           <div>
             <p
               style={{
                 margin: 0,
-                fontSize: "0.8rem",
-                opacity: 0.8,
+                fontSize: "0.78rem",
+                color: "#5f5f5f",
               }}
             >
               {dashboardConfig.tagline}
@@ -347,6 +355,10 @@ const DashboardPage = () => {
               gap: "0.4rem",
               padding: "0.45rem 0.8rem",
               fontSize: "0.85rem",
+              backgroundColor: "#f18b25",
+              color: "#111111",
+              border: "1px solid #111111",
+              boxShadow: "4px 4px 0 #111111",
             }}
           >
             <RefreshCw
@@ -356,22 +368,20 @@ const DashboardPage = () => {
                 transition: "transform 0.2s",
               }}
             />
-            {isSyncing
-              ? dashboardConfig.syncingLabel
-              : dashboardLabels.syncButton}
+            {isSyncing ? dashboardConfig.syncingLabel : dashboardLabels.syncButton}
           </button>
 
           <button
             onClick={() => setShowSettings(true)}
             style={{
-              border: brutalBorder,
-              backgroundColor: CONFIG.colors.background,
-              padding: "0.4rem 0.6rem",
-              borderRadius: 999,
+              border: "1px solid #111111",
+              backgroundColor: "#fffcf9",
+              padding: "0.45rem 0.7rem",
               display: "flex",
               alignItems: "center",
               gap: "0.4rem",
               fontSize: "0.8rem",
+              boxShadow: "4px 4px 0 #111111",
             }}
           >
             <Settings size={16} />
@@ -398,6 +408,10 @@ const DashboardPage = () => {
             flexDirection: "column",
             gap: "1rem",
             height: "fit-content",
+            backgroundColor: "#fffaf5",
+            border: "1px solid #111111",
+            boxShadow: "6px 6px 0 #111111",
+            borderRadius: 0,
           }}
         >
           <div>
@@ -405,59 +419,58 @@ const DashboardPage = () => {
               style={{
                 ...brutalHeading,
                 fontSize: "0.9rem",
-                marginBottom: "0.5rem",
+                marginBottom: "0.75rem",
               }}
             >
               {dashboardLabels.navigation}
             </h2>
+
             <nav
               style={{
                 display: "flex",
                 flexDirection: "column",
-                gap: "0.3rem",
+                gap: "0.45rem",
               }}
             >
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
+
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     style={{
-                      border: brutalBorder,
-                      borderWidth: isActive ? 2 : 1,
-                      backgroundColor: isActive
-                        ? CONFIG.colors.accent
-                        : CONFIG.colors.background,
-                      color: isActive ? CONFIG.colors.onAccent : CONFIG.colors.text,
-                      padding: "0.5rem 0.7rem",
-                      borderRadius: 10,
+                      border: "1px solid #111111",
+                      backgroundColor: isActive ? "#f18b25" : "#fffcf9",
+                      color: "#111111",
+                      padding: "0.65rem 0.75rem",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
                       fontSize: "0.85rem",
                       cursor: "pointer",
+                      boxShadow: isActive ? "3px 3px 0 #111111" : "none",
                     }}
                   >
                     <span
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        gap: "0.4rem",
+                        gap: "0.45rem",
                       }}
                     >
                       <Icon size={16} />
                       {tab.label}
                     </span>
+
                     {tab.badge && (
                       <span
                         style={{
-                          border: brutalBorder,
-                          borderRadius: 999,
+                          border: "1px solid #111111",
                           padding: "0.1rem 0.4rem",
                           fontSize: "0.7rem",
-                          backgroundColor: CONFIG.colors.panel,
+                          backgroundColor: "#fffaf5",
                         }}
                       >
                         {tab.badge}
@@ -472,8 +485,8 @@ const DashboardPage = () => {
           <div
             style={{
               marginTop: "0.5rem",
-              paddingTop: "0.5rem",
-              borderTop: `1px dashed ${CONFIG.colors.border}`,
+              paddingTop: "0.75rem",
+              borderTop: "1px dashed #111111",
               fontSize: "0.75rem",
             }}
           >
@@ -482,11 +495,12 @@ const DashboardPage = () => {
                 ? `${dashboardConfig.lastSyncPrefix} ${lastSync}`
                 : dashboardLabels.noSync}
             </p>
+
             {syncError && (
               <p
                 style={{
                   margin: 0,
-                  color: CONFIG.colors.danger,
+                  color: "#8b1a0a",
                 }}
               >
                 {syncError}
@@ -509,6 +523,10 @@ const DashboardPage = () => {
               display: "grid",
               gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
               gap: "0.75rem",
+              backgroundColor: "#fffaf5",
+              border: "1px solid #111111",
+              boxShadow: "6px 6px 0 #111111",
+              borderRadius: 0,
             }}
           >
             <MetricCard
@@ -537,13 +555,15 @@ const DashboardPage = () => {
             />
           </div>
 
-          {/* Here you would render different tab content based on activeTab.
-              Keeping this minimal since your main error was syntax/env. */}
           <div
             style={{
               ...brutalCard,
               padding: "1rem",
               minHeight: 200,
+              backgroundColor: "#fffaf5",
+              border: "1px solid #111111",
+              boxShadow: "6px 6px 0 #111111",
+              borderRadius: 0,
             }}
           >
             <h2
@@ -555,6 +575,7 @@ const DashboardPage = () => {
             >
               {currentTabConfig?.label}
             </h2>
+
             <p style={{ fontSize: "0.85rem", opacity: 0.8 }}>
               {currentTabConfig?.description ||
                 "Configure this tab content in your dashboard config."}
@@ -568,7 +589,7 @@ const DashboardPage = () => {
           style={{
             position: "fixed",
             inset: 0,
-            backgroundColor: "rgba(0,0,0,0.4)",
+            backgroundColor: "rgba(17,17,17,0.35)",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
@@ -580,8 +601,11 @@ const DashboardPage = () => {
               ...brutalCard,
               padding: "1rem",
               width: "min(420px, 90vw)",
-              backgroundColor: CONFIG.colors.background,
+              backgroundColor: "#fffcf9",
               position: "relative",
+              border: "1px solid #111111",
+              boxShadow: "6px 6px 0 #111111",
+              borderRadius: 0,
             }}
           >
             <button
@@ -607,6 +631,7 @@ const DashboardPage = () => {
             >
               {dashboardConfig.settingsTitle}
             </h2>
+
             <p
               style={{
                 fontSize: "0.8rem",
@@ -632,9 +657,10 @@ const DashboardPage = () => {
                 onChange={(e) => setOpenRouterKey(e.target.value)}
                 placeholder={dashboardConfig.openRouterPlaceholder}
                 style={{
-                  border: brutalBorder,
-                  padding: "0.4rem 0.5rem",
-                  borderRadius: 6,
+                  border: "1px solid #111111",
+                  padding: "0.5rem 0.6rem",
+                  borderRadius: 0,
+                  backgroundColor: "#ffffff",
                 }}
               />
             </label>
@@ -646,6 +672,10 @@ const DashboardPage = () => {
                 width: "100%",
                 padding: "0.5rem 0.75rem",
                 fontSize: "0.85rem",
+                backgroundColor: "#f18b25",
+                color: "#111111",
+                border: "1px solid #111111",
+                boxShadow: "4px 4px 0 #111111",
               }}
             >
               {dashboardLabels.saveSettings}
@@ -660,10 +690,11 @@ const DashboardPage = () => {
 const MetricCard = ({ icon: Icon, label, value, trend }) => (
   <div
     style={{
-      border: brutalBorder,
-      borderRadius: 10,
+      border: "1px solid #111111",
       padding: "0.75rem",
-      backgroundColor: CONFIG.colors.panel,
+      backgroundColor: "#ffffff",
+      boxShadow: "4px 4px 0 #111111",
+      borderRadius: 0,
     }}
   >
     <div
@@ -676,6 +707,7 @@ const MetricCard = ({ icon: Icon, label, value, trend }) => (
       <span style={{ fontSize: "0.75rem", opacity: 0.85 }}>{label}</span>
       <Icon size={16} />
     </div>
+
     <div
       style={{
         display: "flex",
