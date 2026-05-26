@@ -1,6 +1,7 @@
 import CONFIG from "./config";
 
 const tokens = CONFIG.aesthetic.tokens;
+const tokenColors = tokens.colors;
 
 export const theme = {
   philosophy: CONFIG.aesthetic.philosophy,
@@ -10,23 +11,23 @@ export const theme = {
     app: `'${tokens.typography.headings.font}', '${tokens.typography.body.font}', system-ui, sans-serif`,
   },
   colors: {
-    background: "#fffcf9",
-    panel: "#fffaf5",
-    card: "#ffffff",
-    textPrimary: "#111111",
-    textDark: "#111111",
-    border: "#111111",
-    orange: "#f18b25",
-    aquaBlue: "#47b7d4",
-    darkRed: "#8b1a0a",
-    muted: "#5f5f5f",
+    background: tokenColors.background,
+    panel: CONFIG.colors.panel,
+    card: tokenColors.card,
+    textPrimary: tokenColors.text.primary,
+    textDark: tokenColors.text.dark,
+    border: tokens.geometry.borderColor,
+    orange: tokenColors.accents.orange,
+    aquaBlue: tokenColors.accents.aquaBlue,
+    darkRed: tokenColors.accents.darkRed,
+    muted: CONFIG.colors.textMuted,
   },
   geometry: {
     ...tokens.geometry,
     borderWidth: "1px",
     borderColor: "#111111",
     borderRadius: 0,
-    shadows: "6px 6px 0 #111111",
+    shadows: tokens.geometry.shadows,
   },
   layout: tokens.layout,
 };
@@ -45,7 +46,7 @@ export const brutalHeading = {
   fontWeight: tokens.typography.headings.weight || 800,
   fontStyle: "normal",
   textTransform: "none",
-  letterSpacing: "-0.03em",
+  letterSpacing: tokens.typography.headings.letterSpacing,
   color: theme.colors.textPrimary,
 };
 
@@ -53,7 +54,7 @@ export const brutalEyebrow = {
   fontFamily: theme.fonts.heading,
   fontSize: "0.72rem",
   fontWeight: 800,
-  letterSpacing: "0.16em",
+  letterSpacing: "0.12em",
   textTransform: "uppercase",
   margin: 0,
   color: theme.colors.textPrimary,

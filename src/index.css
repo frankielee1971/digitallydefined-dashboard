@@ -1,35 +1,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/* DigitallyDefined Global Theme */
-
-/* Sand background */
-body {
-  background: #F4EEDC !important;
-  font-family: Inter, "DM Sans", sans-serif;
-  color: #000;
-}
-
-/* Square edges everywhere */
-* {
-  border-radius: 0 !important;
-}
-
-/* White cards with black borders */
-.dd-card {
-  background: #fff;
-  border: 2px solid #000;
-  padding: 20px;
-}
 
 :root {
   --brand-background: #fffcf9;
+  --brand-panel: #fffaf5;
   --brand-card: #ffffff;
-  --brand-text-primary: #2d3748;
+  --brand-text-primary: #111111;
   --brand-text-dark: #111111;
+  --brand-text-muted: #5f5f5f;
   --brand-accent-orange: #f18b25;
   --brand-accent-aqua: #47b7d4;
-  --brand-accent-red: #c20f0a;
+  --brand-accent-red: #8b1a0a;
   --brand-border-width: 1px;
   --brand-border-color: #111111;
   --brand-border-radius: 0px;
@@ -45,6 +27,11 @@ body,
   min-height: 100%;
 }
 
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
 body {
   margin: 0;
   background-color: var(--brand-background);
@@ -56,6 +43,7 @@ body {
 *,
 *::before,
 *::after {
+  box-sizing: border-box;
   border-radius: 0;
   box-shadow: none;
 }
@@ -69,6 +57,15 @@ h6 {
   font-family: "Inter", system-ui, sans-serif;
   font-weight: 900;
   font-style: normal;
-  text-transform: uppercase;
   letter-spacing: 0;
+}
+
+a {
+  color: inherit;
+}
+
+.dd-card {
+  background: var(--brand-card);
+  border: var(--brand-border-width) solid var(--brand-border-color);
+  padding: 20px;
 }

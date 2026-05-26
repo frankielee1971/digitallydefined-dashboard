@@ -1,9 +1,7 @@
-/* DigitallyDefined Aesthetic — Soft Brutalism + Gen X Nomad Minimalism */
-
 .dd-signup-wrapper {
-  background: #FFFFC9; /* your buttery soft yellow */
+  background: var(--brand-panel);
   padding: 60px 20px;
-  border-bottom: 2px solid #000;
+  border-bottom: 1px solid var(--brand-border-color);
 }
 
 .dd-signup-container {
@@ -15,16 +13,16 @@
 .dd-signup-title {
   font-family: "Inter", sans-serif;
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 800;
   margin-bottom: 10px;
-  color: #000;
+  color: var(--brand-text-dark);
 }
 
 .dd-signup-subtitle {
   font-family: "DM Sans", sans-serif;
   font-size: 1.1rem;
   margin-bottom: 30px;
-  color: #333;
+  color: var(--brand-text-muted);
 }
 
 /* Form */
@@ -36,35 +34,36 @@
 
 .newsletter-form input {
   padding: 14px;
-  border: 2px solid #000;
-  border-radius: 6px;
+  border: 1px solid var(--brand-border-color);
+  border-radius: 0;
   font-size: 1rem;
-  background: #fff;
-  font-family: "Inter", sans-serif;
+  background: var(--brand-card);
+  font-family: "DM Sans", sans-serif;
 }
 
 .newsletter-form button {
   padding: 14px;
-  background: #000;
-  color: #fff;
-  border-radius: 6px;
+  background: var(--brand-accent-orange);
+  color: var(--brand-text-dark);
+  border-radius: 0;
   font-size: 1rem;
   font-family: "Inter", sans-serif;
+  font-weight: 800;
   cursor: pointer;
   transition: 0.2s ease;
-  border: 2px solid #000;
+  border: 1px solid var(--brand-border-color);
 }
 
 .newsletter-form button:hover {
-  background: #333;
+  background: var(--brand-accent-aqua);
 }
 
 .dd-success {
-  color: #0a8a0a;
+  color: #16a34a;
   font-weight: 600;
 }
 
 .dd-error {
-  color: #c00;
+  color: var(--brand-accent-red);
   font-weight: 600;
 }
