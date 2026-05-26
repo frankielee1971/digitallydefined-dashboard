@@ -1,11 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
   BarChart3,
+  Bot,
   BrainCircuit,
   DollarSign,
   FolderHeart,
   LayoutDashboard,
+  Loader2,
   RefreshCw,
+  Send,
   Settings,
   ShieldCheck,
   TrendingUp,
@@ -13,10 +16,12 @@ import {
   X,
 } from "lucide-react";
 import CONFIG from "../config";
+import Logo from "../components/Logo";
 import {
   brutalBorder,
   brutalButtonPrimary,
   brutalCard,
+  brutalEyebrow,
   brutalHeading,
   theme,
 } from "../theme";
@@ -46,8 +51,22 @@ const dashboardLabels = {
   },
 };
 
-const googleSheetsDataUrl =
-  import.meta.env.VITE_SHEETS_API_URL || dashboardConfig.defaultSheetsUrl;
+const BACKEND_URL =
+  import.meta.env.VITE_DASHBOARD_API_URL ||
+  import.meta.env.VITE_SHEETS_API_URL ||
+  dashboardConfig.defaultSheetsUrl;
+
+const BACKEND_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "";
+const ASSISTANT_MODEL =
+  import.meta.env.VITE_DASHBOARD_ASSISTANT_MODEL ||
+  dashboardConfig.assistantModel ||
+  "openai/gpt-4o-mini";
+
+const assistantWelcome = {
+  role: "assistant",
+  content:
+    "I am ready. Sync the Vault, then ask me what needs attention, what automations look stuck, or what move should come next.",
+};
 
 const tabIcons = {
   dashboard: LayoutDashboard,
@@ -56,8 +75,10 @@ const tabIcons = {
   brain: BrainCircuit,
 };
 
-const formatConversion = (value) =>
-  `${(Number(value || 0) * 100).toFixed(1)}%`;
+const formatConversion = (value) => {
+  if (typeof value === "string" && value.trim() !== "") return value;
+  return `${(Number(value || 0) * 100).toFixed(1)}%`;
+};
 
 const formatAssetValue = (value) => {
   if (typeof value === "number") return `$${value.toLocaleString()}`;
@@ -65,61 +86,495 @@ const formatAssetValue = (value) => {
   return CONFIG.metrics.assetValue;
 };
 
-const formatSiteHealth = (value) => {
-  if (typeof value === "number") {
-    if (value <= 1) return `${Math.round(value * 100)}%`;
-    return `${Math.round(value)}%`;
-  }
-  if (typeof value === "string" && value.trim() !== "") return value;
-  return CONFIG.metrics.systemHealth;
+const cardStyle = {
+  ...brutalCard,
+  backgroundColor: theme.colors.card,
 };
 
-const trendSymbol = (trend) => {
-  if (trend === "up") return "↑";
-  if (trend === "down") return "↓";
-  return "→";
+const compactGrid = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+  gap: "0.75rem",
 };
 
-function BrandLogo() {
-  return (
+const normalizeArray = (value) => (Array.isArray(value) ? value : []);
+
+const summarizeList = (items, mapper, limit = 5) =>
+  normalizeArray(items)
+    .slice(0, limit)
+    .map(mapper)
+    .filter(Boolean);
+
+const normalizeData = (payload = {}) => ({
+  reviews: normalizeArray(payload.reviews).map((review) => ({
+    ...review,
+    name: review.name || review.reviewerName || "Anonymous",
+    reviewText: review.reviewText || review.text || "",
+    aiDraftedResponse:
+      review.aiDraftedResponse ||
+      review.aIDraftedResponse ||
+      review.aiResponse ||
+      "",
+  })),
+  competitors: normalizeArray(payload.competitors),
+  community: normalizeArray(payload.community),
+  campaigns: normalizeArray(payload.campaigns),
+  email: Array.isArray(payload.email) ? payload.email[0] || {} : payload.email || {},
+  alerts: normalizeArray(payload.alerts),
+  sourceHealth: payload.sourceHealth || null,
+  aiBrief: payload.aiBrief || null,
+});
+
+const emptyData = normalizeData();
+
+const buildAssistantSnapshot = ({ stats, data, lastSync }) => ({
+  lastSync: lastSync || "No sync yet",
+  stats,
+  sourceHealth: data.sourceHealth || {},
+  alerts: summarizeList(
+    data.alerts,
+    (alert) => `${alert.type || "info"} from ${alert.source || "System"}: ${alert.message}`,
+  ),
+  reviews: summarizeList(
+    data.reviews,
+    (review) =>
+      `${review.name}: ${review.reviewText || "No review text"}${
+        review.aiDraftedResponse ? ` | AI reply: ${review.aiDraftedResponse}` : ""
+      }`,
+  ),
+  campaigns: summarizeList(
+    data.campaigns,
+    (campaign) =>
+      `${campaign.name || "Campaign"}: open ${campaign.openRate ?? "N/A"}, click ${
+        campaign.clickRate ?? "N/A"
+      }`,
+  ),
+  competitors: summarizeList(
+    data.competitors,
+    (competitor) =>
+      `${competitor.name || competitor.competitor || "Competitor"}: ${
+        competitor.notes || "No notes"
+      }`,
+  ),
+  aiBrief: data.aiBrief || {},
+});
+
+const createLocalAssistantReply = ({ stats, data, lastSync }) => {
+  const alerts = data.alerts.length
+    ? data.alerts.slice(0, 2).map((alert) => alert.message).join(" ")
+    : "No active alerts are showing.";
+  const negativeReviews = data.reviews.filter((review) =>
+    String(review.sentiment || review.rating || "").toLowerCase().includes("negative"),
+  );
+  const nextAction =
+    data.aiBrief?.nextActions?.[0] ||
+    (negativeReviews.length
+      ? "Start with the reviews that need a public reply."
+      : "Review the latest stats, then pick one growth or retention action to push today.");
+
+  return [
+    `Last sync: ${lastSync || "No sync yet"}.`,
+    `Revenue is ${stats.revenue}, leads are ${stats.leads}, conversion is ${stats.conversionRate}, and asset value is ${stats.assetValue}.`,
+    alerts,
+    `Best next move: ${nextAction}`,
+    "Add your OpenRouter key in Settings when you want me to answer follow-up questions with full AI reasoning.",
+  ].join("\n\n");
+};
+
+const MetricCard = ({ icon: Icon, label, value }) => (
+  <div style={{ ...cardStyle, padding: "0.9rem" }}>
     <div
       style={{
-        display: "inline-flex",
-        alignItems: "center",
-        border: "1px solid #111111",
-        padding: "0.5rem 0.75rem",
-        backgroundColor: "#fffcf9",
-        lineHeight: 1,
-        whiteSpace: "nowrap",
+        display: "flex",
+        justifyContent: "space-between",
+        gap: "0.75rem",
+        marginBottom: "0.45rem",
       }}
-      aria-label="DigitallyDefined logo"
     >
-      <span
-        style={{
-          fontFamily: "Inter, DM Sans, Arial, sans-serif",
-          fontWeight: 700,
-          fontSize: "1rem",
-          color: "#111111",
-          letterSpacing: "-0.03em",
-          fontStyle: "normal",
-        }}
-      >
-        Digitally
+      <span style={{ ...brutalEyebrow, color: theme.colors.muted, fontSize: "0.62rem" }}>
+        {label}
       </span>
-      <span
-        style={{
-          fontFamily: "Inter, DM Sans, Arial, sans-serif",
-          fontWeight: 700,
-          fontSize: "1rem",
-          color: "#f18b25",
-          letterSpacing: "-0.03em",
-          fontStyle: "italic",
-          marginLeft: "0.06rem",
-        }}
-      >
-        Defined
-      </span>
+      <Icon size={17} color={theme.colors.aquaBlue} />
     </div>
+    <strong style={{ fontSize: "1.08rem" }}>{value}</strong>
+  </div>
+);
+
+const InfoBlock = ({ label, value }) => (
+  <div style={{ ...cardStyle, padding: "0.75rem" }}>
+    <div style={{ ...brutalEyebrow, color: theme.colors.muted, fontSize: "0.62rem" }}>
+      {label}
+    </div>
+    <div style={{ marginTop: "0.25rem", fontWeight: 800 }}>{value}</div>
+  </div>
+);
+
+const EmptyState = ({ children }) => (
+  <p style={{ margin: 0, color: theme.colors.muted, fontSize: "0.9rem" }}>
+    {children}
+  </p>
+);
+
+function CommandTab({ data, stats }) {
+  return (
+    <div style={{ display: "grid", gap: "1rem" }}>
+      <div style={compactGrid}>
+        <InfoBlock label="Top Asset" value={stats.topAsset} />
+        <InfoBlock label="Community Growth" value={stats.communityGrowth} />
+        <InfoBlock label="Email Growth" value={stats.emailGrowth} />
+        <InfoBlock label="Churn Risk" value={stats.churnRisk} />
+      </div>
+
+      {data.alerts.length > 0 && (
+        <section style={{ display: "grid", gap: "0.5rem" }}>
+          <h3 style={{ ...brutalHeading, margin: 0, fontSize: "0.95rem" }}>
+            System Alerts
+          </h3>
+          {data.alerts.map((alert, index) => (
+            <div
+              key={`${alert.source || "alert"}-${index}`}
+              style={{
+                ...cardStyle,
+                padding: "0.75rem",
+                display: "flex",
+                gap: "0.6rem",
+                alignItems: "flex-start",
+              }}
+            >
+              <span
+                style={{
+                  ...brutalEyebrow,
+                  color:
+                    alert.type === "critical"
+                      ? theme.colors.darkRed
+                      : alert.type === "warning"
+                        ? theme.colors.orange
+                        : theme.colors.aquaBlue,
+                  fontSize: "0.62rem",
+                }}
+              >
+                {alert.type || "info"}
+              </span>
+              <span style={{ fontSize: "0.88rem" }}>
+                <strong>{alert.source || "System"}:</strong> {alert.message}
+              </span>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {data.sourceHealth && (
+        <section style={{ display: "grid", gap: "0.5rem" }}>
+          <h3 style={{ ...brutalHeading, margin: 0, fontSize: "0.95rem" }}>
+            Source Health
+          </h3>
+          <div style={compactGrid}>
+            {Object.entries(data.sourceHealth).map(([key, status]) => (
+              <InfoBlock key={key} label={key} value={status} />
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}
+
+function ReputationTab({ reviews }) {
+  if (!reviews.length) {
+    return <EmptyState>{dashboardConfig.reputationEmpty}</EmptyState>;
+  }
+
+  return (
+    <div style={{ display: "grid", gap: "0.75rem" }}>
+      {reviews.map((review, index) => (
+        <article key={`${review.name}-${index}`} style={{ ...cardStyle, padding: "0.9rem" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: "1rem",
+              marginBottom: "0.45rem",
+            }}
+          >
+            <strong>{review.name}</strong>
+            <span style={{ color: theme.colors.muted, fontSize: "0.78rem" }}>
+              {review.date || ""}
+            </span>
+          </div>
+          <p style={{ margin: 0, fontSize: "0.9rem" }}>{review.reviewText}</p>
+          {review.aiDraftedResponse && (
+            <div
+              style={{
+                borderTop: brutalBorder,
+                marginTop: "0.75rem",
+                paddingTop: "0.75rem",
+              }}
+            >
+              <span style={{ ...brutalEyebrow, color: theme.colors.aquaBlue }}>
+                {dashboardConfig.aiReplyLabel}
+              </span>
+              <p style={{ margin: "0.35rem 0 0", color: theme.colors.muted }}>
+                {review.aiDraftedResponse}
+              </p>
+            </div>
+          )}
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function IntelTab({ data }) {
+  return (
+    <div style={{ display: "grid", gap: "1rem" }}>
+      <div style={compactGrid}>
+        <InfoBlock label="Email Subscribers" value={data.email?.subscribers ?? "N/A"} />
+        <InfoBlock label="Open Rate" value={data.email?.openRate ?? "N/A"} />
+        <InfoBlock label="Click Rate" value={data.email?.clickRate ?? "N/A"} />
+        <InfoBlock label="Revenue / Campaign" value={data.email?.revenuePerCampaign ?? "N/A"} />
+      </div>
+
+      {data.campaigns.length > 0 ? (
+        <section style={{ display: "grid", gap: "0.5rem" }}>
+          <h3 style={{ ...brutalHeading, margin: 0, fontSize: "0.95rem" }}>
+            Campaigns
+          </h3>
+          {data.campaigns.map((campaign, index) => (
+            <div
+              key={`${campaign.name}-${index}`}
+              style={{
+                ...cardStyle,
+                padding: "0.75rem",
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "1rem",
+                flexWrap: "wrap",
+              }}
+            >
+              <strong>{campaign.name}</strong>
+              <span style={{ color: theme.colors.muted }}>
+                Open: {campaign.openRate ?? "N/A"} | Click: {campaign.clickRate ?? "N/A"}
+              </span>
+            </div>
+          ))}
+        </section>
+      ) : (
+        <EmptyState>{dashboardConfig.intelEmpty}</EmptyState>
+      )}
+
+      {data.competitors.length > 0 && (
+        <section style={{ display: "grid", gap: "0.5rem" }}>
+          <h3 style={{ ...brutalHeading, margin: 0, fontSize: "0.95rem" }}>
+            {dashboardConfig.marketIntelTitle}
+          </h3>
+          {data.competitors.map((competitor, index) => (
+            <article
+              key={`${competitor.name || competitor.competitor}-${index}`}
+              style={{ ...cardStyle, padding: "0.75rem" }}
+            >
+              <strong>{competitor.name || competitor.competitor}</strong>
+              {competitor.notes && (
+                <p style={{ margin: "0.3rem 0 0", color: theme.colors.muted }}>
+                  {competitor.notes}
+                </p>
+              )}
+            </article>
+          ))}
+        </section>
+      )}
+    </div>
+  );
+}
+
+function BrainTab({ aiBrief }) {
+  if (!aiBrief) {
+    return <EmptyState>No AI brief available. Click Sync Vault to generate one.</EmptyState>;
+  }
+
+  const sections = [
+    ["What's Working", aiBrief.working, CONFIG.colors.success],
+    ["What's Slipping", aiBrief.slipping, theme.colors.darkRed],
+    ["Next Actions", aiBrief.nextActions, theme.colors.orange],
+  ];
+
+  return (
+    <div style={{ display: "grid", gap: "0.75rem" }}>
+      {sections.map(([title, items, color]) =>
+        items?.length ? (
+          <section key={title} style={{ ...cardStyle, padding: "0.9rem" }}>
+            <h3 style={{ ...brutalHeading, margin: "0 0 0.5rem", color, fontSize: "0.95rem" }}>
+              {title}
+            </h3>
+            <ul style={{ margin: 0, paddingLeft: "1.1rem" }}>
+              {items.map((item, index) => (
+                <li key={`${title}-${index}`} style={{ marginBottom: "0.35rem" }}>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null,
+      )}
+    </div>
+  );
+}
+
+function DashboardAssistant({
+  messages,
+  input,
+  isThinking,
+  assistantError,
+  onInputChange,
+  onSubmit,
+  onQuickPrompt,
+}) {
+  const quickPrompts = [
+    "What needs my attention today?",
+    "Summarize my automations.",
+    "What is the next best move?",
+  ];
+
+  return (
+    <section
+      style={{
+        ...cardStyle,
+        padding: "1rem",
+        backgroundColor: theme.colors.panel,
+        display: "grid",
+        gap: "0.85rem",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "0.75rem",
+          flexWrap: "wrap",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "0.55rem" }}>
+          <Bot size={19} color={theme.colors.aquaBlue} />
+          <h2 style={{ ...brutalHeading, fontSize: "1rem", margin: 0 }}>
+            Dashboard AI Assistant
+          </h2>
+        </div>
+        <span style={{ ...brutalEyebrow, color: theme.colors.muted, fontSize: "0.58rem" }}>
+          {ASSISTANT_MODEL}
+        </span>
+      </div>
+
+      <div
+        style={{
+          border: brutalBorder,
+          backgroundColor: theme.colors.card,
+          minHeight: 180,
+          maxHeight: 280,
+          overflowY: "auto",
+          padding: "0.75rem",
+          display: "grid",
+          gap: "0.65rem",
+          alignContent: "start",
+        }}
+      >
+        {messages.map((message, index) => {
+          const isUser = message.role === "user";
+
+          return (
+            <div
+              key={`${message.role}-${index}`}
+              style={{
+                justifySelf: isUser ? "end" : "start",
+                maxWidth: "min(92%, 720px)",
+                border: brutalBorder,
+                backgroundColor: isUser ? theme.colors.aquaBlue : theme.colors.background,
+                padding: "0.65rem 0.7rem",
+                fontSize: "0.86rem",
+                lineHeight: 1.45,
+                whiteSpace: "pre-wrap",
+              }}
+            >
+              {message.content}
+            </div>
+          );
+        })}
+        {isThinking && (
+          <div
+            style={{
+              justifySelf: "start",
+              border: brutalBorder,
+              backgroundColor: theme.colors.background,
+              padding: "0.65rem 0.7rem",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.45rem",
+              fontSize: "0.86rem",
+            }}
+          >
+            <Loader2 size={15} style={{ animation: "dd-spin 0.8s linear infinite" }} />
+            Thinking through the dashboard...
+          </div>
+        )}
+      </div>
+
+      {assistantError && (
+        <p style={{ margin: 0, color: theme.colors.darkRed, fontSize: "0.82rem" }}>
+          {assistantError}
+        </p>
+      )}
+
+      <div style={{ display: "flex", gap: "0.45rem", flexWrap: "wrap" }}>
+        {quickPrompts.map((prompt) => (
+          <button
+            key={prompt}
+            type="button"
+            onClick={() => onQuickPrompt(prompt)}
+            style={{
+              border: brutalBorder,
+              backgroundColor: theme.colors.card,
+              color: theme.colors.textPrimary,
+              padding: "0.42rem 0.55rem",
+              fontSize: "0.75rem",
+              fontWeight: 800,
+              cursor: "pointer",
+              fontFamily: theme.fonts.body,
+            }}
+          >
+            {prompt}
+          </button>
+        ))}
+      </div>
+
+      <form onSubmit={onSubmit} style={{ display: "flex", gap: "0.5rem" }}>
+        <input
+          value={input}
+          onChange={(event) => onInputChange(event.target.value)}
+          placeholder="Ask about stats, reviews, automations, or next actions..."
+          style={{
+            border: brutalBorder,
+            flex: 1,
+            minWidth: 0,
+            padding: "0.65rem 0.7rem",
+            backgroundColor: theme.colors.card,
+            fontFamily: theme.fonts.body,
+          }}
+        />
+        <button
+          type="submit"
+          disabled={isThinking || !input.trim()}
+          aria-label="Send assistant message"
+          style={{
+            ...brutalButtonPrimary,
+            width: 44,
+            minWidth: 44,
+            padding: 0,
+            opacity: isThinking || !input.trim() ? 0.6 : 1,
+          }}
+        >
+          <Send size={17} />
+        </button>
+      </form>
+    </section>
   );
 }
 
@@ -129,167 +584,75 @@ const DashboardPage = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSync, setLastSync] = useState(null);
   const [syncError, setSyncError] = useState("");
-  const [rawData, setRawData] = useState({
-    reviews: [],
-    competitors: [],
-    community: [],
-    leadMagnets: [],
-    payments: [],
-    campaigns: [],
-    notion: [],
-    assets: [],
-    email: [],
-    alerts: [],
-    aiBrief: null,
-  });
-
+  const [data, setData] = useState(emptyData);
   const [stats, setStats] = useState({
-    assetValue: CONFIG.metrics.assetValue,
-    activeLeads: CONFIG.metrics.activeLeads,
-    siteHealth: CONFIG.metrics.systemHealth,
-    avgSentiment: CONFIG.metrics.sentimentIndex,
     revenue: "$0",
     leads: 0,
+    conversionRate: "0%",
+    assetValue: CONFIG.metrics.assetValue,
+    topAsset: "N/A",
     communityGrowth: "0%",
     emailGrowth: "0%",
-    conversionRate: "0%",
-    topAsset: "N/A",
     churnRisk: "Low",
   });
-
-  const getStored = (key) => localStorage.getItem(key) || "";
-  const [openRouterKey, setOpenRouterKey] = useState(getStored("openRouterKey"));
+  const [openRouterKey, setOpenRouterKey] = useState(
+    localStorage.getItem("openRouterKey") || "",
+  );
+  const [assistantMessages, setAssistantMessages] = useState([assistantWelcome]);
+  const [assistantInput, setAssistantInput] = useState("");
+  const [isAssistantThinking, setIsAssistantThinking] = useState(false);
+  const [assistantError, setAssistantError] = useState("");
 
   useEffect(() => {
     document.title = `${CONFIG.brand.fullName} Dashboard`;
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute("content", CONFIG.seo.description);
-    }
   }, []);
 
   const tabs = useMemo(
-    () =>
-      dashboardConfig.tabs.map((tab) => ({
-        ...tab,
-        icon: tabIcons[tab.id],
-      })),
-    []
+    () => dashboardConfig.tabs.map((tab) => ({ ...tab, icon: tabIcons[tab.id] })),
+    [],
   );
 
-  const normalizeReview = (review = {}) => ({
-    ...review,
-    name: review.name || review.reviewerName || "Anonymous",
-    reviewText: review.reviewText || review.text || "",
-    aiDraftedResponse:
-      review.aiDraftedResponse ||
-      review.aIDraftedResponse ||
-      review.aiResponse ||
-      "",
-  });
+  const currentTabConfig = tabs.find((tab) => tab.id === activeTab);
 
   const syncEmpireData = async () => {
     setIsSyncing(true);
     setSyncError("");
 
     try {
-      const freshUrl = `${googleSheetsDataUrl}${
-        googleSheetsDataUrl.includes("?") ? "&" : "?"
-      }t=${Date.now()}`;
-
-      const sheetsRes = await fetch(freshUrl, {
+      const url = `${BACKEND_URL}${BACKEND_URL.includes("?") ? "&" : "?"}t=${Date.now()}`;
+      const res = await fetch(url, {
         cache: "no-store",
+        headers: BACKEND_KEY
+          ? { "x-api-key": BACKEND_KEY, "Content-Type": "application/json" }
+          : undefined,
       });
 
-      if (!sheetsRes.ok) {
-        throw new Error(`${dashboardConfig.syncFailurePrefix} ${sheetsRes.status}`);
-      }
-
-      const sheetsData = await sheetsRes.json();
-
-      const notionToken = localStorage.getItem("notionToken");
-      const notionDbId = localStorage.getItem("notionDbId");
-      let notionData = null;
-
-      if (notionToken && notionDbId) {
-        const notionRes = await fetch(
-          `https://api.notion.com/v1/databases/${notionDbId}/query`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${notionToken}`,
-              "Notion-Version": "2022-06-28",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({}),
-          }
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(
+          errData.error || `${dashboardConfig.syncFailurePrefix} ${res.status}`,
         );
-
-        if (notionRes.ok) {
-          notionData = await notionRes.json();
-        }
       }
 
-      setRawData((currentData) => ({
-        ...currentData,
-        reviews: Array.isArray(sheetsData?.reviews)
-          ? sheetsData.reviews.map(normalizeReview)
-          : currentData.reviews,
-        competitors: Array.isArray(sheetsData?.competitors)
-          ? sheetsData.competitors
-          : currentData.competitors,
-        community: Array.isArray(sheetsData?.community)
-          ? sheetsData.community
-          : currentData.community,
-        leadMagnets: Array.isArray(sheetsData?.leadMagnets)
-          ? sheetsData.leadMagnets
-          : currentData.leadMagnets,
-        payments: Array.isArray(sheetsData?.payments)
-          ? sheetsData.payments
-          : currentData.payments,
-        campaigns: Array.isArray(sheetsData?.campaigns)
-          ? sheetsData.campaigns
-          : currentData.campaigns,
-        assets: Array.isArray(sheetsData?.assets)
-          ? sheetsData.assets
-          : currentData.assets,
-        email: Array.isArray(sheetsData?.email)
-          ? sheetsData.email
-          : currentData.email,
-        alerts: Array.isArray(sheetsData?.alerts)
-          ? sheetsData.alerts
-          : currentData.alerts,
-        notion: notionData || currentData.notion,
-        aiBrief: sheetsData?.aiBrief || currentData.aiBrief,
-      }));
+      const payload = await res.json();
+      const nextData = normalizeData(payload);
 
-      const newStats = {
-        assetValue: formatAssetValue(sheetsData?.assetValue),
-        activeLeads:
-          typeof sheetsData?.activeLeads === "number"
-            ? sheetsData.activeLeads
-            : CONFIG.metrics.activeLeads,
-        siteHealth: formatSiteHealth(sheetsData?.siteHealth),
-        avgSentiment:
-          typeof sheetsData?.avgSentiment === "number"
-            ? sheetsData.avgSentiment.toFixed(2)
-            : CONFIG.metrics.sentimentIndex,
-        revenue: sheetsData?.revenue || "$0",
-        leads: sheetsData?.leads || 0,
-        communityGrowth: sheetsData?.communityGrowth || "0%",
-        emailGrowth: sheetsData?.emailGrowth || "0%",
-        conversionRate: sheetsData?.conversionRate
-          ? formatConversion(sheetsData.conversionRate)
+      setData(nextData);
+      setStats({
+        revenue: payload.revenue || "$0",
+        leads: payload.leads || 0,
+        conversionRate: payload.conversionRate
+          ? formatConversion(payload.conversionRate)
           : "0%",
-        topAsset: sheetsData?.topAsset || "N/A",
-        churnRisk: sheetsData?.churnRisk || "Low",
-      };
-
-      setStats(newStats);
+        assetValue: formatAssetValue(payload.assetValue),
+        topAsset: payload.topAsset || "N/A",
+        communityGrowth: payload.communityGrowth || "0%",
+        emailGrowth: payload.emailGrowth || "0%",
+        churnRisk: payload.churnRisk || "Low",
+      });
       setLastSync(new Date().toLocaleString());
     } catch (err) {
-      console.error(err);
-      setSyncError(err.message || "Failed to sync data");
+      setSyncError(err.message || dashboardConfig.syncError);
     } finally {
       setIsSyncing(false);
     }
@@ -300,22 +663,128 @@ const DashboardPage = () => {
     setShowSettings(false);
   };
 
-  const currentTabConfig = tabs.find((tab) => tab.id === activeTab);
+  const sendAssistantMessage = async (messageText) => {
+    const trimmedMessage = messageText.trim();
+    if (!trimmedMessage || isAssistantThinking) return;
+
+    const userMessage = { role: "user", content: trimmedMessage };
+    const nextMessages = [...assistantMessages, userMessage];
+
+    setAssistantMessages(nextMessages);
+    setAssistantInput("");
+    setAssistantError("");
+    setIsAssistantThinking(true);
+
+    try {
+      if (!openRouterKey.trim()) {
+        setAssistantMessages((currentMessages) => [
+          ...currentMessages,
+          {
+            role: "assistant",
+            content: createLocalAssistantReply({ stats, data, lastSync }),
+          },
+        ]);
+        return;
+      }
+
+      const snapshot = buildAssistantSnapshot({ stats, data, lastSync });
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${openRouterKey.trim()}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": window.location.origin,
+          "X-Title": `${CONFIG.brand.fullName} Dashboard`,
+        },
+        body: JSON.stringify({
+          model: ASSISTANT_MODEL,
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are the private AI assistant inside the DigitallyDefined dashboard. Be concise, direct, and useful. Use the provided dashboard snapshot as your source of truth. Help the owner understand stats, automations, reviews, alerts, campaigns, and next actions. Do not invent missing numbers; say what needs to be synced or connected.",
+            },
+            {
+              role: "user",
+              content: `Dashboard snapshot:\n${JSON.stringify(snapshot, null, 2)}`,
+            },
+            ...nextMessages.slice(-8),
+          ],
+          temperature: 0.35,
+          max_tokens: 650,
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error?.message || `Assistant failed with status ${res.status}`);
+      }
+
+      const payload = await res.json();
+      const assistantReply =
+        payload.choices?.[0]?.message?.content ||
+        "I could not generate a response from the assistant model.";
+
+      setAssistantMessages((currentMessages) => [
+        ...currentMessages,
+        { role: "assistant", content: assistantReply },
+      ]);
+    } catch (err) {
+      setAssistantError(err.message || "Assistant request failed.");
+      setAssistantMessages((currentMessages) => [
+        ...currentMessages,
+        {
+          role: "assistant",
+          content:
+            "I could not reach the AI model, so here is the local dashboard readout instead.\n\n" +
+            createLocalAssistantReply({ stats, data, lastSync }),
+        },
+      ]);
+    } finally {
+      setIsAssistantThinking(false);
+    }
+  };
+
+  const handleAssistantSubmit = (event) => {
+    event.preventDefault();
+    sendAssistantMessage(assistantInput);
+  };
+
+  const renderTab = () => {
+    if (activeTab === "reputation") return <ReputationTab reviews={data.reviews} />;
+    if (activeTab === "intel") return <IntelTab data={data} />;
+    if (activeTab === "brain") return <BrainTab aiBrief={data.aiBrief} />;
+    return <CommandTab data={data} stats={stats} />;
+  };
 
   return (
     <div
       style={{
         minHeight: "100vh",
-        backgroundColor: "#fffcf9",
-        color: "#111111",
+        backgroundColor: theme.colors.background,
+        color: theme.colors.textPrimary,
         fontFamily: theme.fonts.app,
       }}
     >
+      <style>{`
+        @keyframes dd-spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        @media (max-width: 900px) {
+          .dd-dashboard-shell {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
+
       <header
         style={{
-          borderBottom: "1px solid #111111",
+          borderBottom: brutalBorder,
           padding: "1rem 1.5rem",
-          backgroundColor: "#fffaf5",
+          backgroundColor: theme.colors.panel,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -324,41 +793,20 @@ const DashboardPage = () => {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
-          <BrandLogo />
-          <div>
-            <p
-              style={{
-                margin: 0,
-                fontSize: "0.78rem",
-                color: "#5f5f5f",
-              }}
-            >
-              {dashboardConfig.tagline}
-            </p>
-          </div>
+          <Logo as="div" />
+          <p style={{ margin: 0, fontSize: "0.82rem", color: theme.colors.muted }}>
+            {CONFIG.brand.tagline}
+          </p>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.75rem",
-          }}
-        >
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
           <button
             onClick={syncEmpireData}
             disabled={isSyncing}
             style={{
               ...brutalButtonPrimary,
-              display: "flex",
-              alignItems: "center",
-              gap: "0.4rem",
-              padding: "0.45rem 0.8rem",
-              fontSize: "0.85rem",
-              backgroundColor: "#f18b25",
-              color: "#111111",
-              border: "1px solid #111111",
-              boxShadow: "4px 4px 0 #111111",
+              padding: "0.55rem 0.8rem",
+              opacity: isSyncing ? 0.72 : 1,
             }}
           >
             <RefreshCw
@@ -374,14 +822,9 @@ const DashboardPage = () => {
           <button
             onClick={() => setShowSettings(true)}
             style={{
-              border: "1px solid #111111",
-              backgroundColor: "#fffcf9",
-              padding: "0.45rem 0.7rem",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.4rem",
-              fontSize: "0.8rem",
-              boxShadow: "4px 4px 0 #111111",
+              ...brutalButtonPrimary,
+              backgroundColor: theme.colors.card,
+              padding: "0.55rem 0.8rem",
             }}
           >
             <Settings size={16} />
@@ -391,8 +834,9 @@ const DashboardPage = () => {
       </header>
 
       <main
+        className="dd-dashboard-shell"
         style={{
-          padding: "1.5rem",
+          padding: "clamp(1rem, 4vw, 1.5rem)",
           maxWidth: 1200,
           margin: "0 auto",
           display: "grid",
@@ -402,185 +846,98 @@ const DashboardPage = () => {
       >
         <aside
           style={{
-            ...brutalCard,
+            ...cardStyle,
             padding: "1rem",
-            display: "flex",
-            flexDirection: "column",
+            display: "grid",
             gap: "1rem",
             height: "fit-content",
-            backgroundColor: "#fffaf5",
-            border: "1px solid #111111",
-            boxShadow: "6px 6px 0 #111111",
-            borderRadius: 0,
+            backgroundColor: theme.colors.panel,
           }}
         >
-          <div>
-            <h2
-              style={{
-                ...brutalHeading,
-                fontSize: "0.9rem",
-                marginBottom: "0.75rem",
-              }}
-            >
-              {dashboardLabels.navigation}
-            </h2>
+          <h2 style={{ ...brutalHeading, fontSize: "0.95rem", margin: 0 }}>
+            {dashboardLabels.navigation}
+          </h2>
 
-            <nav
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.45rem",
-              }}
-            >
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.id;
+          <nav style={{ display: "grid", gap: "0.45rem" }}>
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
 
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    style={{
-                      border: "1px solid #111111",
-                      backgroundColor: isActive ? "#f18b25" : "#fffcf9",
-                      color: "#111111",
-                      padding: "0.65rem 0.75rem",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      fontSize: "0.85rem",
-                      cursor: "pointer",
-                      boxShadow: isActive ? "3px 3px 0 #111111" : "none",
-                    }}
-                  >
-                    <span
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.45rem",
-                      }}
-                    >
-                      <Icon size={16} />
-                      {tab.label}
-                    </span>
-
-                    {tab.badge && (
-                      <span
-                        style={{
-                          border: "1px solid #111111",
-                          padding: "0.1rem 0.4rem",
-                          fontSize: "0.7rem",
-                          backgroundColor: "#fffaf5",
-                        }}
-                      >
-                        {tab.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  style={{
+                    border: brutalBorder,
+                    backgroundColor: isActive ? theme.colors.orange : theme.colors.background,
+                    color: theme.colors.textPrimary,
+                    padding: "0.7rem 0.75rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "0.5rem",
+                    fontWeight: 800,
+                    cursor: "pointer",
+                    fontFamily: theme.fonts.body,
+                  }}
+                >
+                  <span style={{ display: "flex", alignItems: "center", gap: "0.45rem" }}>
+                    <Icon size={16} />
+                    {tab.label}
+                  </span>
+                </button>
+              );
+            })}
+          </nav>
 
           <div
             style={{
-              marginTop: "0.5rem",
-              paddingTop: "0.75rem",
-              borderTop: "1px dashed #111111",
-              fontSize: "0.75rem",
+              borderTop: brutalBorder,
+              paddingTop: "0.8rem",
+              color: syncError ? theme.colors.darkRed : theme.colors.muted,
+              fontSize: "0.78rem",
             }}
           >
-            <p style={{ margin: 0, marginBottom: "0.3rem" }}>
-              {lastSync
+            {syncError ||
+              (lastSync
                 ? `${dashboardConfig.lastSyncPrefix} ${lastSync}`
-                : dashboardLabels.noSync}
-            </p>
-
-            {syncError && (
-              <p
-                style={{
-                  margin: 0,
-                  color: "#8b1a0a",
-                }}
-              >
-                {syncError}
-              </p>
-            )}
+                : dashboardLabels.noSync)}
           </div>
         </aside>
 
-        <section
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "1rem",
-          }}
-        >
+        <section style={{ display: "grid", gap: "1rem", alignContent: "start" }}>
           <div
             style={{
-              ...brutalCard,
+              ...cardStyle,
               padding: "1rem",
               display: "grid",
-              gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
               gap: "0.75rem",
-              backgroundColor: "#fffaf5",
-              border: "1px solid #111111",
-              boxShadow: "6px 6px 0 #111111",
-              borderRadius: 0,
+              backgroundColor: theme.colors.panel,
             }}
           >
-            <MetricCard
-              icon={DollarSign}
-              label={dashboardLabels.metrics.revenue}
-              value={stats.revenue}
-              trend={trendSymbol("up")}
-            />
-            <MetricCard
-              icon={Users}
-              label={dashboardLabels.metrics.leads}
-              value={stats.leads}
-              trend={trendSymbol("up")}
-            />
-            <MetricCard
-              icon={TrendingUp}
-              label={dashboardLabels.metrics.conversion}
-              value={stats.conversionRate}
-              trend={trendSymbol("up")}
-            />
-            <MetricCard
-              icon={FolderHeart}
-              label={dashboardLabels.metrics.assetValue}
-              value={stats.assetValue}
-              trend={trendSymbol("up")}
-            />
+            <MetricCard icon={DollarSign} label={dashboardLabels.metrics.revenue} value={stats.revenue} />
+            <MetricCard icon={Users} label={dashboardLabels.metrics.leads} value={stats.leads} />
+            <MetricCard icon={TrendingUp} label={dashboardLabels.metrics.conversion} value={stats.conversionRate} />
+            <MetricCard icon={FolderHeart} label={dashboardLabels.metrics.assetValue} value={stats.assetValue} />
           </div>
 
-          <div
-            style={{
-              ...brutalCard,
-              padding: "1rem",
-              minHeight: 200,
-              backgroundColor: "#fffaf5",
-              border: "1px solid #111111",
-              boxShadow: "6px 6px 0 #111111",
-              borderRadius: 0,
-            }}
-          >
-            <h2
-              style={{
-                ...brutalHeading,
-                fontSize: "1rem",
-                marginBottom: "0.5rem",
-              }}
-            >
+          <div style={{ ...cardStyle, padding: "1rem", minHeight: 220 }}>
+            <h1 style={{ ...brutalHeading, margin: "0 0 0.5rem", fontSize: "1.3rem" }}>
               {currentTabConfig?.label}
-            </h2>
-
-            <p style={{ fontSize: "0.85rem", opacity: 0.8 }}>
-              {currentTabConfig?.description ||
-                "Configure this tab content in your dashboard config."}
-            </p>
+            </h1>
+            {renderTab()}
           </div>
+
+          <DashboardAssistant
+            messages={assistantMessages}
+            input={assistantInput}
+            isThinking={isAssistantThinking}
+            assistantError={assistantError}
+            onInputChange={setAssistantInput}
+            onSubmit={handleAssistantSubmit}
+            onQuickPrompt={sendAssistantMessage}
+          />
         </section>
       </main>
 
@@ -594,73 +951,57 @@ const DashboardPage = () => {
             justifyContent: "center",
             alignItems: "center",
             zIndex: 40,
+            padding: "1rem",
           }}
         >
           <div
             style={{
-              ...brutalCard,
+              ...cardStyle,
               padding: "1rem",
-              width: "min(420px, 90vw)",
-              backgroundColor: "#fffcf9",
+              width: "min(420px, 100%)",
+              backgroundColor: theme.colors.background,
               position: "relative",
-              border: "1px solid #111111",
-              boxShadow: "6px 6px 0 #111111",
-              borderRadius: 0,
             }}
           >
             <button
               onClick={() => setShowSettings(false)}
+              aria-label="Close settings"
               style={{
                 position: "absolute",
                 top: 8,
                 right: 8,
-                border: "none",
-                background: "transparent",
+                border: brutalBorder,
+                background: theme.colors.card,
                 cursor: "pointer",
+                width: 32,
+                height: 32,
+                display: "grid",
+                placeItems: "center",
               }}
             >
               <X size={16} />
             </button>
 
-            <h2
-              style={{
-                ...brutalHeading,
-                fontSize: "1rem",
-                marginBottom: "0.5rem",
-              }}
-            >
+            <h2 style={{ ...brutalHeading, fontSize: "1rem", margin: "0 2.2rem 0.5rem 0" }}>
               {dashboardConfig.settingsTitle}
             </h2>
 
-            <p
-              style={{
-                fontSize: "0.8rem",
-                marginBottom: "0.75rem",
-              }}
-            >
+            <p style={{ fontSize: "0.85rem", margin: "0 0 0.85rem", color: theme.colors.muted }}>
               {dashboardConfig.settingsDescription}
             </p>
 
-            <label
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.25rem",
-                fontSize: "0.8rem",
-                marginBottom: "0.75rem",
-              }}
-            >
+            <label style={{ display: "grid", gap: "0.35rem", fontSize: "0.85rem" }}>
               <span>{dashboardConfig.openRouterLabel}</span>
               <input
                 type="password"
                 value={openRouterKey}
-                onChange={(e) => setOpenRouterKey(e.target.value)}
+                onChange={(event) => setOpenRouterKey(event.target.value)}
                 placeholder={dashboardConfig.openRouterPlaceholder}
                 style={{
-                  border: "1px solid #111111",
-                  padding: "0.5rem 0.6rem",
-                  borderRadius: 0,
-                  backgroundColor: "#ffffff",
+                  border: brutalBorder,
+                  padding: "0.6rem 0.7rem",
+                  backgroundColor: theme.colors.card,
+                  fontFamily: theme.fonts.body,
                 }}
               />
             </label>
@@ -670,12 +1011,8 @@ const DashboardPage = () => {
               style={{
                 ...brutalButtonPrimary,
                 width: "100%",
-                padding: "0.5rem 0.75rem",
-                fontSize: "0.85rem",
-                backgroundColor: "#f18b25",
-                color: "#111111",
-                border: "1px solid #111111",
-                boxShadow: "4px 4px 0 #111111",
+                marginTop: "0.9rem",
+                padding: "0.65rem 0.75rem",
               }}
             >
               {dashboardLabels.saveSettings}
@@ -686,39 +1023,5 @@ const DashboardPage = () => {
     </div>
   );
 };
-
-const MetricCard = ({ icon: Icon, label, value, trend }) => (
-  <div
-    style={{
-      border: "1px solid #111111",
-      padding: "0.75rem",
-      backgroundColor: "#ffffff",
-      boxShadow: "4px 4px 0 #111111",
-      borderRadius: 0,
-    }}
-  >
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        marginBottom: "0.4rem",
-      }}
-    >
-      <span style={{ fontSize: "0.75rem", opacity: 0.85 }}>{label}</span>
-      <Icon size={16} />
-    </div>
-
-    <div
-      style={{
-        display: "flex",
-        alignItems: "baseline",
-        justifyContent: "space-between",
-      }}
-    >
-      <span style={{ fontWeight: 700, fontSize: "1rem" }}>{value}</span>
-      <span style={{ fontSize: "0.75rem", opacity: 0.8 }}>{trend}</span>
-    </div>
-  </div>
-);
 
 export default DashboardPage;
