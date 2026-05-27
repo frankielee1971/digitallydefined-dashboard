@@ -3,10 +3,12 @@ import { Navigate, Routes, Route } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import LandingPage from "./pages/LandingPage";
 import DashboardPage from "./pages/DashboardPage";
+import ChatWidget from "./components/ChatWidget";
 
 function App() {
   const hostname = window.location.hostname;
   const isDashboardDomain = hostname === "dashboard.digitallydefined.online";
+
   const homePage = isDashboardDomain ? (
     <Navigate to="/dashboard" replace />
   ) : (
@@ -16,6 +18,10 @@ function App() {
   return (
     <>
       <SpeedInsights />
+
+      {/* Show chat ONLY on the main site */}
+      {!isDashboardDomain && <ChatWidget />}
+
       <Routes>
         <Route path="/" element={homePage} />
         <Route path="/dashboard" element={<DashboardPage />} />
