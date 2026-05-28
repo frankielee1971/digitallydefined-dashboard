@@ -9,21 +9,32 @@ export default function ChatWidget() {
     if (!input.trim()) return;
 
     const userMessage = { role: "user", content: input };
-    setMessages((prev) => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+
+    setMessages(updatedMessages);
     setInput("");
 
     try {
       const res = await fetch(
-        "https://digitallydefined-os-backend.vercel.app/api/chat",
+        `${import.meta.env.VITE_BACKEND_URL}/api/backend?action=chat`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: input })
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": import.meta.env.VITE_DASHBOARD_API_KEY
+          },
+          body: JSON.stringify({
+            messages: updatedMessages
+          })
         }
       );
 
       const data = await res.json();
-      const botMessage = { role: "assistant", content: data.reply };
+
+      const botMessage = {
+        role: "assistant",
+        content: data.reply || "No response received."
+      };
 
       setMessages((prev) => [...prev, botMessage]);
     } catch (err) {
