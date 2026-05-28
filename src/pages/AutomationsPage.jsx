@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import AutomationsList from "../components/AutomationsList";
+import AutomationsEmptyState from "../components/AutomationsEmptyState";
 
 export default function AutomationsPage() {
   const [automations, setAutomations] = useState([]);
