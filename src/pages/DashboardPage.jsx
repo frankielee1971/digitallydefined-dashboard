@@ -754,7 +754,14 @@ const url = `${BACKEND_URL}?action=dashboard&t=${Date.now()}`;
         return;
       }
 
-      const snapshot = buildAssistantSnapshot({ stats, data, lastSync });
+const snapshot = buildAssistantSnapshot({
+  stats,
+  data: {
+    ...data,
+    automations,   // ← inject your real automations here
+  },
+  lastSync,
+});
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
