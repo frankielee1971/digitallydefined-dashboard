@@ -6,9 +6,15 @@ export default function AutomationsPage() {
   const [automations, setAutomations] = useState([]);
 
   useEffect(() => {
-    const url = `${import.meta.env.VITE_BACKEND_URL}?action=automation.list`;
+    const url = `${import.meta.env.VITE_BACKEND_URL}/api/backend?action=automation.list`;
 
-    fetch(url)
+    fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": import.meta.env.VITE_DASHBOARD_API_KEY
+      }
+    })
       .then(res => res.json())
       .then(data => {
         if (data?.automations) {
