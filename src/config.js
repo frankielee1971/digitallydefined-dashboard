@@ -197,6 +197,10 @@ const CONFIG = {
         id: "brain",
         label: "THE BRAIN",
       },
+      {
+        id: "automations",
+        label: "AUTOMATIONS",
+      },
     ],
     mobileKeysLabel: "Keys",
     systemKeysLabel: "System Keys",

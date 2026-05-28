@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   TrendingUp,
   Users,
+  Workflow,
   X,
 } from "lucide-react";
 import CONFIG from "../config";
@@ -73,6 +74,7 @@ const tabIcons = {
   reputation: ShieldCheck,
   intel: BarChart3,
   brain: BrainCircuit,
+  automations: Workflow,
 };
 
 const formatConversion = (value) => {
@@ -123,6 +125,7 @@ const normalizeData = (payload = {}) => ({
   alerts: normalizeArray(payload.alerts),
   sourceHealth: payload.sourceHealth || null,
   aiBrief: payload.aiBrief || null,
+  automations: normalizeArray(payload.automations),
 });
 
 const emptyData = normalizeData();
@@ -157,6 +160,13 @@ const buildAssistantSnapshot = ({ stats, data, lastSync }) => ({
       }`,
   ),
   aiBrief: data.aiBrief || {},
+  automations: summarizeList(
+    data.automations,
+    (automation) =>
+      `${automation.name || "Automation"}: ${automation.status || "unknown"}${
+        automation.lastRun ? ` | last run: ${automation.lastRun}` : ""
+      }`,
+  ),
 });
 
 const createLocalAssistantReply = ({ stats, data, lastSync }) => {
@@ -172,10 +182,18 @@ const createLocalAssistantReply = ({ stats, data, lastSync }) => {
       ? "Start with the reviews that need a public reply."
       : "Review the latest stats, then pick one growth or retention action to push today.");
 
+  const automationSummary = data.automations.length
+    ? data.automations
+        .slice(0, 3)
+        .map((a) => `${a.name || "Automation"}: ${a.status || "unknown"}`)
+        .join(", ")
+    : "No automations running.";
+
   return [
     `Last sync: ${lastSync || "No sync yet"}.`,
     `Revenue is ${stats.revenue}, leads are ${stats.leads}, conversion is ${stats.conversionRate}, and asset value is ${stats.assetValue}.`,
     alerts,
+    `Automations: ${automationSummary}`,
     `Best next move: ${nextAction}`,
     "Add your OpenRouter key in Settings when you want me to answer follow-up questions with full AI reasoning.",
   ].join("\n\n");
@@ -419,6 +437,38 @@ function BrainTab({ aiBrief }) {
   );
 }
 
+function AutomationsTab({ automations }) {
+  if (!automations.length) {
+    return <EmptyState>{dashboardConfig.automationsEmpty || "No automations configured yet. Set up workflows in your backend to automate reviews, campaigns, and community tasks."}</EmptyState>;
+  }
+
+  return (
+    <div style={{ display: "grid", gap: "0.75rem" }}>
+      {automations.map((automation, index) => (
+        <div
+          key={`${automation.id || automation.name || index}`}
+          style={{ ...cardStyle, padding: "0.9rem" }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
+            <strong>{automation.name || "Automation"}</strong>
+            <span style={{ color: theme.colors.muted, fontSize: "0.78rem" }}>
+              {automation.status || "unknown"}
+            </span>
+          </div>
+          {automation.lastRun && (
+            <p style={{ margin: "0.25rem 0 0", fontSize: "0.85rem", color: theme.colors.muted }}>
+              Last run: {automation.lastRun}
+            </p>
+          )}
+          {automation.details && (
+            <p style={{ margin: "0.5rem 0 0", fontSize: "0.85rem" }}>{automation.details}</p>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function DashboardAssistant({
   messages,
   input,
@@ -595,6 +645,7 @@ const DashboardPage = () => {
     emailGrowth: "0%",
     churnRisk: "Low",
   });
+  const [automations, setAutomations] = useState([]);
   const [openRouterKey, setOpenRouterKey] = useState(
     localStorage.getItem("openRouterKey") || "",
   );
@@ -619,7 +670,7 @@ const DashboardPage = () => {
     setSyncError("");
 
     try {
-      const url = `${BACKEND_URL}${BACKEND_URL.includes("?") ? "&" : "?"}t=${Date.now()}`;
+const url = `${BACKEND_URL}?action=dashboard&t=${Date.now()}`;
       const res = await fetch(url, {
         cache: "no-store",
         headers: BACKEND_KEY
@@ -638,6 +689,22 @@ const DashboardPage = () => {
       const nextData = normalizeData(payload);
 
       setData(nextData);
+
+      const automationsRes = await fetch(
+        `${BACKEND_URL}?action=automation.list`,
+        {
+          headers: BACKEND_KEY
+            ? { "x-api-key": BACKEND_KEY }
+            : undefined,
+        }
+      );
+      if (!automationsRes.ok) {
+        setAutomations([]);
+      } else {
+        const automationsPayload = await automationsRes.json();
+        setAutomations(automationsPayload.automations || []);
+      }
+
       setStats({
         revenue: payload.revenue || "$0",
         leads: payload.leads || 0,
@@ -754,6 +821,7 @@ const DashboardPage = () => {
     if (activeTab === "reputation") return <ReputationTab reviews={data.reviews} />;
     if (activeTab === "intel") return <IntelTab data={data} />;
     if (activeTab === "brain") return <BrainTab aiBrief={data.aiBrief} />;
+    if (activeTab === "automations") return <AutomationsTab automations={data.automations} />;
     return <CommandTab data={data} stats={stats} />;
   };
 
