@@ -161,8 +161,9 @@ const CONFIG = {
   integrations: {
     googleSheetsUrl:
       "https://script.google.com/macros/s/AKfycbwEyg9UPQrxOgNVhkzGWRZAULMkjE4rCQhAKuYUoAoPEG1bCr0xU74X8dRRuyV53ARk/exec",
-    slackWebhookUrl: "YOUR_SLACK_WEBHOOK_URL",
-    gumloopFlowUrl: "YOUR_GUMLOOP_FLOW_URL",
+    slackWebhookUrl: "YOUR_SLACK_WEBHOOK",  // Replace with real URL or ""
+    gumloopFlowUrl: "YOUR_GUMLOOP_URL",     // Replace with real URL or ""
+    facebookGroupId: "YOUR_GROUP_ID",       // Add this if using Facebook
   },
 
   routes: {
