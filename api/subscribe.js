@@ -15,8 +15,8 @@ export default async function handler(req, res) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       grant_type: "client_credentials",
-      client_id: process.env.SENDPULSE_CLIENT_ID,
-      client_secret: process.env.SENDPULSE_CLIENT_SECRET,
+     client_id: process.env.SENDPULSE_API_USER_ID,
+client_secret: process.env.SENDPULSE_API_SECRET,
     }),
   });
 
