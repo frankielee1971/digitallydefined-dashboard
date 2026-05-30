@@ -15,6 +15,7 @@
     "@notionhq/client": "^5.18.0",
     "@vercel/node": "^5.7.3",
     "@vercel/speed-insights": "^2.0.0",
+    "@vercel/toolbar": "^0.2.6",
     "firebase": "^12.13.0",
     "firebase-admin": "^13.8.0",
     "googleapis": "^171.4.0",
