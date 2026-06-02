@@ -52,10 +52,7 @@ const dashboardLabels = {
   },
 };
 
-const BACKEND_URL =
-  import.meta.env.VITE_DASHBOARD_API_URL ||
-  import.meta.env.VITE_SHEETS_API_URL ||
-  dashboardConfig.defaultSheetsUrl;
+const BACKEND_URL = import.meta.env.VITE_DASHBOARD_API_URL;
 
 const BACKEND_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "";
 const ASSISTANT_MODEL =
@@ -743,80 +740,60 @@ const url = `${BACKEND_URL}?action=dashboard&t=${Date.now()}`;
     setIsAssistantThinking(true);
 
     try {
-      if (!openRouterKey.trim()) {
-        setAssistantMessages((currentMessages) => [
-          ...currentMessages,
-          {
-            role: "assistant",
-            content: createLocalAssistantReply({ stats, data, lastSync }),
-          },
-        ]);
-        return;
-      }
-
-const snapshot = buildAssistantSnapshot({
-  stats,
-  data: {
-    ...data,
-    automations,   // ← inject your real automations here
-  },
-  lastSync,
-});
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${openRouterKey.trim()}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": window.location.origin,
-          "X-Title": `${CONFIG.brand.fullName} Dashboard`,
-        },
-        body: JSON.stringify({
-          model: ASSISTANT_MODEL,
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are the private AI assistant inside the DigitallyDefined dashboard. Be concise, direct, and useful. Use the provided dashboard snapshot as your source of truth. Help the owner understand stats, automations, reviews, alerts, campaigns, and next actions. Do not invent missing numbers; say what needs to be synced or connected.",
-            },
-            {
-              role: "user",
-              content: `Dashboard snapshot:\n${JSON.stringify(snapshot, null, 2)}`,
-            },
-            ...nextMessages.slice(-8),
-          ],
-          temperature: 0.35,
-          max_tokens: 650,
-        }),
+      // Build your dashboard snapshot (you already have this function)
+      const snapshot = buildAssistantSnapshot({
+        stats,
+        data: { ...data, automations },
+        lastSync
       });
 
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error?.message || `Assistant failed with status ${res.status}`);
-      }
+      // Send to your Hermes backend
+      const res = await fetch(
+        "https://digitallydefined-os-backend.vercel.app/api/hermes",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(BACKEND_KEY ? { "x-api-key": BACKEND_KEY } : {}),
+          },
+          body: JSON.stringify({
+            message: `
+Dashboard snapshot:
+${JSON.stringify(snapshot, null, 2)}
 
-      const payload = await res.json();
-      const assistantReply =
-        payload.choices?.[0]?.message?.content ||
-        "I could not generate a response from the assistant model.";
+User message:
+${trimmedMessage}
+            `
+          })
+        }
+      );
+
+      const dataRes = await res.json();
+
+      if (!res.ok) {
+        const errorMsg = dataRes.error || dataRes.message || 'Hermes request failed';
+        throw new Error(errorMsg);
+      }
 
       setAssistantMessages((currentMessages) => [
         ...currentMessages,
-        { role: "assistant", content: assistantReply },
+        { role: "assistant", content: dataRes.reply }
       ]);
-    } catch (err) {
-      setAssistantError(err.message || "Assistant request failed.");
+
+    } catch (error) {
+      console.error("Hermes Dashboard Error:", error);
+      setAssistantError(error.message || "Hermes encountered an error.");
       setAssistantMessages((currentMessages) => [
         ...currentMessages,
         {
           role: "assistant",
-          content:
-            "I could not reach the AI model, so here is the local dashboard readout instead.\n\n" +
+          content: "I could not reach Hermes. Here is the local dashboard readout instead.\n\n" +
             createLocalAssistantReply({ stats, data, lastSync }),
         },
       ]);
-    } finally {
-      setIsAssistantThinking(false);
     }
+
+    setIsAssistantThinking(false);
   };
 
   const handleAssistantSubmit = (event) => {
