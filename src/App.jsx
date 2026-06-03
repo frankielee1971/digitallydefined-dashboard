@@ -3,8 +3,9 @@ import { Navigate, Routes, Route } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import LandingPage from "./pages/LandingPage";
 import DashboardPage from "./pages/DashboardPage";
-import AssistantPage from "./pages/AssistantPage"; // ⭐ ADD THIS
+import AssistantPage from "./pages/AssistantPage";
 import ChatWidget from "./components/ChatWidget";
+import HermesWidget from "./components/HermesWidget";
 
 function App() {
   const hostname = window.location.hostname;
@@ -22,6 +23,9 @@ function App() {
 
       {/* Show chat ONLY on the main site */}
       {!isDashboardDomain && <ChatWidget />}
+      
+      {/* Hermes Widget - available on all pages */}
+      <HermesWidget />
 
       <Routes>
         <Route path="/" element={homePage} />
