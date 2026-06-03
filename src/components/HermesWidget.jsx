@@ -1,10 +1,14 @@
 import { useState } from "react";
 
+const BACKEND_URL = import.meta.env.VITE_DASHBOARD_API_URL || "https://digitallydefined-os-backend.vercel.app/api";
+const BACKEND_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "";
+
 export default function HermesWidget() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -13,20 +17,33 @@ export default function HermesWidget() {
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setLoading(true);
+    setError(null);
 
     try {
-      const res = await fetch("/api/hermes", {
+      const res = await fetch(`${BACKEND_URL}/hermes`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(BACKEND_KEY ? { "x-api-key": BACKEND_KEY } : {}),
+        },
         body: JSON.stringify({ messages: [...messages, userMessage] }),
       });
 
       const data = await res.json();
-      const botMessage = { role: "assistant", content: data.reply };
 
+      if (!res.ok) {
+        throw new Error(data.error || data.message || "Hermes request failed");
+      }
+
+      const botMessage = { role: "assistant", content: data.reply };
       setMessages((prev) => [...prev, botMessage]);
     } catch (err) {
-      console.error(err);
+      console.error("Hermes Widget Error:", err);
+      setError(err.message || "Failed to connect to Hermes");
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "Sorry, I couldn't reach Hermes. Please try again later." },
+      ]);
     }
 
     setLoading(false);
@@ -98,6 +115,20 @@ export default function HermesWidget() {
               background: "#f7f7f7",
             }}
           >
+            {error && (
+              <div
+                style={{
+                  marginBottom: "12px",
+                  color: "#d32f2f",
+                  fontSize: "14px",
+                  padding: "8px",
+                  background: "rgba(211,47,47,0.1)",
+                  borderRadius: "8px",
+                }}
+              >
+                {error}
+              </div>
+            )}
             {messages.map((msg, i) => (
               <div
                 key={i}

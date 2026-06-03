@@ -9,42 +9,60 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Email required" });
   }
 
-  // 1. Get OAuth token
-  const tokenRes = await fetch("https://api.sendpulse.com/oauth/access_token", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      grant_type: "client_credentials",
-     client_id: process.env.SENDPULSE_API_USER_ID,
-client_secret: process.env.SENDPULSE_API_SECRET,
-    }),
-  });
+  const apiKey = process.env.BREVO_API_KEY;
+  const listId = process.env.BREVO_LIST_ID;
 
-  const tokenData = await tokenRes.json();
-  const accessToken = tokenData.access_token;
+  if (!apiKey) {
+    return res.status(500).json({ error: "Brevo API key not configured" });
+  }
 
-  // 2. Add subscriber
-  const addRes = await fetch(
-    `https://api.sendpulse.com/addressbooks/${process.env.SENDPULSE_ADDRESS_BOOK_ID}/emails`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
+  try {
+    const headers = {
+      "Content-Type": "application/json",
+      "api-key": apiKey.trim(),
+    };
+
+    // Add subscriber to Brevo list
+    const body = {
+      email,
+      listIds: listId ? [parseInt(listId, 10)] : [],
+      attributes: {
+        SOURCE: "digitallydefined.online",
       },
-      body: JSON.stringify({
-        emails: [
-          {
-            email,
-            variables: {
-              source: "digitallydefined.online",
-            },
-          },
-        ],
-      }),
-    }
-  );
+    };
 
-  const result = await addRes.json();
-  return res.status(200).json(result);
+    console.log('[Brevo] Adding subscriber:', email);
+    console.log('[Brevo] Request body:', JSON.stringify(body));
+
+    const addRes = await fetch('https://api.brevo.com/v3/contacts', {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    });
+
+    console.log('[Brevo] Response status:', addRes.status);
+    const result = await addRes.json();
+    console.log('[Brevo] Response body:', JSON.stringify(result));
+
+    if (!addRes.ok) {
+      const errorMsg = result?.message || 'Brevo subscription failed';
+      console.error('[Brevo] Error:', errorMsg, '| status:', addRes.status);
+      return res.status(addRes.status || 500).json({
+        error: errorMsg,
+        details: result,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Subscription successful',
+      data: result,
+    });
+  } catch (err) {
+    console.error('[Brevo] Subscribe failed:', err.message);
+    return res.status(500).json({
+      error: 'Subscription failed',
+      details: process.env.NODE_ENV !== 'production' ? err.message : undefined,
+    });
+  }
 }
