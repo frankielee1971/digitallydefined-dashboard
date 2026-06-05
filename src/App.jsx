@@ -4,6 +4,7 @@ import { SpeedInsights } from "@vercel/speed-insights/react";
 import LandingPage from "./pages/LandingPage";
 import DashboardPage from "./pages/DashboardPage";
 import AssistantPage from "./pages/AssistantPage";
+import ThankYouCalculatorPage from "./pages/ThankYouCalculatorPage";
 import ChatWidget from "./components/ChatWidget";
 import HermesWidget from "./components/HermesWidget";
 
@@ -30,6 +31,7 @@ function App() {
       <Routes>
         <Route path="/" element={homePage} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/thank-you-calculator" element={<ThankYouCalculatorPage />} />
 
         {/* ⭐ NEW: AI Assistant Page (dashboard only) */}
         {isDashboardDomain && (

@@ -168,6 +168,7 @@ const CONFIG = {
     landing: "/",
     dashboard: "/dashboard",
     dashboardAliases: ["/command", "/internal", "/app"],
+    thankYouCalculator: "/thank-you-calculator",
   },
 
   seo: {
@@ -246,6 +247,28 @@ const CONFIG = {
     openRouterLabel: "OpenRouter AI Key",
     openRouterPlaceholder: "sk-...",
     saveKeysLabel: "Save System Keys",
+  },
+
+  thankYouCalculator: {
+    title: "Thank You for Your Purchase",
+    subtitle: "You now have full access to the 10x ROI Calculator",
+    ctaLabel: "Access Your Download on Gumroad",
+    secondaryCtaLabel: "Visit DigitallyDefined",
+    features: [
+      {
+        title: "Full Calculator Access",
+        description: "Unlock all advanced fields including customer retention, reputation lift, and annualized projections.",
+      },
+      {
+        title: "Business Validation",
+        description: "Validate your digital business decisions with real data before investing in campaigns.",
+      },
+      {
+        title: "Lifetime Updates",
+        description: "Get all future calculator improvements and new features at no additional cost.",
+      },
+    ],
+    emailNote: "Questions? Email us at",
   },
 
   landing: {
