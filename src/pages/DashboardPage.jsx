@@ -749,7 +749,7 @@ const url = `${BACKEND_URL}?action=dashboard&t=${Date.now()}`;
 
       // Send to your Hermes backend
       const res = await fetch(
-        "https://digitallydefined-os-backend.vercel.app/api/hermes",
+        `${BACKEND_URL}/hermes`,
         {
           method: "POST",
           headers: {
