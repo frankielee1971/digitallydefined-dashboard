@@ -1,6 +1,9 @@
 import { useState } from "react";
 
-const BACKEND_URL = import.meta.env.VITE_DASHBOARD_API_URL || "https://digitallydefined-os-backend.vercel.app/api";
+// ✅ Environment variables (Vite syntax)
+const HERMES_URL =
+  import.meta.env.VITE_HERMES_GATEWAY_URL ||
+  "https://digitallydefined-os-backend.vercel.app/api/hermes";
 const BACKEND_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "";
 
 export default function HermesWidget() {
@@ -20,7 +23,7 @@ export default function HermesWidget() {
     setError(null);
 
     try {
-      const res = await fetch(`${BACKEND_URL}/hermes`, {
+      const res = await fetch(HERMES_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -35,14 +38,21 @@ export default function HermesWidget() {
         throw new Error(data.error || data.message || "Hermes request failed");
       }
 
-      const botMessage = { role: "assistant", content: data.reply };
+      const botMessage = {
+        role: "assistant",
+        content: data.reply || "Hermes responded successfully.",
+      };
       setMessages((prev) => [...prev, botMessage]);
     } catch (err) {
       console.error("Hermes Widget Error:", err);
       setError(err.message || "Failed to connect to Hermes");
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Sorry, I couldn't reach Hermes. Please try again later." },
+        {
+          role: "assistant",
+          content:
+            "Sorry, I couldn't reach Hermes. Please try again later or check your backend connection.",
+        },
       ]);
     }
 
