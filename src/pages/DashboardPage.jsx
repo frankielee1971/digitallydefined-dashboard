@@ -3,6 +3,7 @@ import {
   BarChart3,
   Bot,
   BrainCircuit,
+  Database,
   DollarSign,
   FolderHeart,
   LayoutDashboard,
@@ -72,6 +73,7 @@ const tabIcons = {
   intel: BarChart3,
   brain: BrainCircuit,
   automations: Workflow,
+  notion: Database,
 };
 
 const formatConversion = (value) => {
@@ -123,6 +125,7 @@ const normalizeData = (payload = {}) => ({
   sourceHealth: payload.sourceHealth || null,
   aiBrief: payload.aiBrief || null,
   automations: normalizeArray(payload.automations),
+  notion: payload.notion || null,
 });
 
 const emptyData = normalizeData();
@@ -462,6 +465,104 @@ function AutomationsTab({ automations }) {
           )}
         </div>
       ))}
+    </div>
+  );
+}
+
+function NotionTab({ notion }) {
+  if (!notion) {
+    return <EmptyState>No Notion data available. Make sure your Notion credentials are set and sync is complete.</EmptyState>;
+  }
+
+  const { ideas, content } = notion;
+  const ideasList = ideas?.results || [];
+  const contentList = content?.results || [];
+
+  return (
+    <div style={{ display: "grid", gap: "1.5rem" }}>
+      {/* Ideas & Intake Section */}
+      <section style={{ display: "grid", gap: "0.6rem" }}>
+        <h3 style={{ ...brutalHeading, margin: 0, fontSize: "0.95rem" }}>
+          Ideas & Intake (Notion)
+        </h3>
+        {ideasList.length > 0 ? (
+          <div style={{ display: "grid", gap: "0.75rem" }}>
+            {ideasList.map((page) => {
+              const name = page.properties?.IdeaName?.title?.[0]?.plain_text || "Untitled Idea";
+              const ready = page.properties?.["Ready for AI"]?.checkbox;
+              const niche = page.properties?.Niche?.select?.name || "N/A";
+              const type = page.properties?.Type?.select?.name || "N/A";
+              const difficulty = page.properties?.Difficulty?.multi_select?.map(x => x.name).join(", ") || "N/A";
+
+              return (
+                <div key={page.id} style={{ ...cardStyle, padding: "0.85rem" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
+                    <strong style={{ fontSize: "0.92rem" }}>{name}</strong>
+                    <span style={{
+                      ...brutalEyebrow,
+                      backgroundColor: ready ? theme.colors.successTint : theme.colors.panel,
+                      color: ready ? theme.colors.success : theme.colors.muted,
+                      padding: "0.18rem 0.38rem",
+                      border: brutalBorder,
+                      fontSize: "0.62rem"
+                    }}>
+                      {ready ? "READY FOR AI" : "DRAFT"}
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", gap: "1rem", marginTop: "0.45rem", flexWrap: "wrap", fontSize: "0.8rem", color: theme.colors.muted }}>
+                    <span><strong>Niche:</strong> {niche}</span>
+                    <span><strong>Type:</strong> {type}</span>
+                    <span><strong>Difficulty:</strong> {difficulty}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <EmptyState>No ideas found in your Notion database.</EmptyState>
+        )}
+      </section>
+
+      {/* Content Library Section */}
+      <section style={{ display: "grid", gap: "0.6rem" }}>
+        <h3 style={{ ...brutalHeading, margin: 0, fontSize: "0.95rem" }}>
+          Content Library (Notion)
+        </h3>
+        {contentList.length > 0 ? (
+          <div style={{ display: "grid", gap: "0.75rem" }}>
+            {contentList.map((page) => {
+              const title = page.properties?.["Content Title"]?.title?.[0]?.plain_text || "Untitled Content";
+              const status = page.properties?.Status?.status?.name || "N/A";
+              const date = page.properties?.["Publish Date"]?.date?.start || "N/A";
+              const type = page.properties?.Type?.multi_select?.map(x => x.name).join(", ") || "N/A";
+
+              return (
+                <div key={page.id} style={{ ...cardStyle, padding: "0.85rem" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
+                    <strong style={{ fontSize: "0.92rem" }}>{title}</strong>
+                    <span style={{
+                      ...brutalEyebrow,
+                      backgroundColor: status === "Done" ? theme.colors.successTint : theme.colors.panel,
+                      color: status === "Done" ? theme.colors.success : theme.colors.muted,
+                      padding: "0.18rem 0.38rem",
+                      border: brutalBorder,
+                      fontSize: "0.62rem"
+                    }}>
+                      {status.toUpperCase()}
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", gap: "1rem", marginTop: "0.45rem", flexWrap: "wrap", fontSize: "0.8rem", color: theme.colors.muted }}>
+                    <span><strong>Publish Date:</strong> {date}</span>
+                    <span><strong>Format:</strong> {type}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <EmptyState>No content items found in your Notion library.</EmptyState>
+        )}
+      </section>
     </div>
   );
 }
@@ -806,6 +907,7 @@ ${trimmedMessage}
     if (activeTab === "intel") return <IntelTab data={data} />;
     if (activeTab === "brain") return <BrainTab aiBrief={data.aiBrief} />;
     if (activeTab === "automations") return <AutomationsTab automations={data.automations} />;
+    if (activeTab === "notion") return <NotionTab notion={data.notion} />;
     return <CommandTab data={data} stats={stats} />;
   };
 

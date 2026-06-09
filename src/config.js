@@ -199,6 +199,10 @@ const CONFIG = {
         id: "automations",
         label: "AUTOMATIONS",
       },
+      {
+        id: "notion",
+        label: "NOTION DB",
+      },
     ],
     mobileKeysLabel: "Keys",
     systemKeysLabel: "System Keys",
