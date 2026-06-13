@@ -53,6 +53,7 @@ const dashboardLabels = {
   },
 };
 
+const HERMES_URL = import.meta.env.VITE_HERMES_GATEWAY_URL || "https://digitallydefined-os-backend.vercel.app/api/hermes";
 const BACKEND_URL = import.meta.env.VITE_DASHBOARD_API_URL;
 
 const BACKEND_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "";
@@ -768,12 +769,14 @@ const DashboardPage = () => {
     setSyncError("");
 
     try {
-const url = `${BACKEND_URL}?action=dashboard&t=${Date.now()}`;
-      const res = await fetch(url, {
+      const res = await fetch(HERMES_URL, {
+        method: "POST",
         cache: "no-store",
-        headers: BACKEND_KEY
-          ? { "x-api-key": BACKEND_KEY, "Content-Type": "application/json" }
-          : undefined,
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": BACKEND_KEY,
+        },
+        body: JSON.stringify({ action: "dashboard" })
       });
 
       if (!res.ok) {
@@ -788,14 +791,14 @@ const url = `${BACKEND_URL}?action=dashboard&t=${Date.now()}`;
 
       setData(nextData);
 
-      const automationsRes = await fetch(
-        `${BACKEND_URL}?action=automation.list`,
-        {
-          headers: BACKEND_KEY
-            ? { "x-api-key": BACKEND_KEY }
-            : undefined,
-        }
-      );
+      const automationsRes = await fetch(HERMES_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": BACKEND_KEY,
+        },
+        body: JSON.stringify({ action: "automation.list" })
+      });
       if (!automationsRes.ok) {
         setAutomations([]);
       } else {
@@ -849,25 +852,22 @@ const url = `${BACKEND_URL}?action=dashboard&t=${Date.now()}`;
       });
 
       // Send to your Hermes backend
-      const res = await fetch(
-        `${BACKEND_URL}/hermes`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(BACKEND_KEY ? { "x-api-key": BACKEND_KEY } : {}),
-          },
-          body: JSON.stringify({
-            message: `
+      const res = await fetch(HERMES_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": BACKEND_KEY,
+        },
+        body: JSON.stringify({
+          message: `
 Dashboard snapshot:
 ${JSON.stringify(snapshot, null, 2)}
 
 User message:
 ${trimmedMessage}
-            `
-          })
-        }
-      );
+          `
+        })
+      });
 
       const dataRes = await res.json();
 

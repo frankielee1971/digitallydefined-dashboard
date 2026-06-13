@@ -6,14 +6,16 @@ export default function AutomationsPage() {
   const [automations, setAutomations] = useState([]);
 
   useEffect(() => {
-    const url = `${import.meta.env.VITE_BACKEND_URL}/api/backend?action=automation.list`;
+    const HERMES_URL = import.meta.env.VITE_HERMES_GATEWAY_URL || "https://digitallydefined-os-backend.vercel.app/api/hermes";
+    const API_KEY = import.meta.env.VITE_DASHBOARD_API_KEY;
 
-    fetch(url, {
-      method: "GET",
+    fetch(HERMES_URL, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": import.meta.env.VITE_DASHBOARD_API_KEY
-      }
+        "x-api-key": API_KEY
+      },
+      body: JSON.stringify({ action: "automation.list" })
     })
       .then(res => res.json())
       .then(data => {

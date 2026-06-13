@@ -80,6 +80,9 @@ const CUSTOMER_CONFIG = {
   // Leave as is to use DigitallyDefined's backend
   backendApiUrl: "https://digitallydefined-os-backend.vercel.app/api",
   
+  // Hermes Gateway URL for all API calls
+  hermesGatewayUrl: "https://digitallydefined-os-backend.vercel.app/api/hermes",
+  
   // Your Backend API Key (provided by DigitallyDefined)
   // Get this from your purchase confirmation
   backendApiKey: "YOUR-API-KEY-HERE",

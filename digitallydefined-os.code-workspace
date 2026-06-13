@@ -11,6 +11,7 @@ VITE_FIREBASE_MEASUREMENT_ID=G-QZ49EBPV3Z
 # Backend API
 VITE_DASHBOARD_API_URL=https://digitallydefined-os-backend.vercel.app/api
 VITE_CHAT_API_URL=https://digitallydefined-os-backend.vercel.app/api/chat
+VITE_HERMES_GATEWAY_URL=https://digitallydefined-os-backend.vercel.app/api/hermes
 
 # SendPulse
 SENDPULSE_USER_ID=sp_id_b0db3677a045f65fa784a3314cf0f2f6
