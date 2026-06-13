@@ -5,14 +5,11 @@ export default function HermesAssistant() {
   const [messages, setMessages] = useState([]);
 
   async function sendMessage() {
-    const HERMES_URL = import.meta.env.VITE_HERMES_GATEWAY_URL || "https://digitallydefined-os-backend.vercel.app/api/hermes";
-    const API_KEY = import.meta.env.VITE_DASHBOARD_API_KEY;
-    
-    const response = await fetch(HERMES_URL, {
+    const response = await fetch("https://digitallydefined-os-backend.vercel.app/api/hermes", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": API_KEY
+        "x-api-key": process.env.NEXT_PUBLIC_DASHBOARD_API_KEY
       },
       body: JSON.stringify({ message: input })
     });
