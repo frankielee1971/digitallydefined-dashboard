@@ -27,7 +27,7 @@ export default function HermesWidget() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(BACKEND_KEY ? { "x-api-key": BACKEND_KEY } : {}),
+          "x-api-key": BACKEND_KEY,
         },
         body: JSON.stringify({ messages: [...messages, userMessage] }),
       });

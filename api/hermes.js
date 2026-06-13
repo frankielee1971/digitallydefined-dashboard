@@ -7,8 +7,6 @@ const API_KEY = process.env.DASHBOARD_API_KEY;
 
 export default async function handler(req, res) {
   // ✅ CORS - Allow specific origin with credentials
-  const origin = req.headers.origin || req.headers.Origin || '';
-  
   // Set CORS headers for all responses
   res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
