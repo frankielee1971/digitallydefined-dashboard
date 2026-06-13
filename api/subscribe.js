@@ -1,4 +1,16 @@
 export default async function handler(req, res) {
+  // ✅ CORS - Allow specific origin with credentials
+  const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'https://dashboard.digitallydefined.online';
+  res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-api-key');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  // Handle preflight OPTIONS request
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }

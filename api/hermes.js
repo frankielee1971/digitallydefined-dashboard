@@ -1,29 +1,56 @@
 // Website Hermes - Mentor for Gen X Women
 // URL: https://digitallydefined.online/api/hermes
-// Purpose: Public-facing mentor, NO Notion access
+// Purpose: Dashboard API Gateway
+
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'https://dashboard.digitallydefined.online';
+const API_KEY = process.env.DASHBOARD_API_KEY;
 
 export default async function handler(req, res) {
-  // ✅ CORS - Allow all (public)
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  // ✅ CORS - Allow specific origin with credentials
+  const origin = req.headers.origin || req.headers.Origin || '';
+  
+  // Set CORS headers for all responses
+  res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-api-key');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-  // Handle preflight
-  if (req.method === 'OPTIONS') return res.status(200).end();
+  // Handle preflight OPTIONS request
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
 
-  // Only GET and POST allowed
-  if (req.method !== 'GET' && req.method !== 'POST') {
+  // Only POST allowed for actual requests
+  if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // Validate API key
+  const clientApiKey = req.headers['x-api-key'];
+  if (!clientApiKey || clientApiKey !== API_KEY) {
+    console.error('[Hermes Gateway] Unauthorized: Invalid or missing API key');
+    return res.status(401).json({ error: 'Unauthorized - Invalid API key' });
+  }
+
   try {
-    // Return gateway status (NO Notion access - public safe)
+    // Parse the request body
+    let body = {};
+    try {
+      body = req.body || (req.method === 'POST' ? JSON.parse(JSON.stringify(req.body)) : {});
+    } catch (e) {
+      body = req.body || {};
+    }
+
+    // Handle different actions
+    const action = body.action;
+    
+    // Return success response
     return res.status(200).json({
-      status: "Hermes Gateway active",
-      notion: "public_mode",
-      environment: "website",
-      role: "Mentor for Gen X Women",
-      access: "public_safe"
+      status: "success",
+      reply: "Hermes Gateway is active and authenticated",
+      action: action,
+      environment: "dashboard",
+      timestamp: new Date().toISOString()
     });
   } catch (error) {
     console.error('[Hermes Gateway] Error:', error.message);
