@@ -1,9 +1,7 @@
 import { useState } from "react";
 
-// ✅ Environment variables (Vite syntax)
-const HERMES_URL =
-  import.meta.env.VITE_HERMES_GATEWAY_URL ||
-  "https://digitallydefined-os-backend.vercel.app/api/hermes";
+// ✅ Use dashboard's own Hermes endpoint
+const HERMES_URL = "/api/hermes";
 const BACKEND_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "";
 
 export default function HermesWidget() {

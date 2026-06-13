@@ -22,10 +22,9 @@ export default function AssistantPage() {
     setInput("");
 
     try {
-      const HERMES_URL = import.meta.env.VITE_HERMES_GATEWAY_URL || "https://digitallydefined-os-backend.vercel.app/api/hermes";
       const API_KEY = import.meta.env.VITE_DASHBOARD_API_KEY;
       
-      const res = await fetch(HERMES_URL, {
+      const res = await fetch("/api/hermes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

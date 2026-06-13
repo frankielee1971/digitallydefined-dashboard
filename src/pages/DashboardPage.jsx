@@ -53,7 +53,7 @@ const dashboardLabels = {
   },
 };
 
-const HERMES_URL = import.meta.env.VITE_HERMES_GATEWAY_URL || "https://digitallydefined-os-backend.vercel.app/api/hermes";
+const HERMES_URL = "/api/hermes";
 const BACKEND_URL = import.meta.env.VITE_DASHBOARD_API_URL;
 
 const BACKEND_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "";
