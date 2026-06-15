@@ -6,7 +6,11 @@ export default function AutomationsPage() {
   const [automations, setAutomations] = useState([]);
 
   useEffect(() => {
-    const API_KEY = import.meta.env.VITE_DASHBOARD_API_KEY;
+    const API_KEY = localStorage.getItem("groqKey")?.trim() || "";
+    if (!API_KEY) {
+      alert("Hermes API key is missing. Please set groqKey in localStorage.");
+      return;
+    }
 
     fetch("/api/hermes", {
       method: "POST",

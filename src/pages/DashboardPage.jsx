@@ -56,7 +56,11 @@ const dashboardLabels = {
 const HERMES_URL = "/api/hermes";
 const BACKEND_URL = import.meta.env.VITE_DASHBOARD_API_URL;
 
-const BACKEND_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "";
+const getHermesApiKey = () => {
+  if (typeof window === "undefined") return "";
+  return localStorage.getItem("groqKey")?.trim() || "";
+};
+
 const ASSISTANT_MODEL =
   import.meta.env.VITE_DASHBOARD_ASSISTANT_MODEL ||
   dashboardConfig.assistantModel ||
@@ -768,13 +772,20 @@ const DashboardPage = () => {
     setIsSyncing(true);
     setSyncError("");
 
+    const dashboardApiKey = getHermesApiKey();
+    if (!dashboardApiKey) {
+      setSyncError("Hermes API key is missing. Please set groqKey in localStorage.");
+      setIsSyncing(false);
+      return;
+    }
+
     try {
       const res = await fetch(HERMES_URL, {
         method: "POST",
         cache: "no-store",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": BACKEND_KEY,
+          "x-api-key": dashboardApiKey,
         },
         body: JSON.stringify({ action: "dashboard" })
       });
@@ -795,7 +806,7 @@ const DashboardPage = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": BACKEND_KEY,
+          "x-api-key": dashboardApiKey,
         },
         body: JSON.stringify({ action: "automation.list" })
       });
@@ -852,11 +863,18 @@ const DashboardPage = () => {
       });
 
       // Send to your Hermes backend
+      const dashboardApiKey = getHermesApiKey();
+      if (!dashboardApiKey) {
+        setAssistantError("Hermes API key is missing. Please set groqKey in localStorage.");
+        setIsAssistantThinking(false);
+        return;
+      }
+
       const res = await fetch(HERMES_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": BACKEND_KEY,
+          "x-api-key": dashboardApiKey,
         },
         body: JSON.stringify({
           message: `

@@ -8,6 +8,19 @@ export default function ChatWidget() {
   async function sendMessage() {
     if (!input.trim()) return;
 
+    const API_KEY = localStorage.getItem("groqKey")?.trim() || "";
+    if (!API_KEY) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content:
+            "Hermes API key is missing. Please set groqKey in localStorage and try again.",
+        },
+      ]);
+      return;
+    }
+
     const userMessage = { role: "user", content: input };
     const updatedMessages = [...messages, userMessage];
 
@@ -15,8 +28,6 @@ export default function ChatWidget() {
     setInput("");
 
     try {
-      const API_KEY = import.meta.env.VITE_DASHBOARD_API_KEY;
-      
       const res = await fetch("/api/hermes", {
         method: "POST",
         headers: {

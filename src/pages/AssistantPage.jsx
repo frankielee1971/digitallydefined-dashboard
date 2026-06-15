@@ -22,7 +22,11 @@ export default function AssistantPage() {
     setInput("");
 
     try {
-      const API_KEY = import.meta.env.VITE_DASHBOARD_API_KEY;
+      const API_KEY = localStorage.getItem("groqKey")?.trim() || "";
+      if (!API_KEY) {
+        alert("Hermes API key is missing. Please set groqKey in localStorage.");
+        return;
+      }
       
       const res = await fetch("/api/hermes", {
         method: "POST",

@@ -2,7 +2,11 @@ import { useState } from "react";
 
 // ✅ Use dashboard's own Hermes endpoint
 const HERMES_URL = "/api/hermes";
-const BACKEND_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "";
+
+const getHermesApiKey = () => {
+  if (typeof window === "undefined") return "";
+  return localStorage.getItem("groqKey")?.trim() || "";
+};
 
 export default function HermesWidget() {
   const [open, setOpen] = useState(false);
@@ -21,11 +25,18 @@ export default function HermesWidget() {
     setError(null);
 
     try {
+      const apiKey = getHermesApiKey();
+      if (!apiKey) {
+        setError("Hermes API key is missing. Please set groqKey in localStorage.");
+        setLoading(false);
+        return;
+      }
+
       const res = await fetch(HERMES_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": BACKEND_KEY,
+          "x-api-key": apiKey,
         },
         body: JSON.stringify({ messages: [...messages, userMessage] }),
       });

@@ -5,11 +5,17 @@ export default function HermesAssistant() {
   const [messages, setMessages] = useState([]);
 
   async function sendMessage() {
+    const API_KEY = localStorage.getItem("groqKey")?.trim() || "";
+    if (!API_KEY) {
+      alert("Hermes API key is missing. Please set groqKey in localStorage and try again.");
+      return;
+    }
+
     const response = await fetch("/api/hermes", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": import.meta.env.VITE_DASHBOARD_API_KEY
+        "x-api-key": API_KEY
       },
       body: JSON.stringify({ message: input })
     });
