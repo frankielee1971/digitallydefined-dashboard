@@ -57,8 +57,7 @@ const HERMES_URL = "/api/hermes";
 const BACKEND_URL = import.meta.env.VITE_DASHBOARD_API_URL;
 
 const getHermesApiKey = () => {
-  if (typeof window === "undefined") return "";
-  return localStorage.getItem("groqKey")?.trim() || "";
+  return BACKEND_KEY;
 };
 
 const ASSISTANT_MODEL =

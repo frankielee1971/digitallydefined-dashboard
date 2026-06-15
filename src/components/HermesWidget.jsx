@@ -3,9 +3,10 @@ import { useState } from "react";
 // ✅ Use dashboard's own Hermes endpoint
 const HERMES_URL = "/api/hermes";
 
+const BACKEND_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "";
+
 const getHermesApiKey = () => {
-  if (typeof window === "undefined") return "";
-  return localStorage.getItem("groqKey")?.trim() || "";
+  return BACKEND_KEY;
 };
 
 export default function HermesWidget() {

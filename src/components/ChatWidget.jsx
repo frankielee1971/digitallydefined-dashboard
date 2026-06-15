@@ -8,14 +8,14 @@ export default function ChatWidget() {
   async function sendMessage() {
     if (!input.trim()) return;
 
-    const API_KEY = localStorage.getItem("groqKey")?.trim() || "";
+    const API_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "";
     if (!API_KEY) {
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
           content:
-            "Hermes API key is missing. Please set groqKey in localStorage and try again.",
+            "Dashboard API key is missing. Please check your configuration.",
         },
       ]);
       return;

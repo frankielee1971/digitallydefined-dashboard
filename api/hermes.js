@@ -5,12 +5,13 @@ export default async function handler(req, res) {
     'http://localhost:3000',
     'http://localhost:5173',
   ];
+
   const origin = req.headers.origin;
-  const allowedOrigin = origin && allowedOrigins.includes(origin)
+  const allowedOrigin = allowedOrigins.includes(origin)
     ? origin
     : 'https://dashboard.digitallydefined.online';
 
-  // CORS headers
+  // CORS
   res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
   res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-api-key');
@@ -37,10 +38,10 @@ export default async function handler(req, res) {
 
   try {
     const body = req.body || {};
-
     const hermesEndpoint = (process.env.HERMES_BACKEND_URL || 'https://digitallydefined-os-backend.vercel.app').replace(/\/$/, '');
     const action = typeof body.action === 'string' ? body.action : '';
 
+    // --- ACTION MODE ---
     if (action && action !== 'chat') {
       const getActions = new Set([
         'dashboard',
@@ -57,6 +58,7 @@ export default async function handler(req, res) {
 
       const method = getActions.has(action) ? 'GET' : 'POST';
       const { action: _action, ...payload } = body;
+
       const response = await fetch(`${hermesEndpoint}/api?action=${encodeURIComponent(action)}`, {
         method,
         headers: {
@@ -88,9 +90,11 @@ export default async function handler(req, res) {
       return res.status(200).json(data);
     }
 
+    // --- CHAT MODE ---
     const lastMessage = Array.isArray(body.messages)
-      ? [...body.messages].reverse().find((message) => message?.role === 'user')
+      ? [...body.messages].reverse().find((m) => m?.role === 'user')
       : null;
+
     const hermesBody = {
       ...body,
       message: body.message || lastMessage?.content || lastMessage?.text || '',
@@ -125,6 +129,7 @@ export default async function handler(req, res) {
     }
 
     return res.status(200).json(data);
+
   } catch (error) {
     console.error('[Hermes Bridge] Error:', error);
     return res.status(500).json({
