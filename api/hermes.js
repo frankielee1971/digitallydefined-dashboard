@@ -30,7 +30,7 @@ export default async function handler(req, res) {
 
   // API key validation
   const provided = req.headers['x-api-key'] || '';
-  const expected = (process.env.DASHBOARD_API_KEY || '').trim();
+  const expected = (process.env.DASHBOARD_API_KEY || process.env.VITE_DASHBOARD_API_KEY || '').trim();
 
   if (!expected || provided !== expected) {
     return res.status(401).json({ error: 'Unauthorized - API key required' });
