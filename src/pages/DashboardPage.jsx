@@ -54,10 +54,9 @@ const dashboardLabels = {
 };
 
 const HERMES_URL = "/api/hermes";
-const BACKEND_URL = import.meta.env.VITE_DASHBOARD_API_URL;
 
 const getHermesApiKey = () => {
-  return BACKEND_KEY;
+  return import.meta.env.VITE_DASHBOARD_API_KEY || "";
 };
 
 const ASSISTANT_MODEL =
@@ -773,7 +772,7 @@ const DashboardPage = () => {
 
     const dashboardApiKey = getHermesApiKey();
     if (!dashboardApiKey) {
-      setSyncError("Hermes API key is missing. Please set groqKey in localStorage.");
+      setSyncError("Hermes API key is missing. Please set VITE_DASHBOARD_API_KEY in your environment.");
       setIsSyncing(false);
       return;
     }
@@ -864,7 +863,7 @@ const DashboardPage = () => {
       // Send to your Hermes backend
       const dashboardApiKey = getHermesApiKey();
       if (!dashboardApiKey) {
-        setAssistantError("Hermes API key is missing. Please set groqKey in localStorage.");
+        setAssistantError("Hermes API key is missing. Please set VITE_DASHBOARD_API_KEY in your environment.");
         setIsAssistantThinking(false);
         return;
       }
