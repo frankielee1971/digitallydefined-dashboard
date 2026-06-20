@@ -53,7 +53,7 @@ const dashboardLabels = {
   },
 };
 
-const HERMES_URL = "/api/hermes";
+const HERMES_URL = import.meta.env.VITE_HERMES_BACKEND_URL || "/api/hermes";
 
 const getHermesApiKey = () => {
   return import.meta.env.VITE_DASHBOARD_API_KEY || "";
@@ -198,7 +198,7 @@ const createLocalAssistantReply = ({ stats, data, lastSync }) => {
     alerts,
     `Automations: ${automationSummary}`,
     `Best next move: ${nextAction}`,
-    "Add your OpenRouter key in Settings when you want me to answer follow-up questions with full AI reasoning.",
+    "Sync the Vault to see your current stats, then ask me what needs attention or what move should come next.",
   ].join("\n\n");
 };
 
@@ -747,9 +747,6 @@ const DashboardPage = () => {
     churnRisk: "Low",
   });
   const [automations, setAutomations] = useState([]);
-  const [openRouterKey, setOpenRouterKey] = useState(
-    localStorage.getItem("openRouterKey") || "",
-  );
   const [assistantMessages, setAssistantMessages] = useState([assistantWelcome]);
   const [assistantInput, setAssistantInput] = useState("");
   const [isAssistantThinking, setIsAssistantThinking] = useState(false);
@@ -836,7 +833,6 @@ const DashboardPage = () => {
   };
 
   const handleSaveSettings = () => {
-    localStorage.setItem("openRouterKey", openRouterKey.trim());
     setShowSettings(false);
   };
 
@@ -1159,22 +1155,6 @@ ${trimmedMessage}
             <p style={{ fontSize: "0.85rem", margin: "0 0 0.85rem", color: theme.colors.muted }}>
               {dashboardConfig.settingsDescription}
             </p>
-
-            <label style={{ display: "grid", gap: "0.35rem", fontSize: "0.85rem" }}>
-              <span>{dashboardConfig.openRouterLabel}</span>
-              <input
-                type="password"
-                value={openRouterKey}
-                onChange={(event) => setOpenRouterKey(event.target.value)}
-                placeholder={dashboardConfig.openRouterPlaceholder}
-                style={{
-                  border: brutalBorder,
-                  padding: "0.6rem 0.7rem",
-                  backgroundColor: theme.colors.card,
-                  fontFamily: theme.fonts.body,
-                }}
-              />
-            </label>
 
             <button
               onClick={handleSaveSettings}

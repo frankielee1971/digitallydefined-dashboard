@@ -248,9 +248,7 @@ const CONFIG = {
       sentimentIndex: "Sent. Index",
     },
     settingsTitle: "Configuration",
-    openRouterLabel: "OpenRouter AI Key",
-    openRouterPlaceholder: "sk-...",
-    saveKeysLabel: "Save System Keys",
+    saveKeysLabel: "Save Settings",
   },
 
   thankYouCalculator: {
