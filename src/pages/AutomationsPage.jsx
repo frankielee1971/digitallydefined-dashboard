@@ -5,9 +5,10 @@ import AutomationsEmptyState from "../components/AutomationsEmptyState";
 const HERMES_URL =
   import.meta.env.VITE_HERMES_BACKEND_URL ||
   import.meta.env.VITE_HERMES_GATEWAY_URL ||
-  import.meta.env.VITE_DASHBOARD_API_URL ||
   import.meta.env.VITE_CHAT_API_URL ||
   "/api/hermes";
+
+const API_URL = import.meta.env.VITE_DASHBOARD_API_URL || "/api";
 
 export default function AutomationsPage() {
   const [automations, setAutomations] = useState([]);
@@ -21,7 +22,7 @@ export default function AutomationsPage() {
 
     const loadAutomations = async () => {
       try {
-        const response = await fetch(HERMES_URL, {
+        const response = await fetch(API_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

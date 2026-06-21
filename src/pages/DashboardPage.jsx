@@ -56,9 +56,11 @@ const dashboardLabels = {
 const HERMES_URL =
   import.meta.env.VITE_HERMES_BACKEND_URL ||
   import.meta.env.VITE_HERMES_GATEWAY_URL ||
-  import.meta.env.VITE_DASHBOARD_API_URL ||
   import.meta.env.VITE_CHAT_API_URL ||
   "/api/hermes";
+
+// Use the unified API root for action-based requests (dashboard, automation.list, etc.)
+const API_URL = import.meta.env.VITE_DASHBOARD_API_URL || "/api";
 
 const getHermesApiKey = () => {
   return import.meta.env.VITE_DASHBOARD_API_KEY || "";
@@ -780,7 +782,7 @@ const DashboardPage = () => {
     }
 
     try {
-      const res = await fetch(HERMES_URL, {
+      const res = await fetch(API_URL, {
         method: "POST",
         cache: "no-store",
         headers: {
@@ -803,7 +805,7 @@ const DashboardPage = () => {
 
       setData(nextData);
 
-      const automationsRes = await fetch(HERMES_URL, {
+      const automationsRes = await fetch(API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
