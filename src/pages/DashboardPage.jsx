@@ -53,7 +53,12 @@ const dashboardLabels = {
   },
 };
 
-const HERMES_URL = import.meta.env.VITE_HERMES_BACKEND_URL || "/api/hermes";
+const HERMES_URL =
+  import.meta.env.VITE_HERMES_BACKEND_URL ||
+  import.meta.env.VITE_HERMES_GATEWAY_URL ||
+  import.meta.env.VITE_DASHBOARD_API_URL ||
+  import.meta.env.VITE_CHAT_API_URL ||
+  "/api/hermes";
 
 const getHermesApiKey = () => {
   return import.meta.env.VITE_DASHBOARD_API_KEY || "";
@@ -794,6 +799,7 @@ const DashboardPage = () => {
 
       const payload = await res.json();
       const nextData = normalizeData(payload);
+      const metrics = payload.metrics || {};
 
       setData(nextData);
 
@@ -813,16 +819,16 @@ const DashboardPage = () => {
       }
 
       setStats({
-        revenue: payload.revenue || "$0",
-        leads: payload.leads || 0,
-        conversionRate: payload.conversionRate
-          ? formatConversion(payload.conversionRate)
+        revenue: metrics.revenue || "$0",
+        leads: metrics.leads || 0,
+        conversionRate: metrics.conversionRate
+          ? formatConversion(metrics.conversionRate)
           : "0%",
-        assetValue: formatAssetValue(payload.assetValue),
-        topAsset: payload.topAsset || "N/A",
-        communityGrowth: payload.communityGrowth || "0%",
-        emailGrowth: payload.emailGrowth || "0%",
-        churnRisk: payload.churnRisk || "Low",
+        assetValue: formatAssetValue(metrics.assetValue),
+        topAsset: metrics.topAsset || "N/A",
+        communityGrowth: metrics.communityGrowth || "0%",
+        emailGrowth: metrics.emailGrowth || "0%",
+        churnRisk: metrics.churnRisk || "Low",
       });
       setLastSync(new Date().toLocaleString());
     } catch (err) {
