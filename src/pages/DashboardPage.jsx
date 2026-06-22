@@ -789,7 +789,7 @@ const DashboardPage = () => {
           "Content-Type": "application/json",
           "x-api-key": dashboardApiKey,
         },
-        body: JSON.stringify({ action: "dashboard" })
+        body: JSON.stringify({ action: "dashboard" }),
       });
 
       if (!res.ok) {
