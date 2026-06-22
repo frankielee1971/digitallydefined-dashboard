@@ -782,8 +782,8 @@ const DashboardPage = () => {
     }
 
     try {
-      const res = await fetch(API_URL, {
-        method: "POST",
+      const url = `${BACKEND_URL}?action=dashboard&t=${Date.now()}`;
+      const res = await fetch(url, {
         cache: "no-store",
         headers: {
           "Content-Type": "application/json",
