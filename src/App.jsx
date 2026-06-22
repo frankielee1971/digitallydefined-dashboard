@@ -1,42 +1,18 @@
 import React from "react";
-import { Navigate, Routes, Route } from "react-router-dom";
-import { SpeedInsights } from "@vercel/speed-insights/react";
-import LandingPage from "./pages/LandingPage";
+import { Routes, Route, Navigate } from "react-router-dom";
+import CONFIG from "./config";
 import DashboardPage from "./pages/DashboardPage";
-import ThankYouCalculatorPage from "./pages/ThankYouCalculatorPage";
+import LandingPage from "./pages/LandingPage";
+import DigitalSuperpowerQuiz from "./pages/DigitalSuperpowerQuiz";
 
-function App() {
-  const hostname = window.location.hostname;
-  const isDashboardDomain = hostname === "dashboard.digitallydefined.online";
-
-  const homePage = isDashboardDomain ? (
-    <Navigate to="/dashboard" replace />
-  ) : (
-    <LandingPage />
-  );
-
-  return (
-    <>
-      <SpeedInsights />
-
-      <Routes>
-        <Route path="/" element={homePage} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/thank-you-calculator" element={<ThankYouCalculatorPage />} />
-
-        <Route
-          path="*"
-          element={
-            isDashboardDomain ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
-              <Navigate to="/" replace />
-            )
-          }
-        />
-      </Routes>
-    </>
-  );
-}
+const App = () => (
+  <Routes>
+    <Route path="/" element={<LandingPage />} />
+    <Route path="/landing" element={<LandingPage />} />
+    <Route path="/quiz" element={<DigitalSuperpowerQuiz />} />
+    <Route path={CONFIG.routes.dashboard} element={<DashboardPage />} />
+    <Route path="*" element={<Navigate to="/" replace />} />
+  </Routes>
+);
 
 export default App;
