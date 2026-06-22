@@ -263,6 +263,9 @@ const LandingPage = () => {
                 <a href="#free-calculator" style={brutalButtonPrimary}>
                   Run the free calculator <TrendingUp size={16} />
                 </a>
+                <a href={routes.quiz} style={brutalButtonSecondary}>
+                  Discover your digital superpower <Sparkles size={16} />
+                </a>
                 <a
                   href={contact.facebookCommunityUrl}
                   target="_blank"
