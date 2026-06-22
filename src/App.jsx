@@ -3,6 +3,7 @@ import { Navigate, Routes, Route } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import LandingPage from "./pages/LandingPage";
 import DashboardPage from "./pages/DashboardPage";
+import DigitalSuperpowerQuiz from "./pages/DigitalSuperpowerQuiz";
 import AssistantPage from "./pages/AssistantPage"; // ⭐ ADD THIS
 import ChatWidget from "./components/ChatWidget";
 
@@ -26,6 +27,7 @@ function App() {
       <Routes>
         <Route path="/" element={homePage} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/quiz" element={<DigitalSuperpowerQuiz />} />
 
         {/* ⭐ NEW: AI Assistant Page (dashboard only) */}
         {isDashboardDomain && (

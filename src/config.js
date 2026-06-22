@@ -169,6 +169,7 @@ const CONFIG = {
   routes: {
     landing: "/",
     dashboard: "/dashboard",
+    quiz: "/quiz",
     dashboardAliases: ["/command", "/internal", "/app"],
   },
 
