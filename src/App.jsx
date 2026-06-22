@@ -1,12 +1,14 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import CONFIG from "./config";
-import DashboardPage from "./pages/DashboardPage";
 import LandingPage from "./pages/LandingPage";
+import DashboardPage from "./pages/DashboardPage";
+import AssistantPage from "./pages/AssistantPage";
+import ChatWidget from "./components/ChatWidget";
 
-const hostname =
-  typeof window !== "undefined" ? window.location.hostname : "";
+const hostname = typeof window !== "undefined" ? window.location.hostname : "";
 
 const isDashboardHost =
   hostname === "dashboard.digitallydefined.online" ||
@@ -14,6 +16,11 @@ const isDashboardHost =
 
 const App = () => (
   <>
+    <SpeedInsights />
+
+    {/* Show chat ONLY on the main site */}
+    {!isDashboardHost && <ChatWidget />}
+
     <Routes>
       <Route
         path="/"
@@ -37,6 +44,10 @@ const App = () => (
         />
       ))}
 
+      {isDashboardHost && (
+        <Route path="/assistant" element={<AssistantPage />} />
+      )}
+
       <Route
         path="*"
         element={
@@ -48,6 +59,7 @@ const App = () => (
         }
       />
     </Routes>
+
     <Analytics />
   </>
 );
