@@ -667,7 +667,7 @@ const DashboardPage = () => {
     setSyncError("");
 
     try {
-const url = `${BACKEND_URL}?action=dashboard&t=${Date.now()}`;
+      const url = `${BACKEND_URL}?action=dashboard&t=${Date.now()}`;
       const res = await fetch(url, {
         cache: "no-store",
         headers: BACKEND_KEY
