@@ -148,7 +148,7 @@ const LandingPage = () => {
             backgroundColor: colors.warning,
             color: colors.surface,
             padding: "12px 16px",
-            borderBottom: `2px solid ${colors.text}`,
+            borderBottom: brutalBorder,
             transition: "all 0.3s ease",
           }}
         >
@@ -164,7 +164,7 @@ const LandingPage = () => {
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <AlertCircle size={20} strokeWidth={2.5} />
               <span style={{ fontWeight: 700, fontSize: "0.95rem" }}>
-                🚧 Under Construction - New features coming soon!
+                Under Construction - New features coming soon!
               </span>
             </div>
             <button

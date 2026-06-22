@@ -1,67 +1,50 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
-import { Analytics } from "@vercel/analytics/react";
+import { Navigate, Routes, Route } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
-import CONFIG from "./config";
 import LandingPage from "./pages/LandingPage";
 import DashboardPage from "./pages/DashboardPage";
-import AssistantPage from "./pages/AssistantPage";
+import AssistantPage from "./pages/AssistantPage"; // ⭐ ADD THIS
 import ChatWidget from "./components/ChatWidget";
 
-const hostname = typeof window !== "undefined" ? window.location.hostname : "";
+function App() {
+  const hostname = window.location.hostname;
+  const isDashboardDomain = hostname === "dashboard.digitallydefined.online";
 
-const isDashboardHost =
-  hostname === "dashboard.digitallydefined.online" ||
-  hostname === "digitallydefined-reputation-dashboa-nine.vercel.app";
+  const homePage = isDashboardDomain ? (
+    <Navigate to="/dashboard" replace />
+  ) : (
+    <LandingPage />
+  );
 
-const App = () => (
-  <>
-    <SpeedInsights />
+  return (
+    <>
+      <SpeedInsights />
 
-    {/* Show chat ONLY on the main site */}
-    {!isDashboardHost && <ChatWidget />}
+      {/* Show chat ONLY on the main site */}
+      {!isDashboardDomain && <ChatWidget />}
 
-    <Routes>
-      <Route
-        path="/"
-        element={
-          isDashboardHost ? (
-            <Navigate to={CONFIG.routes.dashboard} replace />
-          ) : (
-            <LandingPage />
-          )
-        }
-      />
+      <Routes>
+        <Route path="/" element={homePage} />
+        <Route path="/dashboard" element={<DashboardPage />} />
 
-      <Route path="/landing" element={<LandingPage />} />
-      <Route path={CONFIG.routes.dashboard} element={<DashboardPage />} />
+        {/* ⭐ NEW: AI Assistant Page (dashboard only) */}
+        {isDashboardDomain && (
+          <Route path="/assistant" element={<AssistantPage />} />
+        )}
 
-      {CONFIG.routes.dashboardAliases.map((route) => (
         <Route
-          key={route}
-          path={route}
-          element={<Navigate to={CONFIG.routes.dashboard} replace />}
+          path="*"
+          element={
+            isDashboardDomain ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
         />
-      ))}
-
-      {isDashboardHost && (
-        <Route path="/assistant" element={<AssistantPage />} />
-      )}
-
-      <Route
-        path="*"
-        element={
-          isDashboardHost ? (
-            <Navigate to={CONFIG.routes.dashboard} replace />
-          ) : (
-            <Navigate to="/" replace />
-          )
-        }
-      />
-    </Routes>
-
-    <Analytics />
-  </>
-);
+      </Routes>
+    </>
+  );
+}
 
 export default App;

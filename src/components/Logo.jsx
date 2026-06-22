@@ -1,56 +1,67 @@
 import React from "react";
 import CONFIG from "../config";
-import { theme } from "../theme";
 
 const Logo = ({ as: Component = "span", style = {}, className = "" }) => {
   const logoImage = String(CONFIG.brand.logoImage || "").trim();
 
-  const baseStyle = {
+  const frameStyle = {
     display: "inline-flex",
-    alignItems: "baseline",
+    alignItems: "center",
     gap: 0,
-    color: CONFIG.colors.text,
+    padding: "0.5rem 0.75rem",
+    border: "1px solid #111111",
+    backgroundColor: "#fffcf9",
+    lineHeight: 1,
+    whiteSpace: "nowrap",
+    width: "fit-content",
+    boxSizing: "border-box",
+  };
+
+  const wordStyle = {
     fontFamily: "Inter, system-ui, sans-serif",
-    fontSize: "inherit",
-    fontWeight: 900,
-    fontStyle: "normal",
-    letterSpacing: "-0.05em",
-    textTransform: "uppercase",
+    fontSize: "1rem",
+    fontWeight: 800,
+    letterSpacing: "-0.04em",
+    textTransform: "none",
   };
 
   return (
     <Component
       className={className}
-      style={{ ...baseStyle, ...style }}
+      style={{ ...frameStyle, ...style }}
       aria-label={CONFIG.brand.fullName}
     >
       {logoImage ? (
         <img
           src={`/${logoImage}`}
           alt={CONFIG.brand.fullName}
-          style={{ height: "36px", width: "auto", objectFit: "contain" }}
+          style={{
+            height: "28px",
+            width: "auto",
+            objectFit: "contain",
+            display: "block",
+          }}
         />
       ) : (
         <>
           <span
             style={{
-              fontWeight: 900,
-              fontStyle: "normal",
-              letterSpacing: "inherit",
+              ...wordStyle,
               color: "#111111",
+              fontStyle: "normal",
             }}
           >
-            {CONFIG.brand.nameLight}
+            {CONFIG.brand.nameLight || "Digitally"}
           </span>
           <span
             style={{
-              fontWeight: 900,
+              ...wordStyle,
+              color: "#f18b25",
               fontStyle: "italic",
-              letterSpacing: "inherit",
-              color: CONFIG.colors.accent,
+              marginLeft: "0.05rem",
             }}
           >
-            {CONFIG.brand.nameBold}
+            {CONFIG.brand.nameBold || "Defined"}
           </span>
         </>
       )}
