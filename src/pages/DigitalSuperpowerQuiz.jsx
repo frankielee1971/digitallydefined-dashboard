@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { ArrowRight, ArrowLeft, Sparkles, Zap, Users, BookOpen, Star } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { ArrowLeft, ArrowRight, Sparkles, Zap, Users, BookOpen, Star } from "lucide-react";
 import CONFIG from "../config";
 import Footer from "../components/Footer";
 import Logo from "../components/Logo";
@@ -120,720 +120,352 @@ const results = {
     description:
       "You think in automations, frameworks, and repeatable processes. Your superpower is turning complexity into elegance — Notion templates, automated funnels, digital dashboards, and tools that solve real problems. You build digital products that save people time, and people will pay premium prices for that.",
     assets: [
-      "Notion templates & systems",
-      "Automated email funnels",
-      "Digital dashboards (like this one!)",
-      "Productivity tools & PDF playbooks",
-      "Done-for-you automation setups",
+      "Automated lead funnels",
+      "Notion templates and dashboards",
+      "SaaS-adjacent workflows",
+      "Content repurposing engines",
+      "Premium process toolkits",
     ],
     nextStep:
-      "Package one system you already use in your own life into a Notion template or digital product. Your first sale is closer than you think.",
-    color: "#47B7D4",
+      "Map your highest-value workflow and turn it into a sellable, repeatable system. Then start selling the transformation, not the task.",
+    color: "#52C41A",
   },
   educator: {
-    title: "The Digital Educator",
+    title: "The Expertise Educator",
     emoji: "📚",
     icon: BookOpen,
-    tagline: "Your experience is worth more than you've ever charged for it.",
+    tagline: "Your experience becomes the shortcut people pay for.",
     description:
       "You've spent decades accumulating expertise that others desperately need. Your superpower is transforming lived experience into structured learning — courses, workshops, playbooks, and coaching programs that shortcut other people's journeys.",
     assets: [
-      "Mini-courses & workshops",
-      "PDF guides & playbooks",
-      "Email courses",
-      "1:1 or group coaching programs",
-      "YouTube educational content",
+      "Mini-course funnels",
+      "Coaching container templates",
+      "Paid workshop sequels",
+      "Membership lesson libraries",
+      "Signature programs",
     ],
     nextStep:
-      "Write down the top 5 questions people always ask you. That's your first course outline. Your knowledge is already a product.",
-    color: "#16A34A",
+      "Pick one small, high-impact teaching topic and create a short lead magnet that proves your model. Then invite paid learners to go deeper.",
+    color: "#3366FF",
   },
   connector: {
-    title: "The Community Builder",
-    emoji: "👑",
+    title: "The Community Connector",
+    emoji: "💫",
     icon: Users,
-    tagline: "You don't just grow an audience — you grow a movement.",
+    tagline: "You build belonging, momentum, and repeat business.",
     description:
       "People are drawn to you. You create belonging, safety, and momentum wherever you show up. Your superpower is building communities — Facebook groups, memberships, group coaching containers — where people come for information and stay for connection.",
     assets: [
-      "Paid Facebook group / community",
-      "Membership site or subscription",
-      "Group coaching program",
-      "Live event series or masterminds",
-      "Ambassador / referral programs",
+      "Paid memberships",
+      "Group coaching programs",
+      "Community-led launches",
+      "Membership content roadmaps",
+      "Live event funnels",
     ],
     nextStep:
-      "Turn your existing free community into a premium experience. Even 50 members at $27/month is $1,350 recurring. That's your starting point.",
-    color: "#7C3AED",
+      "Choose a small group format, set a clear outcome, and invite the people who already trust you to join the first cohort.",
+    color: "#FF6B6B",
   },
   strategist: {
-    title: "The Brand Strategist",
-    emoji: "🎯",
+    title: "The Strategy Specialist",
+    emoji: "⭐",
     icon: Star,
-    tagline: "You see what others miss — and that's your most valuable asset.",
+    tagline: "You see the gap between the current state and the next-level opportunity.",
     description:
       "You think in positioning, messaging, and market differentiation. Your superpower is seeing the gap between where someone is and where they could be — and building the bridge. You're wired for consulting, done-for-you services, and brand strategy work that commands premium prices.",
     assets: [
-      "Digital strategy consulting packages",
-      "Done-for-you reputation management",
-      "Keyword research & SEO audits",
-      "Personal brand development",
-      "High-ticket offers & VIP days",
+      "Signature consulting offers",
+      "Premium service packages",
+      "Positioning frameworks",
+      "Brand storytelling systems",
+      "High-ticket launch plans",
     ],
     nextStep:
-      "Package your strategic eye into a signature offer. A 90-minute digital audit + roadmap session is your fastest path to your first $500 online.",
-    color: "#C20F0A",
+      "Start by clarifying the outcome you deliver, then package it in a premium offer for the clients who need it most.",
+    color: "#A259FF",
   },
 };
 
+const calculateResult = (answers) => {
+  const counts = Object.values(answers).reduce((acc, value) => {
+    if (!value) return acc;
+    acc[value] = (acc[value] || 0) + 1;
+    return acc;
+  }, {});
+
+  const entries = Object.entries(counts);
+  if (!entries.length) return "creator";
+
+  entries.sort((a, b) => b[1] - a[1]);
+  return entries[0][0];
+};
+
 const DigitalSuperpowerQuiz = () => {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState([]);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [showResult, setShowResult] = useState(false);
-  const [email, setEmail] = useState("");
-  const [emailSubmitted, setEmailSubmitted] = useState(false);
-  const [emailError, setEmailError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [answers, setAnswers] = useState({});
+  const [currentQuestion, setCurrentQuestion] = useState(1);
+  const [submitted, setSubmitted] = useState(false);
+  const [resultKey, setResultKey] = useState(null);
+  const [showInstructions, setShowInstructions] = useState(true);
 
-  const { colors, contact } = CONFIG;
+  const question = useMemo(
+    () => questions.find((item) => item.id === currentQuestion),
+    [currentQuestion],
+  );
 
-  const container = {
-    maxWidth: theme.layout.containerMaxWidth,
-    margin: "0 auto",
-  };
+  useEffect(() => {
+    document.title = "Digital Superpower Quiz | DigitallyDefined";
+  }, []);
 
-  const section = {
-    padding: `clamp(44px, 7vw, 84px) clamp(${theme.layout.spacing}, 4vw, 32px)`,
-  };
-
-  const calculateResult = (finalAnswers) => {
-    const counts = {
-      creator: 0,
-      builder: 0,
-      educator: 0,
-      connector: 0,
-      strategist: 0,
-    };
-
-    finalAnswers.forEach((value) => {
-      if (counts[value] !== undefined) counts[value] += 1;
-    });
-
-    return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
-  };
-
-  const handleSelect = (value) => {
-    setSelectedOption(value);
+  const handleAnswer = (value) => {
+    setAnswers((prev) => ({ ...prev, [currentQuestion]: value }));
   };
 
   const handleNext = () => {
-    if (!selectedOption) return;
-
-    const newAnswers = [...answers, selectedOption];
-
-    if (currentQuestion < questions.length - 1) {
-      setAnswers(newAnswers);
+    if (currentQuestion < questions.length) {
       setCurrentQuestion(currentQuestion + 1);
-      setSelectedOption(null);
-    } else {
-      setAnswers(newAnswers);
-      setShowResult(true);
     }
   };
 
   const handleBack = () => {
-    if (currentQuestion === 0) return;
-
-    const previousAnswers = answers.slice(0, -1);
-    const previousSelection = answers[currentQuestion - 1] || null;
-
-    setAnswers(previousAnswers);
-    setCurrentQuestion(currentQuestion - 1);
-    setSelectedOption(previousSelection);
-  };
-
-  const handleRestart = () => {
-    setCurrentQuestion(0);
-    setAnswers([]);
-    setSelectedOption(null);
-    setShowResult(false);
-    setEmail("");
-    setEmailSubmitted(false);
-    setEmailError("");
-    setIsSubmitting(false);
-  };
-
-  const handleEmailSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!email || !/\S+@\S+\.\S+/.test(email)) {
-      setEmailError("Please enter a valid email address.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    setEmailError("");
-
-    try {
-      const superpowerKey = calculateResult(answers);
-      const payload = {
-        type: "quiz_lead",
-        email,
-        superpower: results[superpowerKey].title,
-        timestamp: new Date().toISOString(),
-      };
-
-      await fetch(CONFIG.integrations?.googleSheetsUrl || "", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      }).catch(() => {});
-
-      setEmailSubmitted(true);
-    } catch (error) {
-      setEmailSubmitted(true);
-    } finally {
-      setIsSubmitting(false);
+    if (currentQuestion > 1) {
+      setCurrentQuestion(currentQuestion - 1);
     }
   };
 
-  if (showResult) {
-    const resultKey = calculateResult(answers);
-    const result = results[resultKey];
+  const handleSubmit = () => {
+    const key = calculateResult(answers);
+    setResultKey(key);
+    setSubmitted(true);
+    setShowInstructions(false);
+  };
 
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          backgroundColor: colors.background,
-          color: colors.text,
-          fontFamily: theme.fonts.app,
-        }}
-      >
-        <header
-          style={{
-            position: "sticky",
-            top: 0,
-            zIndex: 20,
-            borderBottom: brutalBorder,
-            backgroundColor: colors.surface,
-            padding: `18px ${theme.layout.spacing}`,
-          }}
-        >
-          <div
-            style={{
-              ...container,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "18px",
-              flexWrap: "wrap",
-            }}
-          >
-            <Logo as="div" style={{ fontSize: "clamp(1.1rem, 2vw, 1.45rem)" }} />
-            <a href="/" style={brutalButtonSecondary}>
-              ← Back to Home
-            </a>
-          </div>
-        </header>
+  const handleReset = () => {
+    setAnswers({});
+    setCurrentQuestion(1);
+    setSubmitted(false);
+    setResultKey(null);
+    setShowInstructions(true);
+  };
 
-        <main>
-          <section style={section}>
-            <div style={{ ...container, maxWidth: "780px" }}>
-              <div style={{ textAlign: "center", marginBottom: "40px" }}>
-                <p
-                  style={{
-                    ...brutalEyebrow,
-                    color: colors.textMuted,
-                    marginBottom: "16px",
-                  }}
-                >
-                  Your Digital Superpower Is
-                </p>
-                <div style={{ fontSize: "64px", marginBottom: "16px", lineHeight: 1 }}>
-                  {result.emoji}
-                </div>
-                <h1
-                  style={{
-                    ...brutalHeading,
-                    fontSize: "clamp(2.2rem, 5vw, 3.4rem)",
-                    lineHeight: 1,
-                    color: colors.text,
-                    margin: "0 0 12px",
-                  }}
-                >
-                  {result.title}
-                </h1>
-                <p
-                  style={{
-                    fontSize: "clamp(1.05rem, 2vw, 1.25rem)",
-                    color: result.color,
-                    fontWeight: 700,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.08em",
-                    margin: 0,
-                  }}
-                >
-                  {result.tagline}
-                </p>
-              </div>
-
-              <div
-                style={{
-                  ...brutalCard,
-                  padding: "clamp(24px, 4vw, 36px)",
-                  marginBottom: "24px",
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: "1.05rem",
-                    lineHeight: 1.7,
-                    color: colors.text,
-                    margin: 0,
-                  }}
-                >
-                  {result.description}
-                </p>
-              </div>
-
-              <div
-                style={{
-                  ...brutalCard,
-                  padding: "clamp(24px, 4vw, 36px)",
-                  marginBottom: "24px",
-                  backgroundColor: colors.dark,
-                  color: colors.bone,
-                }}
-              >
-                <p
-                  style={{
-                    ...brutalEyebrow,
-                    color: result.color,
-                    marginBottom: "18px",
-                  }}
-                >
-                  Your Best Digital Assets to Build
-                </p>
-                <ul
-                  style={{
-                    listStyle: "none",
-                    padding: 0,
-                    margin: 0,
-                    display: "grid",
-                    gap: "10px",
-                  }}
-                >
-                  {result.assets.map((asset) => (
-                    <li
-                      key={asset}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "12px",
-                        fontSize: "0.95rem",
-                        fontWeight: 600,
-                      }}
-                    >
-                      <span
-                        style={{
-                          width: "8px",
-                          height: "8px",
-                          backgroundColor: result.color,
-                          flexShrink: 0,
-                          display: "inline-block",
-                        }}
-                      />
-                      {asset}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div
-                style={{
-                  ...brutalCard,
-                  padding: "clamp(24px, 4vw, 36px)",
-                  marginBottom: "32px",
-                }}
-              >
-                <p
-                  style={{
-                    ...brutalEyebrow,
-                    color: result.color,
-                    marginBottom: "10px",
-                  }}
-                >
-                  Your Next Step
-                </p>
-                <p
-                  style={{
-                    fontSize: "1rem",
-                    lineHeight: 1.65,
-                    color: colors.text,
-                    margin: 0,
-                  }}
-                >
-                  {result.nextStep}
-                </p>
-              </div>
-
-              <div
-                style={{
-                  ...brutalCard,
-                  padding: "clamp(24px, 4vw, 36px)",
-                  marginBottom: "32px",
-                  backgroundColor: colors.backgroundAlt,
-                }}
-              >
-                {!emailSubmitted ? (
-                  <>
-                    <p
-                      style={{
-                        ...brutalEyebrow,
-                        color: colors.textMuted,
-                        marginBottom: "10px",
-                      }}
-                    >
-                      Get Your Full Superpower Breakdown
-                    </p>
-                    <h2
-                      style={{
-                        ...brutalHeading,
-                        fontSize: "clamp(1.3rem, 3vw, 1.9rem)",
-                        margin: "0 0 12px",
-                        color: colors.text,
-                      }}
-                    >
-                      Want a deeper breakdown + action plan?
-                    </h2>
-                    <p
-                      style={{
-                        fontSize: "0.95rem",
-                        color: colors.textMuted,
-                        lineHeight: 1.6,
-                        marginBottom: "20px",
-                      }}
-                    >
-                      Drop your email and I&apos;ll send you a personalized digital roadmap
-                      for the {result.title} — plus the exact tools and first steps I
-                      recommend.
-                    </p>
-
-                    <form
-                      onSubmit={handleEmailSubmit}
-                      style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}
-                    >
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="your@email.com"
-                        style={{
-                          flex: "1 1 240px",
-                          padding: "14px 16px",
-                          border: brutalBorder,
-                          borderRadius: "0px",
-                          fontSize: "0.95rem",
-                          fontFamily: theme.fonts.body,
-                          backgroundColor: colors.surface,
-                          color: colors.text,
-                          outline: "none",
-                        }}
-                      />
-                      <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        style={{
-                          ...brutalButtonPrimary,
-                          opacity: isSubmitting ? 0.7 : 1,
-                        }}
-                      >
-                        {isSubmitting ? "Sending..." : "Send My Roadmap"}{" "}
-                        <ArrowRight size={16} />
-                      </button>
-                    </form>
-
-                    {emailError && (
-                      <p
-                        style={{
-                          color: colors.danger,
-                          fontSize: "0.85rem",
-                          marginTop: "8px",
-                          fontWeight: 700,
-                        }}
-                      >
-                        {emailError}
-                      </p>
-                    )}
-                  </>
-                ) : (
-                  <div style={{ textAlign: "center", padding: "16px 0" }}>
-                    <div style={{ fontSize: "40px", marginBottom: "12px" }}>🎉</div>
-                    <h3
-                      style={{
-                        ...brutalHeading,
-                        fontSize: "1.4rem",
-                        margin: "0 0 8px",
-                        color: colors.text,
-                      }}
-                    >
-                      You&apos;re in!
-                    </h3>
-                    <p
-                      style={{
-                        color: colors.textMuted,
-                        fontSize: "0.95rem",
-                        margin: 0,
-                      }}
-                    >
-                      Check your inbox — your personalized roadmap is on its way.
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  gap: "14px",
-                  flexWrap: "wrap",
-                  justifyContent: "center",
-                  marginBottom: "32px",
-                }}
-              >
-                <a
-                  href={contact.facebookCommunityUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={brutalButtonPrimary}
-                >
-                  Join the Community <Users size={16} />
-                </a>
-                <button onClick={handleRestart} style={brutalButtonSecondary}>
-                  Retake the Quiz <ArrowRight size={16} />
-                </button>
-              </div>
-            </div>
-          </section>
-        </main>
-
-        <Footer />
-      </div>
-    );
-  }
-
-  const question = questions[currentQuestion];
+  const result = resultKey ? results[resultKey] : null;
 
   return (
     <div
       style={{
         minHeight: "100vh",
-        backgroundColor: colors.background,
-        color: colors.text,
+        backgroundColor: theme.colors.background,
+        color: theme.colors.text,
         fontFamily: theme.fonts.app,
       }}
     >
       <header
         style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 20,
           borderBottom: brutalBorder,
-          backgroundColor: colors.surface,
-          padding: `18px ${theme.layout.spacing}`,
+          backgroundColor: theme.colors.surface,
+          padding: `24px ${theme.layout.spacing}`,
         }}
       >
         <div
           style={{
-            ...container,
+            maxWidth: theme.layout.containerMaxWidth,
+            margin: "0 auto",
             display: "flex",
-            alignItems: "center",
             justifyContent: "space-between",
-            gap: "18px",
+            alignItems: "center",
+            gap: theme.layout.spacing,
             flexWrap: "wrap",
           }}
         >
-          <Logo as="div" style={{ fontSize: "clamp(1.1rem, 2vw, 1.45rem)" }} />
-          <a href="/" style={brutalButtonSecondary}>
-            ← Back to Home
-          </a>
+          <Logo as="div" style={{ fontSize: "clamp(1.2rem, 2vw, 1.5rem)" }} />
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <a href={CONFIG.routes.landing} style={brutalButtonSecondary}>
+              Home
+            </a>
+            <a href={CONFIG.routes.dashboard} style={brutalButtonSecondary}>
+              Dashboard
+            </a>
+          </div>
         </div>
       </header>
 
-      <main>
-        <section style={section}>
-          <div style={{ ...container, maxWidth: "680px" }}>
-            <p
-              style={{
-                ...brutalEyebrow,
-                color: colors.textMuted,
-                marginBottom: "24px",
-                textAlign: "center",
-              }}
-            >
-              Digital Superpower Quiz
-            </p>
-
-            <div style={{ marginBottom: "36px" }}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: "8px",
-                }}
-              >
-                <span
+      <main style={{ padding: `clamp(40px, 5vw, 60px) ${theme.layout.spacing}` }}>
+        <div
+          style={{
+            maxWidth: 1100,
+            margin: "0 auto",
+            display: "grid",
+            gap: "32px",
+          }}
+        >
+          <section
+            style={{
+              display: "grid",
+              gap: "18px",
+              padding: "32px",
+              ...brutalCard,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+              <span style={{ fontSize: "1.25rem" }}>{result ? result.emoji : "✨"}</span>
+              <div>
+                <div style={{ ...brutalEyebrow, marginBottom: "8px" }}>
+                  Digital Superpower Quiz
+                </div>
+                <h1
                   style={{
-                    fontSize: "0.78rem",
-                    fontWeight: 700,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                    color: colors.textMuted,
+                    ...brutalHeading,
+                    margin: 0,
+                    fontSize: "clamp(2rem, 4vw, 3rem)",
                   }}
                 >
-                  Question {currentQuestion + 1} of {questions.length}
-                </span>
-                <span
-                  style={{
-                    fontSize: "0.78rem",
-                    fontWeight: 700,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                    color: colors.accent,
-                  }}
-                >
-                  {Math.round(((currentQuestion + 1) / questions.length) * 100)}%
-                  {" "}Complete
-                </span>
-              </div>
-
-              <div
-                style={{
-                  height: "6px",
-                  backgroundColor: colors.backgroundAlt,
-                  border: brutalBorder,
-                }}
-              >
-                <div
-                  style={{
-                    height: "100%",
-                    width: `${((currentQuestion + 1) / questions.length) * 100}%`,
-                    backgroundColor: colors.accent,
-                    transition: "width 0.3s ease",
-                  }}
-                />
+                  Discover the way you win online.
+                </h1>
               </div>
             </div>
+            <p style={{ margin: 0, color: theme.colors.textMuted, maxWidth: "780px" }}>
+              Answer 7 quick questions to uncover your digital superpower and get a clear next step for the business model that fits your experience, personality, and goals.
+            </p>
+          </section>
 
-            <h1
-              style={{
-                ...brutalHeading,
-                fontSize: "clamp(1.4rem, 3.5vw, 2rem)",
-                lineHeight: 1.2,
-                marginBottom: "28px",
-                color: colors.text,
-              }}
-            >
-              {question.question}
-            </h1>
+          {showInstructions && (
+            <section style={{ ...brutalCard, padding: "28px" }}>
+              <h2 style={{ ...brutalHeading, margin: 0 }}>How it works</h2>
+              <p style={{ margin: "16px 0 0", color: theme.colors.textMuted }}>
+                Choose the option that feels most true for you in the moment. This quiz is about energy and focus, not perfection.
+              </p>
+            </section>
+          )}
 
-            <div style={{ display: "grid", gap: "12px", marginBottom: "32px" }}>
-              {question.options.map((option) => {
-                const isSelected = selectedOption === option.value;
+          {!submitted ? (
+            <section style={{ ...brutalCard, padding: "28px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
+                <div>
+                  <p style={{ ...brutalEyebrow, margin: 0 }}>Question {currentQuestion} of {questions.length}</p>
+                  <h2 style={{ margin: "12px 0 0", fontSize: "clamp(1.5rem, 3vw, 2rem)" }}>{question.question}</h2>
+                </div>
+                <div style={{ fontWeight: 700, color: theme.colors.primary }}>{answers[currentQuestion] ? "Answer selected" : "Choose an answer"}</div>
+              </div>
 
-                return (
+              <div
+                style={{
+                  display: "grid",
+                  gap: "14px",
+                  marginTop: "28px",
+                }}
+              >
+                {question.options.map((option) => (
                   <button
                     key={option.value}
-                    onClick={() => handleSelect(option.value)}
+                    type="button"
+                    onClick={() => handleAnswer(option.value)}
                     style={{
-                      ...brutalCard,
-                      padding: "18px 20px",
-                      textAlign: "left",
-                      cursor: "pointer",
-                      backgroundColor: isSelected ? colors.dark : colors.surface,
-                      color: isSelected ? colors.bone : colors.text,
-                      borderColor: isSelected ? colors.accent : "#111111",
-                      borderWidth: isSelected ? "2px" : "1px",
-                      fontFamily: theme.fonts.body,
-                      fontSize: "0.97rem",
-                      lineHeight: 1.5,
-                      fontWeight: isSelected ? 700 : 400,
-                      transition: "all 0.15s ease",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "14px",
+                      ...brutalButtonSecondary,
+                      justifyContent: "flex-start",
+                      borderColor: answers[currentQuestion] === option.value ? theme.colors.primary : theme.colors.border,
+                      color: theme.colors.text,
                     }}
                   >
-                    <span
-                      style={{
-                        width: "20px",
-                        height: "20px",
-                        flexShrink: 0,
-                        border: `2px solid ${isSelected ? colors.accent : "#111"}`,
-                        backgroundColor: isSelected ? colors.accent : "transparent",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      {isSelected && (
-                        <span
-                          style={{
-                            width: "8px",
-                            height: "8px",
-                            backgroundColor: colors.dark,
-                            display: "block",
-                          }}
-                        />
-                      )}
+                    <span style={{ fontWeight: 700, marginRight: "10px" }}>
+                      {answers[currentQuestion] === option.value ? "●" : "○"}
                     </span>
                     {option.text}
                   </button>
-                );
-              })}
-            </div>
+                ))}
+              </div>
 
-            <div
-              style={{
-                display: "flex",
-                gap: "14px",
-                justifyContent: "space-between",
-              }}
-            >
-              <button
-                onClick={handleBack}
-                disabled={currentQuestion === 0}
-                style={{
-                  ...brutalButtonSecondary,
-                  opacity: currentQuestion === 0 ? 0.3 : 1,
-                  cursor: currentQuestion === 0 ? "not-allowed" : "pointer",
-                }}
-              >
-                <ArrowLeft size={16} /> Back
-              </button>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", marginTop: "28px" }}>
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  disabled={currentQuestion === 1}
+                  style={{
+                    ...brutalButtonSecondary,
+                    opacity: currentQuestion === 1 ? 0.5 : 1,
+                    cursor: currentQuestion === 1 ? "not-allowed" : "pointer",
+                  }}
+                >
+                  <ArrowLeft size={16} /> Back
+                </button>
+                <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+                  {currentQuestion < questions.length ? (
+                    <button type="button" onClick={handleNext} style={brutalButtonPrimary}>
+                      Next <ArrowRight size={16} />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleSubmit}
+                      disabled={Object.keys(answers).length < questions.length}
+                      style={{
+                        ...brutalButtonPrimary,
+                        opacity: Object.keys(answers).length < questions.length ? 0.6 : 1,
+                        cursor: Object.keys(answers).length < questions.length ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      See my superpower <ArrowRight size={16} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </section>
+          ) : (
+            <section style={{ ...brutalCard, padding: "28px" }}>
+              <div style={{ display: "grid", gap: "18px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                  <span style={{ fontSize: "1.5rem" }}>{result.emoji}</span>
+                  <div>
+                    <div style={{ ...brutalEyebrow, margin: 0 }}>Your digital superpower</div>
+                    <h2 style={{ margin: "8px 0 0", fontSize: "clamp(2rem, 4vw, 3rem)" }}>{result.title}</h2>
+                  </div>
+                </div>
 
-              <button
-                onClick={handleNext}
-                disabled={!selectedOption}
-                style={{
-                  ...brutalButtonPrimary,
-                  opacity: !selectedOption ? 0.4 : 1,
-                  cursor: !selectedOption ? "not-allowed" : "pointer",
-                }}
-              >
-                {currentQuestion === questions.length - 1
-                  ? "See My Superpower"
-                  : "Next"}{" "}
-                <ArrowRight size={16} />
-              </button>
-            </div>
-          </div>
-        </section>
+                <p style={{ margin: 0, color: theme.colors.textMuted, maxWidth: "720px" }}>{result.tagline}</p>
+                <p style={{ margin: 0 }}>{result.description}</p>
+
+                <div style={{ display: "grid", gap: "12px" }}>
+                  <h3 style={{ margin: 0 }}>Digital assets to build first</h3>
+                  <div style={{
+                    display: "grid",
+                    gap: "10px",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                  }}>
+                    {result.assets.map((asset) => (
+                      <div key={asset} style={{ ...brutalCard, padding: "14px" }}>
+                        {asset}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 style={{ margin: "0 0 10px" }}>Best next step</h3>
+                  <p style={{ margin: 0 }}>{result.nextStep}</p>
+                </div>
+
+                <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+                  <button type="button" onClick={handleReset} style={brutalButtonSecondary}>
+                    Retake the quiz
+                  </button>
+                  <a href={CONFIG.routes.dashboard} style={brutalButtonPrimary}>
+                    Go to dashboard
+                  </a>
+                </div>
+              </div>
+            </section>
+          )}
+        </div>
       </main>
 
-      <Footer />
+      <Footer
+        colors={theme.colors}
+        containerStyle={{ maxWidth: theme.layout.containerMaxWidth, margin: "0 auto" }}
+        footerStyle={{ padding: `32px ${theme.layout.spacing}`, backgroundColor: theme.colors.surface }}
+        routes={CONFIG.routes}
+        landing={CONFIG.landing}
+        contact={CONFIG.contact}
+        year={new Date().getFullYear()}
+        showDashboardLink={false}
+      />
     </div>
   );
 };
