@@ -79,6 +79,7 @@ const tabIcons = {
   intel: BarChart3,
   brain: BrainCircuit,
   automations: Workflow,
+  notion: Bot,
 };
 
 const formatConversion = (value) => {
@@ -803,6 +804,7 @@ const DashboardPage = () => {
     if (activeTab === "intel") return <IntelTab data={data} />;
     if (activeTab === "brain") return <BrainTab aiBrief={data.aiBrief} />;
     if (activeTab === "automations") return <AutomationsTab automations={data.automations} />;
+    if (activeTab === "notion") return <EmptyState>Notion database integration coming soon.</EmptyState>;
     return <CommandTab data={data} stats={stats} />;
   };
 
