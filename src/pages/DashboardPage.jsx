@@ -52,7 +52,10 @@ const dashboardLabels = {
   },
 };
 
-const BACKEND_URL = import.meta.env.VITE_DASHBOARD_API_URL;
+const API_URL =
+  import.meta.env.VITE_HERMES_GATEWAY_URL ||
+  import.meta.env.VITE_DASHBOARD_API_URL ||
+  "/api/hermes";
 
 const BACKEND_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "";
 const ASSISTANT_MODEL =
@@ -667,7 +670,7 @@ const DashboardPage = () => {
     setSyncError("");
 
     try {
-      const url = `${BACKEND_URL}?action=dashboard&t=${Date.now()}`;
+      const url = `${API_URL}?action=dashboard&t=${Date.now()}`;
       const res = await fetch(url, {
         cache: "no-store",
         headers: BACKEND_KEY
@@ -688,7 +691,7 @@ const DashboardPage = () => {
       setData(nextData);
 
       const automationsRes = await fetch(
-        `${BACKEND_URL}?action=automation.list`,
+        `${API_URL}?action=automation.list`,
         {
           headers: BACKEND_KEY
             ? { "x-api-key": BACKEND_KEY }
@@ -748,9 +751,7 @@ const DashboardPage = () => {
       });
 
       // Send to your Hermes backend
-      const res = await fetch(
-        "https://digitallydefined-os-backend.vercel.app/api/hermes",
-        {
+      const res = await fetch(API_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

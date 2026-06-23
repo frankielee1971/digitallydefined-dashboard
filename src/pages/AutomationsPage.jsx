@@ -6,7 +6,11 @@ export default function AutomationsPage() {
   const [automations, setAutomations] = useState([]);
 
   useEffect(() => {
-    const url = `${import.meta.env.VITE_BACKEND_URL}/api/backend?action=automation.list`;
+    const API_URL =
+      import.meta.env.VITE_HERMES_GATEWAY_URL ||
+      import.meta.env.VITE_BACKEND_URL ||
+      "/api/hermes";
+    const url = `${API_URL}?action=automation.list`;
 
     fetch(url, {
       method: "GET",

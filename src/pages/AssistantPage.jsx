@@ -22,9 +22,11 @@ export default function AssistantPage() {
     setInput("");
 
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/backend?action=chat`,
-        {
+      const API_URL =
+        import.meta.env.VITE_HERMES_GATEWAY_URL ||
+        import.meta.env.VITE_BACKEND_URL ||
+        "/api/hermes";
+      const res = await fetch(`${API_URL}?action=chat`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
