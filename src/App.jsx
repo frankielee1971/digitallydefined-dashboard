@@ -1,10 +1,12 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import CONFIG from "./config";
 import DashboardPage from "./pages/DashboardPage";
 import DigitalSuperpowerQuiz from "./pages/DigitalSuperpowerQuiz";
-import AssistantPage from "./pages/AssistantPage"; // ⭐ ADD THIS
+import AssistantPage from "./pages/AssistantPage";
 import ChatWidget from "./components/ChatWidget";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
   const hostname = window.location.hostname;
