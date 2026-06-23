@@ -56,53 +56,19 @@ export default function AssistantPage() {
   }
 
   return (
-    <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        background: "#f7f7f7"
-      }}
-    >
+    <div className="dd-page dd-page--assistant">
       {/* Header */}
-      <div
-        style={{
-          padding: "16px",
-          background: "#000",
-          color: "#fff",
-          fontSize: "20px",
-          fontWeight: "bold"
-        }}
-      >
-        DigitallyDefined AI Assistant
-      </div>
+      <div className="dd-assistant-header">DigitallyDefined AI Assistant</div>
 
       {/* Messages */}
-      <div
-        style={{
-          flex: 1,
-          padding: "20px",
-          overflowY: "auto"
-        }}
-      >
+      <div className="dd-assistant-body">
         {messages.map((m, i) => (
           <div
             key={i}
-            style={{
-              marginBottom: "14px",
-              textAlign: m.role === "user" ? "right" : "left"
-            }}
+            className={`dd-assistant-message dd-assistant-message--${m.role}`}
           >
             <div
-              style={{
-                display: "inline-block",
-                padding: "10px 14px",
-                borderRadius: "10px",
-                background: m.role === "user" ? "#000" : "#eaeaea",
-                color: m.role === "user" ? "#fff" : "#000",
-                maxWidth: "80%",
-                lineHeight: "1.4"
-              }}
+              className={`dd-assistant-message-bubble dd-assistant-message-bubble--${m.role}`}
             >
               {m.content}
             </div>
@@ -113,35 +79,17 @@ export default function AssistantPage() {
       </div>
 
       {/* Input */}
-      <div
-        style={{
-          padding: "16px",
-          display: "flex",
-          gap: "10px",
-          background: "#fff",
-          borderTop: "1px solid #ddd"
-        }}
-      >
+      <div className="dd-assistant-input-row">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask me anything..."
-          style={{
-            flex: 1,
-            padding: "12px",
-            borderRadius: "8px",
-            border: "1px solid #ccc"
-          }}
+          className="dd-assistant-input"
         />
         <button
           onClick={sendMessage}
-          style={{
-            background: "#000",
-            color: "#fff",
-            padding: "12px 18px",
-            borderRadius: "8px",
-            cursor: "pointer"
-          }}
+          className="dd-button dd-button--primary"
+          type="button"
         >
           Send
         </button>

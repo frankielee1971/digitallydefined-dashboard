@@ -53,102 +53,40 @@ export default function ChatWidget() {
       {/* Floating Button */}
       <button
         onClick={() => setOpen(!open)}
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          right: "24px",
-          background: "#000",
-          color: "#fff",
-          padding: "14px 18px",
-          borderRadius: "50%",
-          fontSize: "20px",
-          cursor: "pointer",
-          zIndex: 9999
-        }}
+        className="dd-chat-toggle"
       >
         💬
       </button>
 
       {/* Chat Window */}
       {open && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: "90px",
-            right: "24px",
-            width: "320px",
-            height: "420px",
-            background: "#fff",
-            borderRadius: "12px",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-            zIndex: 9999
-          }}
-        >
-          <div
-            style={{
-              padding: "12px",
-              background: "#000",
-              color: "#fff",
-              fontWeight: "bold"
-            }}
-          >
-            DigitallyDefined AI
-          </div>
+        <div className="dd-chat-window">
+          <div className="dd-chat-header">DigitallyDefined AI</div>
 
-          <div
-            style={{
-              flex: 1,
-              padding: "12px",
-              overflowY: "auto"
-            }}
-          >
+          <div className="dd-chat-body">
             {messages.map((m, i) => (
               <div
                 key={i}
-                style={{
-                  marginBottom: "10px",
-                  textAlign: m.role === "user" ? "right" : "left"
-                }}
+                className={`dd-chat-message dd-chat-message--${m.role}`}
               >
-                <div
-                  style={{
-                    display: "inline-block",
-                    padding: "8px 12px",
-                    borderRadius: "8px",
-                    background: m.role === "user" ? "#000" : "#f1f1f1",
-                    color: m.role === "user" ? "#fff" : "#000"
-                  }}
-                >
+                <div className="dd-chat-bubble">
                   {m.content}
                 </div>
               </div>
             ))}
           </div>
 
-          <div style={{ padding: "12px", display: "flex", gap: "8px" }}>
+          <div className="dd-chat-footer">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask me anything..."
-              style={{
-                flex: 1,
-                padding: "8px",
-                borderRadius: "6px",
-                border: "1px solid #ccc"
-              }}
+              className="dd-chat-input"
             />
             <button
               onClick={sendMessage}
-              style={{
-                background: "#000",
-                color: "#fff",
-                padding: "8px 12px",
-                borderRadius: "6px",
-                cursor: "pointer"
-              }}
+              className="dd-button dd-button--primary"
+              type="button"
             >
               Send
             </button>
