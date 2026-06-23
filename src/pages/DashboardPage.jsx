@@ -54,10 +54,14 @@ const dashboardLabels = {
 
 const API_URL =
   import.meta.env.VITE_HERMES_GATEWAY_URL ||
-  import.meta.env.VITE_DASHBOARD_API_URL ||
-  "/api/hermes";
+  "https://digitallydefined-os-backend.vercel.app/api/hermes";
 
-const BACKEND_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "";
+const API_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "";
+const API_HEADERS = {
+  "Content-Type": "application/json",
+  "x-api-key": API_KEY,
+};
+
 const ASSISTANT_MODEL =
   import.meta.env.VITE_DASHBOARD_ASSISTANT_MODEL ||
   dashboardConfig.assistantModel ||
@@ -670,12 +674,10 @@ const DashboardPage = () => {
     setSyncError("");
 
     try {
-      const url = `${API_URL}?action=dashboard&t=${Date.now()}`;
-      const res = await fetch(url, {
+      const res = await fetch(API_URL, {
+        method: "GET",
         cache: "no-store",
-        headers: BACKEND_KEY
-          ? { "x-api-key": BACKEND_KEY, "Content-Type": "application/json" }
-          : undefined,
+        headers: API_HEADERS,
       });
 
       if (!res.ok) {
@@ -690,14 +692,15 @@ const DashboardPage = () => {
 
       setData(nextData);
 
-      const automationsRes = await fetch(
-        `${API_URL}?action=automation.list`,
-        {
-          headers: BACKEND_KEY
-            ? { "x-api-key": BACKEND_KEY }
-            : undefined,
-        }
-      );
+      const automationsRes = await fetch(API_URL, {
+        method: "POST",
+        headers: API_HEADERS,
+        body: JSON.stringify({
+          message: "automation.list",
+          context: {},
+          conversation: [],
+        }),
+      });
       if (!automationsRes.ok) {
         setAutomations([]);
       } else {
@@ -753,19 +756,12 @@ const DashboardPage = () => {
       // Send to your Hermes backend
       const res = await fetch(API_URL, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(BACKEND_KEY ? { "x-api-key": BACKEND_KEY } : {}),
-          },
+          headers: API_HEADERS,
           body: JSON.stringify({
-            message: `
-Dashboard snapshot:
-${JSON.stringify(snapshot, null, 2)}
-
-User message:
-${trimmedMessage}
-            `
-          })
+            message: trimmedMessage,
+            context: snapshot,
+            conversation: nextMessages,
+          }),
         }
       );
 

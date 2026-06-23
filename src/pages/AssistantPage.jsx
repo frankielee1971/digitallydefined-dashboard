@@ -24,15 +24,18 @@ export default function AssistantPage() {
     try {
       const API_URL =
         import.meta.env.VITE_HERMES_GATEWAY_URL ||
-        import.meta.env.VITE_BACKEND_URL ||
-        "/api/hermes";
-      const res = await fetch(`${API_URL}?action=chat`, {
+        "https://digitallydefined-os-backend.vercel.app/api/hermes";
+      const res = await fetch(API_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_DASHBOARD_API_KEY
+            "x-api-key": import.meta.env.VITE_DASHBOARD_API_KEY || ""
           },
-          body: JSON.stringify({ messages: updatedMessages })
+          body: JSON.stringify({
+            message: input.trim(),
+            context: {},
+            conversation: updatedMessages,
+          })
         }
       );
 
