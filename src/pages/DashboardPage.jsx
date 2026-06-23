@@ -56,6 +56,10 @@ const API_URL =
   import.meta.env.VITE_HERMES_GATEWAY_URL ||
   "https://digitallydefined-os-backend.vercel.app/api/hermes";
 
+const DASHBOARD_API_URL =
+  import.meta.env.VITE_DASHBOARD_API_URL ||
+  "https://digitallydefined-os-backend.vercel.app/api/index";
+
 const API_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "";
 const API_HEADERS = {
   "Content-Type": "application/json",
@@ -675,7 +679,7 @@ const DashboardPage = () => {
     setSyncError("");
 
     try {
-      const res = await fetch(API_URL, {
+      const res = await fetch(`${DASHBOARD_API_URL}?action=dashboard`, {
         method: "GET",
         cache: "no-store",
         headers: API_HEADERS,
@@ -693,13 +697,12 @@ const DashboardPage = () => {
 
       setData(nextData);
 
-      const automationsRes = await fetch(API_URL, {
+      const automationsRes = await fetch(DASHBOARD_API_URL, {
         method: "POST",
         headers: API_HEADERS,
         body: JSON.stringify({
-          message: "automation.list",
+          action: "automation.list",
           context: {},
-          conversation: [],
         }),
       });
       if (!automationsRes.ok) {
