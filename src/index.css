@@ -69,3 +69,120 @@ a {
   border: var(--brand-border-width) solid var(--brand-border-color);
   padding: 20px;
 }
+
+.dd-page {
+  min-height: 100vh;
+  background: var(--brand-background);
+  color: var(--brand-text-primary);
+  font-family: "DM Sans", system-ui, sans-serif;
+}
+
+.dd-page__container {
+  max-width: var(--brand-container-max-width);
+  margin: 0 auto;
+  display: grid;
+  gap: 32px;
+  padding: 32px 24px;
+}
+
+.dd-page__hero {
+  border-bottom: var(--brand-border-width) solid var(--brand-border-color);
+  background: var(--brand-panel);
+  padding: 32px 24px;
+}
+
+.dd-page__hero-inner {
+  max-width: var(--brand-container-max-width);
+  margin: 0 auto;
+  display: grid;
+  gap: 24px;
+}
+
+.dd-page__hero-meta,
+.dd-page__section-header,
+.dd-page__actions,
+.dd-page__footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.dd-heading {
+  margin: 0;
+  font-family: "Inter", system-ui, sans-serif;
+  font-weight: 900;
+  letter-spacing: 0;
+  color: var(--brand-text-primary);
+}
+
+.dd-heading--large {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.dd-heading--medium {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.dd-text {
+  margin: 0;
+  color: var(--brand-text-primary);
+  line-height: 1.7;
+}
+
+.dd-text--muted {
+  color: var(--brand-text-muted);
+}
+
+.dd-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: var(--brand-border-width) solid var(--brand-border-color);
+  background: transparent;
+  color: var(--brand-text-primary);
+  padding: 14px 20px;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 700;
+  transition: opacity 0.2s ease;
+}
+
+.dd-button:hover {
+  opacity: 0.95;
+}
+
+.dd-button--primary {
+  background: var(--brand-accent-orange);
+  color: #ffffff;
+  border-color: var(--brand-accent-orange);
+}
+
+.dd-button--secondary {
+  background: transparent;
+}
+
+.dd-button--selected {
+  border-color: var(--brand-accent-aqua);
+  background: rgba(71, 183, 212, 0.08);
+}
+
+.dd-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dd-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.dd-grid--assets {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.dd-card--spaced {
+  padding: 28px;
+}
