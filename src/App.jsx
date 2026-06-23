@@ -1,51 +1,24 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
-import CONFIG from "./config";
-import DashboardPage from "./pages/DashboardPage";
-import DigitalSuperpowerQuiz from "./pages/DigitalSuperpowerQuiz";
-import AssistantPage from "./pages/AssistantPage";
-import LandingPage from "./pages/LandingPage";
-import ChatWidget from "./components/ChatWidget";
+
+import DashboardPage from "./pages/DashboardPage.jsx";
+import AssistantPage from "./pages/AssistantPage.jsx";
+import AutomationsPage from "./pages/AutomationsPage.jsx";
+import QuizPage from "./pages/QuizPage.jsx";
 
 function App() {
-  const hostname = window.location.hostname;
-  const isDashboardDomain = hostname === "dashboard.digitallydefined.online";
-
-  const homePage = isDashboardDomain ? (
-    <Navigate to="/dashboard" replace />
-  ) : (
-    <LandingPage />
-  );
-
   return (
     <>
-      <SpeedInsights />
-
-      {/* Show chat ONLY on the main site */}
-      {!isDashboardDomain && <ChatWidget />}
-
       <Routes>
-        <Route path="/" element={homePage} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/quiz" element={<DigitalSuperpowerQuiz />} />
-
-        {/* ⭐ NEW: AI Assistant Page (dashboard only) */}
-        {isDashboardDomain && (
-          <Route path="/assistant" element={<AssistantPage />} />
-        )}
-
-        <Route
-          path="*"
-          element={
-            isDashboardDomain ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
-              <Navigate to="/" replace />
-            )
-          }
-        />
+        <Route path="/assistant" element={<AssistantPage />} />
+        <Route path="/automations" element={<AutomationsPage />} />
+        <Route path="/quiz" element={<QuizPage />} />
       </Routes>
+
+      <SpeedInsights />
     </>
   );
 }
