@@ -5,7 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/react";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import AssistantPage from "./pages/AssistantPage.jsx";
 import AutomationsPage from "./pages/AutomationsPage.jsx";
-import Quiz from "./pages/Quiz.jsx"; // ✅ matches your renamed file
+import Quiz from "./pages/Quiz.jsx"; // Make sure this file exists
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/assistant" element={<AssistantPage />} />
         <Route path="/automations" element={<AutomationsPage />} />
-        <Route path="/quiz" element={<Quiz />} /> {/* ✅ updated */}
+        <Route path="/quiz" element={<Quiz />} />
       </Routes>
 
       <SpeedInsights />
