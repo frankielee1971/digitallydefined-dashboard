@@ -6,14 +6,23 @@ export default function NewsletterSignup() {
 
   async function subscribe(e) {
     e.preventDefault();
-    const res = await fetch("/api/subscribe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
-    if (res.ok) {
-      setStatus("success");
-    } else {
+    // Use current origin for frontend serverless function
+    const API_URL = `${window.location.origin}/api/subscribe`;
+    
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (res.ok) {
+        setStatus("success");
+        setEmail("");
+      } else {
+        setStatus("error");
+      }
+    } catch (err) {
+      console.error("Newsletter subscription error:", err);
       setStatus("error");
     }
   }

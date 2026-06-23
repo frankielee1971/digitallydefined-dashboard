@@ -3,15 +3,6 @@ import { ArrowLeft, ArrowRight, Sparkles, Zap, Users, BookOpen, Star } from "luc
 import CONFIG from "../config";
 import Footer from "../components/Footer";
 import Logo from "../components/Logo";
-import {
-  brutalBorder,
-  brutalButtonPrimary,
-  brutalButtonSecondary,
-  brutalCard,
-  brutalEyebrow,
-  brutalHeading,
-  theme,
-} from "../theme";
 
 const questions = [
   {
@@ -250,120 +241,71 @@ const DigitalSuperpowerQuiz = () => {
   const result = resultKey ? results[resultKey] : null;
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: theme.colors.background,
-        color: theme.colors.text,
-        fontFamily: theme.fonts.app,
-      }}
-    >
-      <header
-        style={{
-          borderBottom: brutalBorder,
-          backgroundColor: theme.colors.surface,
-          padding: `24px ${theme.layout.spacing}`,
-        }}
-      >
-        <div
-          style={{
-            maxWidth: theme.layout.containerMaxWidth,
-            margin: "0 auto",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: theme.layout.spacing,
-            flexWrap: "wrap",
-          }}
-        >
-          <Logo as="div" style={{ fontSize: "clamp(1.2rem, 2vw, 1.5rem)" }} />
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-            <a href={CONFIG.routes.landing} style={brutalButtonSecondary}>
-              Home
-            </a>
-            <a href={CONFIG.routes.dashboard} style={brutalButtonSecondary}>
-              Dashboard
-            </a>
+    <div className="dd-page">
+      <header className="dd-page__hero">
+        <div className="dd-page__hero-inner">
+          <div className="dd-page__hero-meta">
+            <Logo as="div" style={{ fontSize: "clamp(1.2rem, 2vw, 1.5rem)" }} />
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              <a className="dd-button dd-button--secondary" href={CONFIG.routes.landing}>
+                Home
+              </a>
+              <a className="dd-button dd-button--secondary" href={CONFIG.routes.dashboard}>
+                Dashboard
+              </a>
+            </div>
           </div>
-        </div>
-      </header>
 
-      <main style={{ padding: `clamp(40px, 5vw, 60px) ${theme.layout.spacing}` }}>
-        <div
-          style={{
-            maxWidth: 1100,
-            margin: "0 auto",
-            display: "grid",
-            gap: "32px",
-          }}
-        >
-          <section
-            style={{
-              display: "grid",
-              gap: "18px",
-              padding: "32px",
-              ...brutalCard,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+          <section className="dd-card dd-card--spaced">
+            <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
               <span style={{ fontSize: "1.25rem" }}>{result ? result.emoji : "✨"}</span>
               <div>
-                <div style={{ ...brutalEyebrow, marginBottom: "8px" }}>
+                <div className="dd-text dd-text--muted" style={{ marginBottom: "8px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", fontSize: "0.85rem" }}>
                   Digital Superpower Quiz
                 </div>
-                <h1
-                  style={{
-                    ...brutalHeading,
-                    margin: 0,
-                    fontSize: "clamp(2rem, 4vw, 3rem)",
-                  }}
-                >
-                  Discover the way you win online.
-                </h1>
+                <h1 className="dd-heading dd-heading--large">Discover the way you win online.</h1>
               </div>
             </div>
-            <p style={{ margin: 0, color: theme.colors.textMuted, maxWidth: "780px" }}>
+            <p className="dd-text dd-text--muted" style={{ maxWidth: "780px" }}>
               Answer 7 quick questions to uncover your digital superpower and get a clear next step for the business model that fits your experience, personality, and goals.
             </p>
           </section>
+        </div>
+      </header>
 
+      <main>
+        <div className="dd-page__container">
           {showInstructions && (
-            <section style={{ ...brutalCard, padding: "28px" }}>
-              <h2 style={{ ...brutalHeading, margin: 0 }}>How it works</h2>
-              <p style={{ margin: "16px 0 0", color: theme.colors.textMuted }}>
+            <section className="dd-card dd-card--spaced">
+              <h2 className="dd-heading dd-heading--medium">How it works</h2>
+              <p className="dd-text dd-text--muted" style={{ marginTop: "16px" }}>
                 Choose the option that feels most true for you in the moment. This quiz is about energy and focus, not perfection.
               </p>
             </section>
           )}
 
           {!submitted ? (
-            <section style={{ ...brutalCard, padding: "28px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
+            <section className="dd-card dd-card--spaced">
+              <div className="dd-page__section-header">
                 <div>
-                  <p style={{ ...brutalEyebrow, margin: 0 }}>Question {currentQuestion} of {questions.length}</p>
-                  <h2 style={{ margin: "12px 0 0", fontSize: "clamp(1.5rem, 3vw, 2rem)" }}>{question.question}</h2>
+                  <p className="dd-text dd-text--muted" style={{ margin: 0, textTransform: "uppercase", letterSpacing: "0.12em", fontWeight: 700, fontSize: "0.85rem" }}>
+                    Question {currentQuestion} of {questions.length}
+                  </p>
+                  <h2 className="dd-heading dd-heading--medium" style={{ marginTop: "12px" }}>{question.question}</h2>
                 </div>
-                <div style={{ fontWeight: 700, color: theme.colors.primary }}>{answers[currentQuestion] ? "Answer selected" : "Choose an answer"}</div>
+                <div className="dd-text" style={{ fontWeight: 700, color: "var(--brand-accent-aqua)" }}>
+                  {answers[currentQuestion] ? "Answer selected" : "Choose an answer"}
+                </div>
               </div>
 
-              <div
-                style={{
-                  display: "grid",
-                  gap: "14px",
-                  marginTop: "28px",
-                }}
-              >
+              <div className="dd-grid" style={{ marginTop: "28px" }}>
                 {question.options.map((option) => (
                   <button
                     key={option.value}
                     type="button"
                     onClick={() => handleAnswer(option.value)}
-                    style={{
-                      ...brutalButtonSecondary,
-                      justifyContent: "flex-start",
-                      borderColor: answers[currentQuestion] === option.value ? theme.colors.primary : theme.colors.border,
-                      color: theme.colors.text,
-                    }}
+                    className={`dd-button dd-button--secondary ${answers[currentQuestion] === option.value ? "dd-button--selected" : ""}`}
+                    style={{ justifyContent: "flex-start" }}
                   >
                     <span style={{ fontWeight: 700, marginRight: "10px" }}>
                       {answers[currentQuestion] === option.value ? "●" : "○"}
@@ -373,22 +315,18 @@ const DigitalSuperpowerQuiz = () => {
                 ))}
               </div>
 
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", marginTop: "28px" }}>
+              <div className="dd-page__actions" style={{ marginTop: "28px" }}>
                 <button
                   type="button"
                   onClick={handleBack}
                   disabled={currentQuestion === 1}
-                  style={{
-                    ...brutalButtonSecondary,
-                    opacity: currentQuestion === 1 ? 0.5 : 1,
-                    cursor: currentQuestion === 1 ? "not-allowed" : "pointer",
-                  }}
+                  className="dd-button dd-button--secondary"
                 >
                   <ArrowLeft size={16} /> Back
                 </button>
                 <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
                   {currentQuestion < questions.length ? (
-                    <button type="button" onClick={handleNext} style={brutalButtonPrimary}>
+                    <button type="button" onClick={handleNext} className="dd-button dd-button--primary">
                       Next <ArrowRight size={16} />
                     </button>
                   ) : (
@@ -396,11 +334,7 @@ const DigitalSuperpowerQuiz = () => {
                       type="button"
                       onClick={handleSubmit}
                       disabled={Object.keys(answers).length < questions.length}
-                      style={{
-                        ...brutalButtonPrimary,
-                        opacity: Object.keys(answers).length < questions.length ? 0.6 : 1,
-                        cursor: Object.keys(answers).length < questions.length ? "not-allowed" : "pointer",
-                      }}
+                      className="dd-button dd-button--primary"
                     >
                       See my superpower <ArrowRight size={16} />
                     </button>
@@ -409,28 +343,26 @@ const DigitalSuperpowerQuiz = () => {
               </div>
             </section>
           ) : (
-            <section style={{ ...brutalCard, padding: "28px" }}>
-              <div style={{ display: "grid", gap: "18px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            <section className="dd-card dd-card--spaced">
+              <div className="dd-grid" style={{ gap: "18px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
                   <span style={{ fontSize: "1.5rem" }}>{result.emoji}</span>
                   <div>
-                    <div style={{ ...brutalEyebrow, margin: 0 }}>Your digital superpower</div>
-                    <h2 style={{ margin: "8px 0 0", fontSize: "clamp(2rem, 4vw, 3rem)" }}>{result.title}</h2>
+                    <div className="dd-text dd-text--muted" style={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", fontSize: "0.85rem" }}>
+                      Your digital superpower
+                    </div>
+                    <h2 className="dd-heading dd-heading--large" style={{ marginTop: "8px" }}>{result.title}</h2>
                   </div>
                 </div>
 
-                <p style={{ margin: 0, color: theme.colors.textMuted, maxWidth: "720px" }}>{result.tagline}</p>
-                <p style={{ margin: 0 }}>{result.description}</p>
+                <p className="dd-text dd-text--muted" style={{ maxWidth: "720px" }}>{result.tagline}</p>
+                <p className="dd-text">{result.description}</p>
 
-                <div style={{ display: "grid", gap: "12px" }}>
-                  <h3 style={{ margin: 0 }}>Digital assets to build first</h3>
-                  <div style={{
-                    display: "grid",
-                    gap: "10px",
-                    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-                  }}>
+                <div className="dd-grid" style={{ gap: "12px" }}>
+                  <h3 className="dd-heading" style={{ fontSize: "1.25rem" }}>Digital assets to build first</h3>
+                  <div className="dd-grid dd-grid--assets">
                     {result.assets.map((asset) => (
-                      <div key={asset} style={{ ...brutalCard, padding: "14px" }}>
+                      <div key={asset} className="dd-card" style={{ padding: "14px" }}>
                         {asset}
                       </div>
                     ))}
@@ -438,15 +370,15 @@ const DigitalSuperpowerQuiz = () => {
                 </div>
 
                 <div>
-                  <h3 style={{ margin: "0 0 10px" }}>Best next step</h3>
-                  <p style={{ margin: 0 }}>{result.nextStep}</p>
+                  <h3 className="dd-heading" style={{ fontSize: "1.25rem", margin: "0 0 10px" }}>Best next step</h3>
+                  <p className="dd-text">{result.nextStep}</p>
                 </div>
 
-                <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-                  <button type="button" onClick={handleReset} style={brutalButtonSecondary}>
+                <div className="dd-page__footer-actions" style={{ gap: "12px" }}>
+                  <button type="button" onClick={handleReset} className="dd-button dd-button--secondary">
                     Retake the quiz
                   </button>
-                  <a href={CONFIG.routes.dashboard} style={brutalButtonPrimary}>
+                  <a href={CONFIG.routes.dashboard} className="dd-button dd-button--primary">
                     Go to dashboard
                   </a>
                 </div>
@@ -457,9 +389,9 @@ const DigitalSuperpowerQuiz = () => {
       </main>
 
       <Footer
-        colors={theme.colors}
-        containerStyle={{ maxWidth: theme.layout.containerMaxWidth, margin: "0 auto" }}
-        footerStyle={{ padding: `32px ${theme.layout.spacing}`, backgroundColor: theme.colors.surface }}
+        colors={{ text: "var(--brand-text-primary)", textMuted: "var(--brand-text-muted)" }}
+        containerStyle={{ maxWidth: "var(--brand-container-max-width)", margin: "0 auto" }}
+        footerStyle={{ padding: "32px 24px", backgroundColor: "var(--brand-panel)" }}
         routes={CONFIG.routes}
         landing={CONFIG.landing}
         contact={CONFIG.contact}
