@@ -1,7 +1,6 @@
 import React from "react";
-import { Navigate, Routes, Route } from "react-router-dom";
-import { SpeedInsights } from "@vercel/speed-insights/react";
-import LandingPage from "./pages/LandingPage";
+import { Routes, Route, Navigate } from "react-router-dom";
+import CONFIG from "./config";
 import DashboardPage from "./pages/DashboardPage";
 import DigitalSuperpowerQuiz from "./pages/DigitalSuperpowerQuiz";
 import AssistantPage from "./pages/AssistantPage"; // ⭐ ADD THIS

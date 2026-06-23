@@ -159,8 +159,6 @@ const CONFIG = {
   },
 
   integrations: {
-    googleSheetsUrl:
-      "https://script.google.com/macros/s/AKfycbwEyg9UPQrxOgNVhkzGWRZAULMkjE4rCQhAKuYUoAoPEG1bCr0xU74X8dRRuyV53ARk/exec",
     slackWebhookUrl: "YOUR_SLACK_WEBHOOK",  // "https://hooks.slack.com/services/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""
     gumloopFlowUrl: "YOUR_GUMLOOP_URL",     // Replace with real URL or ""
     facebookGroupId: "YOUR_GROUP_ID",       // Add this if using Facebook
@@ -171,6 +169,7 @@ const CONFIG = {
     dashboard: "/dashboard",
     quiz: "/quiz",
     dashboardAliases: ["/command", "/internal", "/app"],
+    thankYouCalculator: "/thank-you-calculator",
   },
 
   seo: {
@@ -180,8 +179,6 @@ const CONFIG = {
   },
 
   dashboard: {
-    defaultSheetsUrl:
-      "https://script.google.com/macros/s/AKfycbwEyg9UPQrxOgNVhkzGWRZAULMkjE4rCQhAKuYUoAoPEG1bCr0xU74X8dRRuyV53ARk/exec",
     tabs: [
       {
         id: "dashboard",
@@ -202,6 +199,10 @@ const CONFIG = {
       {
         id: "automations",
         label: "AUTOMATIONS",
+      },
+      {
+        id: "notion",
+        label: "NOTION DB",
       },
     ],
     mobileKeysLabel: "Keys",
@@ -248,9 +249,29 @@ const CONFIG = {
       sentimentIndex: "Sent. Index",
     },
     settingsTitle: "Configuration",
-    openRouterLabel: "OpenRouter AI Key",
-    openRouterPlaceholder: "sk-...",
-    saveKeysLabel: "Save System Keys",
+    saveKeysLabel: "Save Settings",
+  },
+
+  thankYouCalculator: {
+    title: "Thank You for Your Purchase",
+    subtitle: "You now have full access to the 10x ROI Calculator",
+    ctaLabel: "Access Your Download on Gumroad",
+    secondaryCtaLabel: "Visit DigitallyDefined",
+    features: [
+      {
+        title: "Full Calculator Access",
+        description: "Unlock all advanced fields including customer retention, reputation lift, and annualized projections.",
+      },
+      {
+        title: "Business Validation",
+        description: "Validate your digital business decisions with real data before investing in campaigns.",
+      },
+      {
+        title: "Lifetime Updates",
+        description: "Get all future calculator improvements and new features at no additional cost.",
+      },
+    ],
+    emailNote: "Questions? Email us at",
   },
 
   landing: {
