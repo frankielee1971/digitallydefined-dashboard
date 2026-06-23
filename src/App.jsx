@@ -1,9 +1,11 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import CONFIG from "./config";
 import DashboardPage from "./pages/DashboardPage";
 import DigitalSuperpowerQuiz from "./pages/DigitalSuperpowerQuiz";
-import AssistantPage from "./pages/AssistantPage"; // ⭐ ADD THIS
+import AssistantPage from "./pages/AssistantPage";
+import LandingPage from "./pages/LandingPage";
 import ChatWidget from "./components/ChatWidget";
 
 function App() {
