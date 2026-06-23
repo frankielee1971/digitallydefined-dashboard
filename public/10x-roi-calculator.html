@@ -102,17 +102,130 @@ footer a{color:var(--or);text-decoration:none}
 <body>
 
 <script>
-// Access gate — runs before anything renders
-(function() {
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get('access');
-  const validTokens = ['DD2026', 'DD10X']; // change these anytime
+// ============================================
+// ACCESS GATE SYSTEM - 10x ROI Calculator
+// Supports: Static tokens, Wildcard patterns, Email validation
+// ============================================
 
-  if (!validTokens.includes(token)) {
-    // No valid token → send to Gumroad sales page
-    window.location.replace('https://digitallydefined.online/calculator');
-    document.body.innerHTML = ''; // blank the page during redirect
+(function() {
+  'use strict';
+
+  // Configuration
+  const CONFIG = {
+    // Static tokens (manual access)
+    validTokens: ['DD2026', 'DD10X'],
+    
+    // Wildcard patterns (accept any token matching these prefixes)
+    // Useful for Gumroad order IDs, etc.
+    tokenPatterns: ['GUM-', 'PAID-'],
+    
+    // Valid email domains (if using email validation)
+    validEmailDomains: [],
+    
+    // Redirect URLs
+    salesPage: 'https://francescaonline.gumroad.com/l/digital-business-os',
+    fallbackPage: 'https://digitallydefined.online/calculator',
+    
+    // Storage key for saving tokens
+    storageKey: 'dd_calculator_access'
+  };
+
+  // ============================================
+  // TOKEN VALIDATION FUNCTIONS
+  // ============================================
+
+  function getTokenFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('access') || params.get('token');
   }
+
+  function getTokenFromHash() {
+    const hash = window.location.hash.substring(1);
+    if (hash && hash.startsWith('access=')) {
+      return hash.substring(7);
+    }
+    return null;
+  }
+
+  function getTokenFromStorage() {
+    try {
+      return localStorage.getItem(CONFIG.storageKey) || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function isTokenValid(token) {
+    if (!token) return false;
+    
+    // Check static tokens
+    if (CONFIG.validTokens.includes(token)) {
+      return true;
+    }
+    
+    // Check wildcard patterns
+    for (const pattern of CONFIG.tokenPatterns) {
+      if (token.startsWith(pattern)) {
+        return true;
+      }
+    }
+    
+    // Check if it's a valid email (optional)
+    if (isValidEmail(token)) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  function isValidEmail(email) {
+    if (!email || !email.includes('@')) return false;
+    
+    if (CONFIG.validEmailDomains.length === 0) return false;
+    
+    const domain = email.split('@')[1];
+    return CONFIG.validEmailDomains.some(d => domain === d || domain.endsWith('.' + d));
+  }
+
+  function saveTokenToStorage(token) {
+    try {
+      localStorage.setItem(CONFIG.storageKey, token);
+    } catch (e) {
+      // Ignore storage errors
+    }
+  }
+
+  // ============================================
+  // MAIN ACCESS CHECK
+  // ============================================
+
+  const urlToken = getTokenFromURL();
+  const hashToken = getTokenFromHash();
+  const storedToken = getTokenFromStorage();
+  
+  let activeToken = urlToken || hashToken || storedToken;
+
+  // If we have a token from URL/hash, save it to storage
+  if (urlToken || hashToken) {
+    saveTokenToStorage(activeToken);
+  }
+
+  // Validate the token
+  const hasAccess = isTokenValid(activeToken);
+
+  if (!hasAccess) {
+    // No valid token → redirect to Gumroad sales page
+    window.location.replace(CONFIG.salesPage);
+    document.body.innerHTML = '<div style="text-align:center;padding:2rem;font-family:Arial,sans-serif">Redirecting to sales page...</div>';
+    return;
+  }
+
+  // Token is valid - allow access
+  // Optionally clean the URL to hide the token
+  if (urlToken && window.history && window.history.replaceState) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+
 })();
 </script>
 
@@ -222,7 +335,7 @@ footer a{color:var(--or);text-decoration:none}
 <div class="cta">
   <h2>Ready to See the <span>Real Numbers?</span></h2>
   <p>The full calculator gives you revenue projections, lead flow modeling, digital asset valuation, competitor benchmarks, and opportunity forecasting.</p>
-  <a href="https://digitallydefined.online" class="btn" target="_blank" rel="noopener noreferrer">Unlock the Full 10x ROI Calculator</a>
+  <a href="https://francescaonline.gumroad.com/l/digital-business-os" class="btn" target="_blank" rel="noopener noreferrer">Get Full Access on Gumroad</a>
   <a href="https://facebook.com/groups/digitallydefind" class="btn gh" target="_blank" rel="noopener noreferrer">Join the Community</a>
 </div>
 

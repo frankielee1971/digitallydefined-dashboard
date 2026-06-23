@@ -3,6 +3,7 @@ import {
   BarChart3,
   Bot,
   BrainCircuit,
+  Database,
   DollarSign,
   FolderHeart,
   LayoutDashboard,
@@ -52,9 +53,19 @@ const dashboardLabels = {
   },
 };
 
-const BACKEND_URL = import.meta.env.VITE_DASHBOARD_API_URL;
+const HERMES_URL =
+  import.meta.env.VITE_HERMES_BACKEND_URL ||
+  import.meta.env.VITE_HERMES_GATEWAY_URL ||
+  import.meta.env.VITE_CHAT_API_URL ||
+  "/api/hermes";
 
-const BACKEND_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "";
+// Use the unified API root for action-based requests (dashboard, automation.list, etc.)
+const API_URL = import.meta.env.VITE_DASHBOARD_API_URL || "/api";
+
+const getHermesApiKey = () => {
+  return import.meta.env.VITE_DASHBOARD_API_KEY || "";
+};
+
 const ASSISTANT_MODEL =
   import.meta.env.VITE_DASHBOARD_ASSISTANT_MODEL ||
   dashboardConfig.assistantModel ||
@@ -72,6 +83,7 @@ const tabIcons = {
   intel: BarChart3,
   brain: BrainCircuit,
   automations: Workflow,
+  notion: Database,
 };
 
 const formatConversion = (value) => {
@@ -123,6 +135,7 @@ const normalizeData = (payload = {}) => ({
   sourceHealth: payload.sourceHealth || null,
   aiBrief: payload.aiBrief || null,
   automations: normalizeArray(payload.automations),
+  notion: payload.notion || null,
 });
 
 const emptyData = normalizeData();
@@ -192,7 +205,7 @@ const createLocalAssistantReply = ({ stats, data, lastSync }) => {
     alerts,
     `Automations: ${automationSummary}`,
     `Best next move: ${nextAction}`,
-    "Add your OpenRouter key in Settings when you want me to answer follow-up questions with full AI reasoning.",
+    "Sync the Vault to see your current stats, then ask me what needs attention or what move should come next.",
   ].join("\n\n");
 };
 
@@ -466,6 +479,104 @@ function AutomationsTab({ automations }) {
   );
 }
 
+function NotionTab({ notion }) {
+  if (!notion) {
+    return <EmptyState>No Notion data available. Make sure your Notion credentials are set and sync is complete.</EmptyState>;
+  }
+
+  const { ideas, content } = notion;
+  const ideasList = ideas?.results || [];
+  const contentList = content?.results || [];
+
+  return (
+    <div style={{ display: "grid", gap: "1.5rem" }}>
+      {/* Ideas & Intake Section */}
+      <section style={{ display: "grid", gap: "0.6rem" }}>
+        <h3 style={{ ...brutalHeading, margin: 0, fontSize: "0.95rem" }}>
+          Ideas & Intake (Notion)
+        </h3>
+        {ideasList.length > 0 ? (
+          <div style={{ display: "grid", gap: "0.75rem" }}>
+            {ideasList.map((page) => {
+              const name = page.properties?.IdeaName?.title?.[0]?.plain_text || "Untitled Idea";
+              const ready = page.properties?.["Ready for AI"]?.checkbox;
+              const niche = page.properties?.Niche?.select?.name || "N/A";
+              const type = page.properties?.Type?.select?.name || "N/A";
+              const difficulty = page.properties?.Difficulty?.multi_select?.map(x => x.name).join(", ") || "N/A";
+
+              return (
+                <div key={page.id} style={{ ...cardStyle, padding: "0.85rem" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
+                    <strong style={{ fontSize: "0.92rem" }}>{name}</strong>
+                    <span style={{
+                      ...brutalEyebrow,
+                      backgroundColor: ready ? theme.colors.successTint : theme.colors.panel,
+                      color: ready ? theme.colors.success : theme.colors.muted,
+                      padding: "0.18rem 0.38rem",
+                      border: brutalBorder,
+                      fontSize: "0.62rem"
+                    }}>
+                      {ready ? "READY FOR AI" : "DRAFT"}
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", gap: "1rem", marginTop: "0.45rem", flexWrap: "wrap", fontSize: "0.8rem", color: theme.colors.muted }}>
+                    <span><strong>Niche:</strong> {niche}</span>
+                    <span><strong>Type:</strong> {type}</span>
+                    <span><strong>Difficulty:</strong> {difficulty}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <EmptyState>No ideas found in your Notion database.</EmptyState>
+        )}
+      </section>
+
+      {/* Content Library Section */}
+      <section style={{ display: "grid", gap: "0.6rem" }}>
+        <h3 style={{ ...brutalHeading, margin: 0, fontSize: "0.95rem" }}>
+          Content Library (Notion)
+        </h3>
+        {contentList.length > 0 ? (
+          <div style={{ display: "grid", gap: "0.75rem" }}>
+            {contentList.map((page) => {
+              const title = page.properties?.["Content Title"]?.title?.[0]?.plain_text || "Untitled Content";
+              const status = page.properties?.Status?.status?.name || "N/A";
+              const date = page.properties?.["Publish Date"]?.date?.start || "N/A";
+              const type = page.properties?.Type?.multi_select?.map(x => x.name).join(", ") || "N/A";
+
+              return (
+                <div key={page.id} style={{ ...cardStyle, padding: "0.85rem" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
+                    <strong style={{ fontSize: "0.92rem" }}>{title}</strong>
+                    <span style={{
+                      ...brutalEyebrow,
+                      backgroundColor: status === "Done" ? theme.colors.successTint : theme.colors.panel,
+                      color: status === "Done" ? theme.colors.success : theme.colors.muted,
+                      padding: "0.18rem 0.38rem",
+                      border: brutalBorder,
+                      fontSize: "0.62rem"
+                    }}>
+                      {status.toUpperCase()}
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", gap: "1rem", marginTop: "0.45rem", flexWrap: "wrap", fontSize: "0.8rem", color: theme.colors.muted }}>
+                    <span><strong>Publish Date:</strong> {date}</span>
+                    <span><strong>Format:</strong> {type}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <EmptyState>No content items found in your Notion library.</EmptyState>
+        )}
+      </section>
+    </div>
+  );
+}
+
 function DashboardAssistant({
   messages,
   input,
@@ -643,9 +754,6 @@ const DashboardPage = () => {
     churnRisk: "Low",
   });
   const [automations, setAutomations] = useState([]);
-  const [openRouterKey, setOpenRouterKey] = useState(
-    localStorage.getItem("openRouterKey") || "",
-  );
   const [assistantMessages, setAssistantMessages] = useState([assistantWelcome]);
   const [assistantInput, setAssistantInput] = useState("");
   const [isAssistantThinking, setIsAssistantThinking] = useState(false);
@@ -666,13 +774,22 @@ const DashboardPage = () => {
     setIsSyncing(true);
     setSyncError("");
 
+    const dashboardApiKey = getHermesApiKey();
+    if (!dashboardApiKey) {
+      setSyncError("Hermes API key is missing. Please set VITE_DASHBOARD_API_KEY in your environment.");
+      setIsSyncing(false);
+      return;
+    }
+
     try {
-      const url = `${BACKEND_URL}?action=dashboard&t=${Date.now()}`;
-      const res = await fetch(url, {
+      const res = await fetch(API_URL, {
+        method: "POST",
         cache: "no-store",
-        headers: BACKEND_KEY
-          ? { "x-api-key": BACKEND_KEY, "Content-Type": "application/json" }
-          : undefined,
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": dashboardApiKey,
+        },
+        body: JSON.stringify({ action: "dashboard" }),
       });
 
       if (!res.ok) {
@@ -684,17 +801,18 @@ const DashboardPage = () => {
 
       const payload = await res.json();
       const nextData = normalizeData(payload);
+      const metrics = payload.metrics || {};
 
       setData(nextData);
 
-      const automationsRes = await fetch(
-        `${BACKEND_URL}?action=automation.list`,
-        {
-          headers: BACKEND_KEY
-            ? { "x-api-key": BACKEND_KEY }
-            : undefined,
-        }
-      );
+      const automationsRes = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": dashboardApiKey,
+        },
+        body: JSON.stringify({ action: "automation.list" })
+      });
       if (!automationsRes.ok) {
         setAutomations([]);
       } else {
@@ -703,16 +821,16 @@ const DashboardPage = () => {
       }
 
       setStats({
-        revenue: payload.revenue || "$0",
-        leads: payload.leads || 0,
-        conversionRate: payload.conversionRate
-          ? formatConversion(payload.conversionRate)
+        revenue: metrics.revenue || "$0",
+        leads: metrics.leads || 0,
+        conversionRate: metrics.conversionRate
+          ? formatConversion(metrics.conversionRate)
           : "0%",
-        assetValue: formatAssetValue(payload.assetValue),
-        topAsset: payload.topAsset || "N/A",
-        communityGrowth: payload.communityGrowth || "0%",
-        emailGrowth: payload.emailGrowth || "0%",
-        churnRisk: payload.churnRisk || "Low",
+        assetValue: formatAssetValue(metrics.assetValue),
+        topAsset: metrics.topAsset || "N/A",
+        communityGrowth: metrics.communityGrowth || "0%",
+        emailGrowth: metrics.emailGrowth || "0%",
+        churnRisk: metrics.churnRisk || "Low",
       });
       setLastSync(new Date().toLocaleString());
     } catch (err) {
@@ -723,7 +841,6 @@ const DashboardPage = () => {
   };
 
   const handleSaveSettings = () => {
-    localStorage.setItem("openRouterKey", openRouterKey.trim());
     setShowSettings(false);
   };
 
@@ -748,25 +865,29 @@ const DashboardPage = () => {
       });
 
       // Send to your Hermes backend
-      const res = await fetch(
-        "https://digitallydefined-os-backend.vercel.app/api/hermes",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(BACKEND_KEY ? { "x-api-key": BACKEND_KEY } : {}),
-          },
-          body: JSON.stringify({
-            message: `
+      const dashboardApiKey = getHermesApiKey();
+      if (!dashboardApiKey) {
+        setAssistantError("Hermes API key is missing. Please set VITE_DASHBOARD_API_KEY in your environment.");
+        setIsAssistantThinking(false);
+        return;
+      }
+
+      const res = await fetch(HERMES_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": dashboardApiKey,
+        },
+        body: JSON.stringify({
+          message: `
 Dashboard snapshot:
 ${JSON.stringify(snapshot, null, 2)}
 
 User message:
 ${trimmedMessage}
-            `
-          })
-        }
-      );
+          `
+        })
+      });
 
       const dataRes = await res.json();
 
@@ -806,6 +927,7 @@ ${trimmedMessage}
     if (activeTab === "intel") return <IntelTab data={data} />;
     if (activeTab === "brain") return <BrainTab aiBrief={data.aiBrief} />;
     if (activeTab === "automations") return <AutomationsTab automations={data.automations} />;
+    if (activeTab === "notion") return <NotionTab notion={data.notion} />;
     return <CommandTab data={data} stats={stats} />;
   };
 
@@ -1041,22 +1163,6 @@ ${trimmedMessage}
             <p style={{ fontSize: "0.85rem", margin: "0 0 0.85rem", color: theme.colors.muted }}>
               {dashboardConfig.settingsDescription}
             </p>
-
-            <label style={{ display: "grid", gap: "0.35rem", fontSize: "0.85rem" }}>
-              <span>{dashboardConfig.openRouterLabel}</span>
-              <input
-                type="password"
-                value={openRouterKey}
-                onChange={(event) => setOpenRouterKey(event.target.value)}
-                placeholder={dashboardConfig.openRouterPlaceholder}
-                style={{
-                  border: brutalBorder,
-                  padding: "0.6rem 0.7rem",
-                  backgroundColor: theme.colors.card,
-                  fontFamily: theme.fonts.body,
-                }}
-              />
-            </label>
 
             <button
               onClick={handleSaveSettings}

@@ -14,11 +14,13 @@ import {
   theme,
 } from "../theme";
 
+
 const LandingPage = () => {
   const [showUnderConstruction, setShowUnderConstruction] = useState(true);
   const year = new Date().getFullYear();
   const { colors, contact, landing, routes, seo } = CONFIG;
   const fullCalculatorUrl = contact.fullCalculatorUrl || contact.gumroadUrl;
+
 
   const facelessAssets = [
     "SEO Content",
@@ -32,6 +34,7 @@ const LandingPage = () => {
     "Reputation Signals",
     "Digital Calculators",
   ];
+
 
   const realEstateSteps = [
     {
@@ -56,18 +59,11 @@ const LandingPage = () => {
     },
   ];
 
-  const fullCalculatorFeatures = [
-    "Revenue projections by channel",
-    "Lead flow modeling and conversion rates",
-    "Digital asset valuation score",
-    "Competitor benchmarks in your niche",
-    "Visibility scoring and gap analysis",
-    "Opportunity forecasting for 30, 60, and 90 days",
-  ];
 
   useEffect(() => {
     document.title = "DigitallyDefined | Build Your Digital Empire";
     let metaDescription = document.querySelector('meta[name="description"]');
+
 
     if (!metaDescription) {
       metaDescription = document.createElement("meta");
@@ -75,11 +71,13 @@ const LandingPage = () => {
       document.head.appendChild(metaDescription);
     }
 
+
     metaDescription.setAttribute(
       "content",
       "For Gen X women reinventing themselves digitally. Build faceless digital assets, grow passive income, and multiply your digital reputation 10x.",
     );
   }, [seo.description, seo.title]);
+
 
   const container = {
     maxWidth: theme.layout.containerMaxWidth,
@@ -88,6 +86,7 @@ const LandingPage = () => {
   const section = {
     padding: `clamp(44px, 7vw, 84px) clamp(${theme.layout.spacing}, 4vw, 32px)`,
   };
+
 
   return (
     <div
@@ -106,6 +105,7 @@ const LandingPage = () => {
           align-items: center;
         }
 
+
         .dd-brand-hero {
           display: flex;
           flex-wrap: wrap;
@@ -113,17 +113,34 @@ const LandingPage = () => {
           row-gap: 0;
         }
 
+
         .dd-proof-grid {
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
           gap: 16px;
         }
 
+
+        .dd-quiz-cta-grid {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          gap: clamp(28px, 5vw, 56px);
+          align-items: center;
+        }
+
+
+        .dd-quiz-stat {
+          display: grid;
+        }
+
+
         @media (max-width: 920px) {
           .dd-hero-grid,
-          .dd-roi-calculator__top {
+          .dd-roi-calculator__top,
+          .dd-quiz-cta-grid {
             grid-template-columns: 1fr !important;
           }
+
 
           .dd-roi-calculator__top > div:first-child {
             border-right: 0 !important;
@@ -131,13 +148,20 @@ const LandingPage = () => {
           }
         }
 
+
         @media (max-width: 720px) {
           .dd-proof-grid,
           .dd-roi-calculator__top div[style*="repeat(3"] {
             grid-template-columns: 1fr !important;
           }
+
+
+          .dd-quiz-stat {
+            display: none !important;
+          }
         }
       `}</style>
+
 
       {showUnderConstruction && (
         <div
@@ -181,14 +205,15 @@ const LandingPage = () => {
                 justifyContent: "center",
                 transition: "opacity 0.2s",
               }}
-              onMouseEnter={(e) => (e.target.style.opacity = "0.7")}
-              onMouseLeave={(e) => (e.target.style.opacity = "1")}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
             >
               <X size={20} strokeWidth={2.5} />
             </button>
           </div>
         </div>
       )}
+
 
       <header
         style={{
@@ -213,17 +238,17 @@ const LandingPage = () => {
         >
           <Logo as="div" style={{ fontSize: "clamp(1.1rem, 2vw, 1.45rem)" }} />
           <a
-            href={fullCalculatorUrl}
-            target="_blank"
-            rel="noreferrer"
-            style={brutalButtonSecondary}
+            href="/quiz"
+            style={{ ...brutalButtonSecondary, display: "flex", alignItems: "center", gap: "8px" }}
           >
-            Full calculator <ArrowRight size={16} />
+            Take the quiz <Sparkles size={16} />
           </a>
         </div>
       </header>
 
+
       <main>
+        {/* ── HERO ── */}
         <section style={section}>
           <div className="dd-hero-grid" style={container}>
             <div style={{ display: "grid", gap: "24px" }}>
@@ -259,6 +284,8 @@ const LandingPage = () => {
                   from their online presence.
                 </p>
               </div>
+
+              {/* ── THREE CTAs: calculator + community + quiz ── */}
               <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
                 <a href="#free-calculator" style={brutalButtonPrimary}>
                   Run the free calculator <TrendingUp size={16} />
@@ -274,7 +301,11 @@ const LandingPage = () => {
                 >
                   Join the community <Users size={16} />
                 </a>
+                <a href="/quiz" style={brutalButtonSecondary}>
+                  Find my superpower <Sparkles size={16} />
+                </a>
               </div>
+
               <p
                 style={{
                   margin: 0,
@@ -312,6 +343,7 @@ const LandingPage = () => {
                 ))}
               </div>
             </div>
+
 
             <div
               style={{
@@ -372,6 +404,8 @@ const LandingPage = () => {
           </div>
         </section>
 
+
+        {/* ── FREE CALCULATOR ── */}
         <section id="free-calculator" style={{ ...section, paddingTop: 0 }}>
           <div style={{ ...container, display: "grid", gap: "24px" }}>
             <div style={{ maxWidth: "780px" }}>
@@ -400,6 +434,8 @@ const LandingPage = () => {
           </div>
         </section>
 
+
+        {/* ── WHO IT'S FOR ── */}
         <section style={{ ...section, backgroundColor: colors.backgroundAlt }}>
           <div
             style={{
@@ -431,6 +467,8 @@ const LandingPage = () => {
           </div>
         </section>
 
+
+        {/* ── FACELESS MARKETING ── */}
         <section style={section}>
           <div
             style={{
@@ -487,6 +525,7 @@ const LandingPage = () => {
               </a>
             </div>
 
+
             <div style={{ ...brutalCard, padding: "28px" }}>
               <p style={{ ...brutalEyebrow, color: colors.primary }}>
                 Faceless asset types
@@ -509,8 +548,8 @@ const LandingPage = () => {
                         index % 4 === 0
                           ? colors.primary
                           : index % 4 === 2
-                            ? colors.accent
-                            : colors.surface,
+                          ? colors.accent
+                          : colors.surface,
                       color: index % 4 === 2 ? colors.surface : colors.text,
                       fontSize: "0.72rem",
                       fontWeight: 900,
@@ -537,6 +576,8 @@ const LandingPage = () => {
           </div>
         </section>
 
+
+        {/* ── DIGITAL REAL ESTATE ── */}
         <section style={{ ...section, backgroundColor: colors.dark, color: colors.bone }}>
           <div style={{ ...container, display: "grid", gap: "28px" }}>
             <div>
@@ -598,18 +639,12 @@ const LandingPage = () => {
                 </article>
               ))}
             </div>
-            <a
-              href={fullCalculatorUrl}
-              target="_blank"
-              rel="noreferrer"
-              style={{ ...brutalButtonSecondary, width: "fit-content" }}
-            >
-              See your digital real estate map <ArrowRight size={16} />
-            </a>
           </div>
         </section>
 
-        <section id="community" style={section}>
+
+        {/* ── COMMUNITY ── */}
+        <section style={section}>
           <div
             style={{
               ...container,
@@ -683,55 +718,126 @@ const LandingPage = () => {
           </div>
         </section>
 
-        <section style={{ ...section, backgroundColor: colors.dark, color: colors.bone }}>
-          <div style={{ ...container, display: "grid", gap: "20px" }}>
-            <p style={{ ...brutalEyebrow, color: colors.primary }}>Next step</p>
-            <h2
+
+        {/* ── QUIZ CTA ── */}
+        <section
+          style={{
+            ...section,
+            backgroundColor: colors.dark,
+            color: colors.bone,
+          }}
+        >
+          <div
+            style={{
+              ...container,
+              display: "grid",
+              gridTemplateColumns: "minmax(0, 1fr) auto",
+              gap: "clamp(28px, 5vw, 56px)",
+              alignItems: "center",
+            }}
+            className="dd-quiz-cta-grid"
+          >
+            <div>
+              <p style={{ ...brutalEyebrow, color: colors.primary, marginBottom: "14px" }}>
+                Free 60-second quiz
+              </p>
+              <h2
+                style={{
+                  ...brutalHeading,
+                  fontSize: "clamp(1.9rem, 4vw, 3rem)",
+                  lineHeight: 1.02,
+                  color: colors.bone,
+                  margin: "0 0 16px",
+                }}
+              >
+                What&apos;s Your Digital Superpower?
+              </h2>
+              <p
+                style={{
+                  fontSize: "clamp(1rem, 2vw, 1.15rem)",
+                  lineHeight: 1.65,
+                  color: colors.boneMuted,
+                  maxWidth: "560px",
+                  margin: "0 0 18px",
+                }}
+              >
+                Take this quick quiz to find the digital path that fits your
+                strengths, your season of life, and the kind of work you actually
+                want to build.
+              </p>
+              <p
+                style={{
+                  fontSize: "1rem",
+                  lineHeight: 1.65,
+                  color: colors.boneMuted,
+                  maxWidth: "560px",
+                  margin: "0 0 28px",
+                }}
+              >
+                You do not need to be loud, young, on camera, or techy to build
+                something real online. You just need a path that fits you better
+                than the usual internet noise.
+              </p>
+              <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
+                <a href="/quiz" style={brutalButtonPrimary}>
+                  Find My Superpower <Sparkles size={16} />
+                </a>
+              </div>
+              <p
+                style={{
+                  marginTop: "14px",
+                  fontSize: "0.78rem",
+                  fontWeight: 900,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: colors.boneFaint,
+                }}
+              >
+                Free · No credit card · Takes 60 seconds
+              </p>
+            </div>
+
+
+            <div
+              className="dd-quiz-stat"
               style={{
-                ...brutalHeading,
-                margin: 0,
-                color: colors.bone,
-                fontSize: "clamp(1.9rem, 4vw, 3rem)",
-                lineHeight: 1.05,
+                border: `1px solid ${colors.whiteBorderSoft}`,
+                padding: "clamp(24px, 4vw, 36px)",
+                display: "grid",
+                gap: "20px",
+                minWidth: "220px",
+                backgroundColor: "rgba(255,255,255,0.03)",
               }}
             >
-              Ready for the full 10x ROI calculator?
-            </h2>
-            <p style={{ margin: 0, maxWidth: "720px", color: colors.boneMuted }}>
-              Buy the paid calculator on Gumroad when you want a clearer business
-              case for paid traffic, reputation management, or a digital real
-              estate upgrade. The full version shows your revenue projections,
-              visibility gaps, digital asset value, and competitor benchmarks.
-            </p>
-            <div style={{ display: "grid", gap: "10px", maxWidth: "760px" }}>
-              {fullCalculatorFeatures.map((feature) => (
-                <div key={feature} style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
-                  <CheckCircle2 size={18} color={colors.primary} style={{ marginTop: "3px", flexShrink: 0 }} />
-                  <span>{feature}</span>
+              {[
+                { emoji: "📝", label: "The Content Creator" },
+                { emoji: "⚙️", label: "The Systems Builder" },
+                { emoji: "📚", label: "The Digital Educator" },
+                { emoji: "🤝", label: "The Community Builder" },
+                { emoji: "📣", label: "The Brand Strategist" },
+              ].map(({ emoji, label }) => (
+                <div
+                  key={label}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    fontSize: "0.85rem",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                    color: colors.boneMuted,
+                  }}
+                >
+                  <span style={{ fontSize: "20px" }}>{emoji}</span>
+                  {label}
                 </div>
               ))}
-            </div>
-            <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
-              <a
-                href={fullCalculatorUrl}
-                target="_blank"
-                rel="noreferrer"
-                style={brutalButtonPrimary}
-              >
-                Buy on Gumroad <ArrowRight size={16} />
-              </a>
-              <a
-                href={contact.facebookCommunityUrl}
-                target="_blank"
-                rel="noreferrer"
-                style={brutalButtonSecondary}
-              >
-                Join Facebook community <Users size={16} />
-              </a>
             </div>
           </div>
         </section>
       </main>
+
 
       <Footer
         colors={colors}
@@ -746,5 +852,6 @@ const LandingPage = () => {
     </div>
   );
 };
+
 
 export default LandingPage;
