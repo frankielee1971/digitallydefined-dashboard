@@ -44,25 +44,30 @@ export default async function handler(req, res) {
 
   try {
     // === Parse Request Body ===
-    const body = req.body || {};
-    
-    // Ensure body is an object
+    let body = {};
+    if (typeof req.body === 'string') {
+      try {
+        body = JSON.parse(req.body);
+      } catch {
+        body = {};
+      }
+    } else if (typeof req.body === 'object' && req.body !== null) {
+      body = req.body;
+    }
+
     if (typeof body !== 'object' || body === null) {
-      return res.status(400).json({ 
-        error: 'Invalid request body - must be JSON object' 
+      return res.status(400).json({
+        error: 'Invalid request body - must be JSON object'
       });
     }
 
-    const action = typeof body.action === 'string' ? body.action : '';
-
     // === Proxy ALL requests to Backend ===
-    // All requests (actions and chat) are proxied to the backend /api/hermes endpoint
-    const hermesEndpoint = (process.env.HERMES_BACKEND_URL || 'https://digitallydefined-os-backend.vercel.app').replace(/\/$/, '');
-    const backendUrl = body.action 
+    // IMPORTANT: Updated backend URL to the correct existing project
+    const hermesEndpoint = (process.env.HERMES_BACKEND_URL || 'https://digitallydefined-os-backend-1.vercel.app').replace(/\/$/, '');
+
+    const backendUrl = body.action
       ? `${hermesEndpoint}/api?action=${encodeURIComponent(body.action)}`
       : `${hermesEndpoint}/api/hermes`;
-    
-    const { action: _action, ...payload } = body;
 
     try {
       const response = await fetch(backendUrl, {
@@ -71,7 +76,7 @@ export default async function handler(req, res) {
           'Content-Type': 'application/json',
           'x-api-key': expected,
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(body),
         signal: AbortSignal.timeout(30000),
       });
 
