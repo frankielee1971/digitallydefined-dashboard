@@ -53,12 +53,8 @@ const dashboardLabels = {
 };
 
 const API_URL =
-  import.meta.env.VITE_HERMES_GATEWAY_URL ||
+  import.meta.env.VITE_HERMES_URL ||
   "https://digitallydefined-os-backend.vercel.app/api/hermes";
-
-const DASHBOARD_API_URL =
-  import.meta.env.VITE_DASHBOARD_API_URL ||
-  "https://digitallydefined-os-backend.vercel.app/api/index";
 
 const API_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "";
 const API_HEADERS = {
@@ -679,10 +675,10 @@ const DashboardPage = () => {
     setSyncError("");
 
     try {
-      const res = await fetch(`${DASHBOARD_API_URL}?action=dashboard`, {
-        method: "GET",
-        cache: "no-store",
+      const res = await fetch(API_URL, {
+        method: "POST",
         headers: API_HEADERS,
+        body: JSON.stringify({ action: "dashboard" }),
       });
 
       if (!res.ok) {
@@ -697,13 +693,10 @@ const DashboardPage = () => {
 
       setData(nextData);
 
-      const automationsRes = await fetch(DASHBOARD_API_URL, {
+      const automationsRes = await fetch(API_URL, {
         method: "POST",
         headers: API_HEADERS,
-        body: JSON.stringify({
-          action: "automation.list",
-          context: {},
-        }),
+        body: JSON.stringify({ action: "automation.list" }),
       });
       if (!automationsRes.ok) {
         setAutomations([]);
