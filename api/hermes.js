@@ -67,7 +67,7 @@ export default async function handler(req, res) {
 
     const backendUrl = body.action
       ? `${hermesEndpoint}/api?action=${encodeURIComponent(body.action)}`
-      : `${hermesEndpoint}/api/hermes`;
+      : `${hermesEndpoint}/api?action=hermes`;
 
     try {
       const response = await fetch(backendUrl, {
