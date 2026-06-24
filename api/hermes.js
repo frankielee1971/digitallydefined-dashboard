@@ -62,12 +62,10 @@ export default async function handler(req, res) {
     }
 
     // === Proxy ALL requests to Backend ===
-    // IMPORTANT: Updated backend URL to the correct existing project
     const hermesEndpoint = (process.env.HERMES_BACKEND_URL || 'https://digitallydefined-os-backend-1.vercel.app').replace(/\/$/, '');
 
-    const backendUrl = body.action
-      ? `${hermesEndpoint}/api?action=${encodeURIComponent(body.action)}`
-      : `${hermesEndpoint}/api?action=hermes`;
+    // ALWAYS send Hermes requests to /api/hermes
+    const backendUrl = `${hermesEndpoint}/api/hermes`;
 
     try {
       const response = await fetch(backendUrl, {
