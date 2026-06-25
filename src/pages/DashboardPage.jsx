@@ -754,7 +754,8 @@ const DashboardPage = () => {
           headers: API_HEADERS,
           body: JSON.stringify({
             message: trimmedMessage,
-            context: snapshot,
+            messages: nextMessages,
+            context: {},
             conversation: nextMessages,
           }),
         }
