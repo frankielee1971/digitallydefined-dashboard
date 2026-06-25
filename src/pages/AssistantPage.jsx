@@ -32,7 +32,12 @@ export default function AssistantPage() {
           "Content-Type": "application/json",
           "x-api-key": import.meta.env.VITE_DASHBOARD_API_KEY || ""
         },
-        body: JSON.stringify({ messages: updated }),
+      body: JSON.stringify({
+        message: input.trim(),
+        messages: updated,
+        context: {},
+        conversation: updated,
+      }),
       });
 
       const data = await res.json();

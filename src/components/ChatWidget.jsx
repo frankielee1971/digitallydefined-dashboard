@@ -24,8 +24,11 @@ export default function ChatWidget() {
           "Content-Type": "application/json",
           "x-api-key": import.meta.env.VITE_DASHBOARD_API_KEY || "",
         },
-        body: JSON.stringify({
+      body: JSON.stringify({
+          message: input.trim(),
           messages: updatedMessages,
+          context: {},
+          conversation: updatedMessages,
         }),
       });
 
