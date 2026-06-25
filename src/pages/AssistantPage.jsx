@@ -2,95 +2,117 @@ import { useState, useEffect, useRef } from "react";
 
 export default function AssistantPage() {
   const [messages, setMessages] = useState([
-    { role: "assistant", content: "Hi Francesca! How can I help you today?" }
+    { role: "assistant", content: "Hi! I'm connected to Hermes. What should we move on next?" }
   ]);
   const [input, setInput] = useState("");
+  const [error, setError] = useState(null);
+  const [provider, setProvider] = useState(null);
+  const [model, setModel] = useState(null);
   const messagesEndRef = useRef(null);
 
-  // Auto-scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  async function sendMessage() {
-    if (!input.trim()) return;
+  const sendMessage = async () => {
+    if (!input.trim() || error === "sending") return;
+    setError("sending");
+    setProvider(null);
+    setModel(null);
 
-    const userMessage = { role: "user", content: input };
-    const updatedMessages = [...messages, userMessage];
-
-    setMessages(updatedMessages);
+    const userMessage = { role: "user", content: input.trim() };
+    const updated = [...messages, userMessage];
+    setMessages(updated);
     setInput("");
 
     try {
-      const API_URL =
-        import.meta.env.VITE_HERMES_GATEWAY_URL ||
-        "https://digitallydefined-os-backend.vercel.app/api/hermes";
-      const res = await fetch(API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": import.meta.env.VITE_DASHBOARD_API_KEY || ""
-          },
-          body: JSON.stringify({
-            message: input.trim(),
-            context: {},
-            conversation: updatedMessages,
-          })
-        }
-      );
+      const res = await fetch("/api/hermes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": import.meta.env.VITE_DASHBOARD_API_KEY || ""
+        },
+        body: JSON.stringify({ messages: updated }),
+      });
 
       const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error || `Request failed with status ${res.status}`);
+      }
 
-      const botMessage = {
+      const assistant = {
         role: "assistant",
-        content: data.reply || "I’m here — but I didn’t get a response from the server."
+        content: typeof data?.reply === "string" && data.reply ? data.reply : "I’m here — but I didn’t get a response from the server.",
+        provider: data?.provider || null,
+        model: data?.model || null,
       };
-
-      setMessages((prev) => [...prev, botMessage]);
+      setProvider(assistant.provider);
+      setModel(assistant.model);
+      setMessages((prev) => [...prev, assistant]);
+      setError(null);
     } catch (err) {
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "Error contacting server." }
-      ]);
+      setError(err instanceof Error ? err.message : "Something went wrong while reaching Hermes.");
+      setMessages((prev) => [...prev, { role: "assistant", content: "I couldn’t reach the backend just now." }]);
     }
-  }
+  };
+
+  const onKeyDown = (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      sendMessage();
+    }
+  };
 
   return (
     <div className="dd-page dd-page--assistant">
-      {/* Header */}
       <div className="dd-assistant-header">DigitallyDefined AI Assistant</div>
 
-      {/* Messages */}
       <div className="dd-assistant-body">
         {messages.map((m, i) => (
-          <div
-            key={i}
-            className={`dd-assistant-message dd-assistant-message--${m.role}`}
-          >
-            <div
-              className={`dd-assistant-message-bubble dd-assistant-message-bubble--${m.role}`}
-            >
+          <div key={i} className={`dd-assistant-message dd-assistant-message--${m.role}`}>
+            <div className={`dd-assistant-message-bubble dd-assistant-message-bubble--${m.role}`}>
               {m.content}
             </div>
+            {i === messages.length - 1 && m.role === "assistant" && (m.provider || m.model) ? (
+              <div className="dd-assistant-meta">
+                {m.provider ? <span className="dd-assistant-chip">{m.provider}</span> : null}
+                {m.model ? <span className="dd-assistant-chip">{m.model}</span> : null}
+              </div>
+            ) : null}
           </div>
         ))}
+
+        {provider && model ? (
+          <div className="dd-assistant-meta">
+            <span className="dd-assistant-chip">provider: {provider}</span>
+            <span className="dd-assistant-chip">model: {model}</span>
+          </div>
+        ) : null}
+
+        {error && error !== "sending" ? (
+          <div className="dd-assistant-meta">
+            <span className="dd-assistant-chip dd-assistant-chip--error">error: {error}</span>
+          </div>
+        ) : null}
+
+        {error === "sending" ? (
+          <div className="dd-assistant-meta">
+            <span className="dd-assistant-chip">Hermes is thinking…</span>
+          </div>
+        ) : null}
 
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
       <div className="dd-assistant-input-row">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask me anything..."
+          onKeyDown={onKeyDown}
+          placeholder="Ask Hermes anything…"
           className="dd-assistant-input"
         />
-        <button
-          onClick={sendMessage}
-          className="dd-button dd-button--primary"
-          type="button"
-        >
+        <button onClick={sendMessage} className="dd-button dd-button--primary" type="button">
           Send
         </button>
       </div>

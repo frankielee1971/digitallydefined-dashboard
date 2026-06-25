@@ -75,11 +75,11 @@ const questions = [
     id: 7,
     question: "Which statement sounds most like you?",
     options: [
-      { text: "\"I want to create things that matter — content with real impact\"", value: "creator" },
-      { text: "\"I want to build once and earn while I sleep\"", value: "builder" },
-      { text: "\"My knowledge and experience deserve to be monetized\"", value: "educator" },
-      { text: "\"I want to build something people belong to\"", value: "connector" },
-      { text: "\"I want to be known as THE go-to expert in my space\"", value: "strategist" },
+      { text: '"I want to create things that matter — content with real impact"', value: "creator" },
+      { text: '"I want to build once and earn while I sleep"', value: "builder" },
+      { text: '"My knowledge and experience deserve to be monetized"', value: "educator" },
+      { text: '"I want to build something people belong to"', value: "connector" },
+      { text: '"I want to be known as THE go-to expert in my space"', value: "strategist" },
     ],
   },
 ];
@@ -238,6 +238,12 @@ const DigitalSuperpowerQuiz = () => {
     setShowInstructions(true);
   };
 
+  const handleGoToDashboard = () => {
+    if (typeof window !== "undefined") {
+      window.location.href = CONFIG.routes.dashboard;
+    }
+  };
+
   const result = resultKey ? results[resultKey] : null;
 
   return (
@@ -260,7 +266,10 @@ const DigitalSuperpowerQuiz = () => {
             <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
               <span style={{ fontSize: "1.25rem" }}>{result ? result.emoji : "✨"}</span>
               <div>
-                <div className="dd-text dd-text--muted" style={{ marginBottom: "8px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", fontSize: "0.85rem" }}>
+                <div
+                  className="dd-text dd-text--muted"
+                  style={{ marginBottom: "8px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", fontSize: "0.85rem" }}
+                >
                   Digital Superpower Quiz
                 </div>
                 <h1 className="dd-heading dd-heading--large">Discover the way you win online.</h1>
@@ -288,7 +297,10 @@ const DigitalSuperpowerQuiz = () => {
             <section className="dd-card dd-card--spaced">
               <div className="dd-page__section-header">
                 <div>
-                  <p className="dd-text dd-text--muted" style={{ margin: 0, textTransform: "uppercase", letterSpacing: "0.12em", fontWeight: 700, fontSize: "0.85rem" }}>
+                  <p
+                    className="dd-text dd-text--muted"
+                    style={{ margin: 0, textTransform: "uppercase", letterSpacing: "0.12em", fontWeight: 700, fontSize: "0.85rem" }}
+                  >
                     Question {currentQuestion} of {questions.length}
                   </p>
                   <h2 className="dd-heading dd-heading--medium" style={{ marginTop: "12px" }}>{question.question}</h2>
@@ -299,9 +311,9 @@ const DigitalSuperpowerQuiz = () => {
               </div>
 
               <div className="dd-grid" style={{ marginTop: "28px" }}>
-                {question.options.map((option) => (
+                {question.options.map((option, index) => (
                   <button
-                    key={option.value}
+                    key={`${question.id}-${index}`}
                     type="button"
                     onClick={() => handleAnswer(option.value)}
                     className={`dd-button dd-button--secondary ${answers[currentQuestion] === option.value ? "dd-button--selected" : ""}`}
@@ -348,7 +360,10 @@ const DigitalSuperpowerQuiz = () => {
                 <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
                   <span style={{ fontSize: "1.5rem" }}>{result.emoji}</span>
                   <div>
-                    <div className="dd-text dd-text--muted" style={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", fontSize: "0.85rem" }}>
+                    <div
+                      className="dd-text dd-text--muted"
+                      style={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", fontSize: "0.85rem" }}
+                    >
                       Your digital superpower
                     </div>
                     <h2 className="dd-heading dd-heading--large" style={{ marginTop: "8px" }}>{result.title}</h2>
@@ -378,9 +393,9 @@ const DigitalSuperpowerQuiz = () => {
                   <button type="button" onClick={handleReset} className="dd-button dd-button--secondary">
                     Retake the quiz
                   </button>
-                  <a href={CONFIG.routes.dashboard} className="dd-button dd-button--primary">
-                    Go to dashboard
-                  </a>
+                  <button type="button" onClick={handleGoToDashboard} className="dd-button dd-button--primary">
+                    Go to dashboard <ArrowRight size={16} />
+                  </button>
                 </div>
               </div>
             </section>

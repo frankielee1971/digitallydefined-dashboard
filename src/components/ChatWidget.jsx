@@ -4,50 +4,57 @@ export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [error, setError] = useState(null);
 
   async function sendMessage() {
-    if (!input.trim()) return;
+    if (!input.trim() || error === "sending") return;
+    setError("sending");
 
-    const userMessage = { role: "user", content: input };
+    const userMessage = { role: "user", content: input.trim() };
     const updatedMessages = [...messages, userMessage];
 
     setMessages(updatedMessages);
     setInput("");
 
     try {
-      const API_URL = import.meta.env.VITE_HERMES_URL || "/api/hermes";
+      const API_URL = import.meta.env.VITE_HERMES_GATEWAY_URL || "/api/hermes";
       const res = await fetch(API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": import.meta.env.VITE_DASHBOARD_API_KEY || ""
+          "x-api-key": import.meta.env.VITE_DASHBOARD_API_KEY || "",
         },
         body: JSON.stringify({
-          message: input.trim(),
-          context: {},
-          conversation: updatedMessages,
-        })
+          messages: updatedMessages,
+        }),
       });
 
       const data = await res.json();
 
+      if (!res.ok) {
+        throw new Error(data?.error || `Request failed with status ${res.status}`);
+      }
+
       const botMessage = {
         role: "assistant",
-        content: data.reply || "No response received."
+        content: typeof data?.reply === "string" && data.reply ? data.reply : "No response received.",
+        provider: data?.provider || null,
+        model: data?.model || null,
       };
 
       setMessages((prev) => [...prev, botMessage]);
+      setError(null);
     } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong while reaching Hermes.");
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Error contacting server." }
+        { role: "assistant", content: "Error contacting server." },
       ]);
     }
   }
 
   return (
     <>
-      {/* Floating Button */}
       <button
         onClick={() => setOpen(!open)}
         className="dd-chat-toggle"
@@ -55,7 +62,6 @@ export default function ChatWidget() {
         💬
       </button>
 
-      {/* Chat Window */}
       {open && (
         <div className="dd-chat-window">
           <div className="dd-chat-header">DigitallyDefined AI</div>
@@ -77,6 +83,12 @@ export default function ChatWidget() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  sendMessage();
+                }
+              }}
               placeholder="Ask me anything..."
               className="dd-chat-input"
             />
