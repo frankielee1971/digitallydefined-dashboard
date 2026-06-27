@@ -33,6 +33,7 @@ export default function AssistantPage() {
           "x-api-key": import.meta.env.VITE_DASHBOARD_API_KEY || ""
         },
       body: JSON.stringify({
+        action: "hermes",
         message: input.trim(),
         messages: updated,
         context: {},

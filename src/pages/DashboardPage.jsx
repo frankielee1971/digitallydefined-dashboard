@@ -673,10 +673,11 @@ const DashboardPage = () => {
     setSyncError("");
 
     try {
-      const res = await fetch(API_URL, {
+      const syncUrl = API_URL.replace("/hermes", "/sync");
+      const res = await fetch(syncUrl, {
         method: "POST",
         headers: API_HEADERS,
-        body: JSON.stringify({ action: "dashboard" }),
+        body: JSON.stringify({ action: "sync" }),
       });
 
       if (!res.ok) {
@@ -753,6 +754,7 @@ const DashboardPage = () => {
           method: "POST",
           headers: API_HEADERS,
           body: JSON.stringify({
+            action: "hermes",
             message: trimmedMessage,
             messages: nextMessages,
             context: {},
