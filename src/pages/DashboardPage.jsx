@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import CONFIG from "../config";
 import Logo from "../components/Logo";
-import SimpleDashboardAssistant from "../components/DashboardAssistant";
+
 import {
   brutalBorder,
   brutalButtonPrimary,
@@ -882,12 +882,6 @@ const DashboardPage = () => {
         </div>
       </header>
 
-      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 clamp(1rem, 4vw, 1.5rem)" }}>
-        <h2 style={{ ...brutalHeading, fontSize: "1.25rem", margin: "0 0 1rem" }}>
-          AI Assistant
-        </h2>
-        <SimpleDashboardAssistant />
-      </section>
 
       <main
         className="dd-dashboard-shell"
