@@ -5,6 +5,10 @@
 		},
 		{
 			"path": "../digitallydefined-os-backend"
+		},
+		{
+			"name": "digitallydefined-os-backend",
+			"path": "../../../../digitallydefined-os-backend/digitallydefined-os-backend"
 		}
 	],
 	"settings": {}

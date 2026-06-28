@@ -678,7 +678,7 @@ const DashboardPage = () => {
       const res = await fetch(syncUrl, {
         method: "POST",
         headers: API_HEADERS,
-        body: JSON.stringify({ action: "sync" }),
+        body: JSON.stringify({ message: "sync" }),
       });
 
       if (!res.ok) {
@@ -696,7 +696,7 @@ const DashboardPage = () => {
       const automationsRes = await fetch(API_URL, {
         method: "POST",
         headers: API_HEADERS,
-        body: JSON.stringify({ action: "automation.list" }),
+        body: JSON.stringify({ message: "automation.list" }),
       });
       if (!automationsRes.ok) {
         setAutomations([]);
