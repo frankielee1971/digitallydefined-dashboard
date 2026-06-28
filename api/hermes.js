@@ -61,13 +61,30 @@ export default async function handler(req, res) {
 
     let parsed;
     if (contentType.includes('application/json')) {
-      try { parsed = JSON.parse(text); } catch { parsed = { reply: text }; }
+      try {
+        parsed = JSON.parse(text);
+      } catch {
+        parsed = {
+          reply: text,
+          error: 'Backend returned invalid JSON despite JSON content-type',
+          status: response.status,
+        };
+      }
     } else {
-      parsed = { reply: text };
+      parsed = {
+        reply: text,
+        error: 'Backend returned non-JSON response',
+        providerError: text.slice(0, 200),
+      };
     }
 
     if (!response.ok) {
-      return res.status(response.status).json({ error: parsed?.error || parsed?.message || 'Backend request failed', status: response.status });
+      return res.status(response.status).json({
+        error: parsed?.error || parsed?.message || 'Backend request failed',
+        status: response.status,
+        providerError: parsed?.providerError || text.slice(0, 200),
+        reply: parsed?.reply || '',
+      });
     }
 
     return res.status(200).json(parsed);

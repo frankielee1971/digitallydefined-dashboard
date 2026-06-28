@@ -6,7 +6,7 @@ export default function ChatWidget() {
   const [input, setInput] = useState("");
   const [error, setError] = useState(null);
 
-  async function sendMessage() {
+  async sendMessage() {
     if (!input.trim() || error === "sending") return;
     setError("sending");
 
@@ -17,15 +17,15 @@ export default function ChatWidget() {
     setInput("");
 
     try {
-      const API_URL = `${import.meta.env.VITE_DASHBOARD_API_URL || "https://digitallydefined-os-backend.vercel.app/api"}/hermes`;
+      const API_URL = import.meta.env.VITE_DASHBOARD_HERMES_URL ||
+        "https://digitallydefined-os-backend.vercel.app/api/hermes";
       const res = await fetch(API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "x-api-key": import.meta.env.VITE_DASHBOARD_API_KEY || "",
         },
-      body: JSON.stringify({
-          action: "hermes",
+        body: JSON.stringify({
           message: input.trim(),
           messages: updatedMessages,
           context: {},
@@ -33,10 +33,19 @@ export default function ChatWidget() {
         }),
       });
 
-      const data = await res.json();
+      const text = await res.text();
+      const data = res.headers.get("content-type")?.includes("application/json")
+        ? (() => { try { return JSON.parse(text); } catch { return null; } })()
+        : null;
 
       if (!res.ok) {
-        throw new Error(data?.error || `Request failed with status ${res.status}`);
+        const providerError = data?.providerError || data?.error || `Request failed with status ${res.status}`;
+        const snippet = text?.slice(0, 200);
+        throw new Error(snippet ? `${providerError} - ${snippet}` : providerError);
+      }
+
+      if (!data) {
+        throw new Error("Unexpected non-JSON response from Hermes.");
       }
 
       const botMessage = {
