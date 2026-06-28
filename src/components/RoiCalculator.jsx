@@ -194,7 +194,7 @@ const RoiCalculator = ({ mode = "free", onFullCalculatorClick }) => {
 
         <div
           style={{
-            backgroundColor: "#2D3748",
+            backgroundColor: colors.dark,
             color: colors.bone,
             padding: "clamp(28px, 5vw, 48px)",
             display: "grid",

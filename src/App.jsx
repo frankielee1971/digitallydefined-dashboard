@@ -3,53 +3,51 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import CONFIG from "./config";
 import DashboardPage from "./pages/DashboardPage";
+import DigitalSuperpowerQuiz from "./pages/DigitalSuperpowerQuiz";
+import AssistantPage from "./pages/AssistantPage";
+import ChatWidget from "./components/ChatWidget";
 import LandingPage from "./pages/LandingPage";
 
-const hostname =
-  typeof window !== "undefined" ? window.location.hostname : "";
+function App() {
+  const hostname = window.location.hostname;
+  const isDashboardDomain = hostname === "dashboard.digitallydefined.online";
 
-const isDashboardHost =
-  hostname === "dashboard.digitallydefined.online" ||
-  hostname === "digitallydefined-reputation-dashboa-nine.vercel.app";
+  const homePage = isDashboardDomain ? (
+    <Navigate to="/dashboard" replace />
+  ) : (
+    <LandingPage />
+  );
 
-const App = () => (
-  <>
-    <Routes>
-      <Route
-        path="/"
-        element={
-          isDashboardHost ? (
-            <Navigate to={CONFIG.routes.dashboard} replace />
-          ) : (
-            <LandingPage />
-          )
-        }
-      />
+  return (
+    <>
+      <SpeedInsights />
 
-      <Route path="/landing" element={<LandingPage />} />
-      <Route path={CONFIG.routes.dashboard} element={<DashboardPage />} />
+      {/* Show chat ONLY on the main site */}
+      {!isDashboardDomain && <ChatWidget />}
 
-      {CONFIG.routes.dashboardAliases.map((route) => (
+      <Routes>
+        <Route path="/" element={homePage} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/quiz" element={<DigitalSuperpowerQuiz />} />
+
+        {/* ⭐ NEW: AI Assistant Page (dashboard only) */}
+        {isDashboardDomain && (
+          <Route path="/assistant" element={<AssistantPage />} />
+        )}
+
         <Route
-          key={route}
-          path={route}
-          element={<Navigate to={CONFIG.routes.dashboard} replace />}
+          path="*"
+          element={
+            isDashboardDomain ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
         />
-      ))}
-
-      <Route
-        path="*"
-        element={
-          isDashboardHost ? (
-            <Navigate to={CONFIG.routes.dashboard} replace />
-          ) : (
-            <Navigate to="/" replace />
-          )
-        }
-      />
-    </Routes>
-    <SpeedInsights />
-  </>
-);
+      </Routes>
+    </>
+  );
+}
 
 export default App;
