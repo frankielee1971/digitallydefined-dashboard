@@ -6,7 +6,7 @@ export default function ChatWidget() {
   const [input, setInput] = useState("");
   const [error, setError] = useState(null);
 
-  async sendMessage() {
+  sendMessage = async () => {
     if (!input.trim() || error === "sending") return;
     setError("sending");
 
@@ -17,8 +17,8 @@ export default function ChatWidget() {
     setInput("");
 
     try {
-      const API_URL = import.meta.env.VITE_DASHBOARD_HERMES_URL ||
-        "https://digitallydefined-os-backend.vercel.app/api/hermes";
+      const API_URL = import.meta.env.VITE_HERMES_GATEWAY_URL || "";
+
       const res = await fetch(API_URL, {
         method: "POST",
         headers: {

@@ -5,9 +5,7 @@ export default function AutomationsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const API_URL =
-      import.meta.env.VITE_HERMES_GATEWAY_URL ||
-      "https://digitallydefined-os-backend.vercel.app/api/hermes";
+    const API_URL = import.meta.env.VITE_HERMES_GATEWAY_URL || "";
 
     fetch(API_URL, {
       method: "POST",
