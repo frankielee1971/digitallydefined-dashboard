@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ArrowRight, CheckCircle2, Sparkles, TrendingUp, Users, AlertCircle, X } from "lucide-react";
+import { CheckCircle2, Sparkles, TrendingUp, Users, AlertCircle, X } from "lucide-react";
 import CONFIG from "../config";
 import Footer from "../components/Footer";
 import Logo from "../components/Logo";
@@ -16,7 +16,7 @@ import {
 
 
 const LandingPage = () => {
-  const [showUnderConstruction, setShowUnderConstruction] = useState(false); // Reduced prominence
+  const [showUnderConstruction, setShowUnderConstruction] = useState(false);
   const year = new Date().getFullYear();
   const { colors, contact, landing, routes, seo } = CONFIG;
   const fullCalculatorUrl = contact.fullCalculatorUrl || contact.gumroadUrl;
@@ -25,29 +25,29 @@ const LandingPage = () => {
   const assetPaths = [
     {
       type: "Visibility Assets",
-      examples: "SEO content, reviews, listings, reputation signals",
+      description: "SEO content, reviews, listings, and reputation signals that make you findable without being everywhere.",
       icon: "🔍",
     },
     {
       type: "Product Assets",
-      examples: "templates, calculators, Notion systems, playbooks",
+      description: "Templates, calculators, Notion systems, and playbooks that sell while you sleep.",
       icon: "📦",
     },
     {
       type: "Automation Assets",
-      examples: "funnels, email sequences, AI content engines",
+      description: "Funnels, email sequences, and AI content engines that work on your schedule.",
       icon: "⚙️",
     },
     {
       type: "Audience Assets",
-      examples: "community, authority positioning, trust ecosystems",
+      description: "Community, authority positioning, and trust ecosystems that compound over time.",
       icon: "👥",
     },
   ];
 
 
   useEffect(() => {
-    document.title = "DigitallyDefined | Build Your Digital Empire";
+    document.title = "DigitallyDefined | Find Your Digital Superpower";
     let metaDescription = document.querySelector('meta[name="description"]');
 
 
@@ -60,7 +60,7 @@ const LandingPage = () => {
 
     metaDescription.setAttribute(
       "content",
-      "For Gen X women reinventing themselves digitally. Build faceless digital assets, grow passive income, and multiply your digital reputation 10x.",
+      "Take the 60-second quiz to discover which faceless digital income path fits your strengths, lifestyle, and goals. Built for Gen X women reinventing themselves.",
     );
   }, [seo.description, seo.title]);
 
@@ -70,7 +70,7 @@ const LandingPage = () => {
     margin: "0 auto",
   };
   const section = {
-    padding: `clamp(44px, 7vw, 84px) clamp(${theme.layout.spacing}, 4vw, 32px)`,
+    padding: `clamp(48px, 7vw, 88px) clamp(${theme.layout.spacing}, 4vw, 32px)`,
   };
 
 
@@ -87,17 +87,17 @@ const LandingPage = () => {
         .dd-hero-grid {
           display: grid;
           grid-template-columns: 1fr;
-          gap: clamp(36px, 6vw, 64px);
+          gap: clamp(32px, 5vw, 56px);
           align-items: center;
           text-align: center;
         }
 
 
         .dd-hero-content {
-          max-width: 800px;
+          max-width: 780px;
           margin: 0 auto;
           display: grid;
-          gap: clamp(20px, 3vw, 32px);
+          gap: clamp(18px, 2.5vw, 28px);
         }
 
 
@@ -113,8 +113,8 @@ const LandingPage = () => {
         .dd-proof-grid {
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 16px;
-          max-width: 700px;
+          gap: 14px;
+          max-width: 680px;
           margin: 0 auto;
         }
 
@@ -134,8 +134,8 @@ const LandingPage = () => {
 
         .dd-asset-paths {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 16px;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 20px;
         }
 
 
@@ -148,11 +148,25 @@ const LandingPage = () => {
         }
 
 
-        .dd-hero-trust {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          align-items: center;
+        .dd-steps-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+          gap: 0;
+        }
+
+
+        .dd-faceless-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 28px;
+          align-items: start;
+        }
+
+
+        .dd-audience-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 18px;
         }
 
 
@@ -210,9 +224,7 @@ const LandingPage = () => {
           >
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <AlertCircle size={18} strokeWidth={2.5} />
-              <span style={{ fontWeight: 700 }}>
-                New features coming soon
-              </span>
+              <span style={{ fontWeight: 700 }}>New features coming soon</span>
             </div>
             <button
               onClick={() => setShowUnderConstruction(false)}
@@ -268,8 +280,8 @@ const LandingPage = () => {
 
 
       <main>
-        {/* ── HERO: Quiz-First, Centered, Cleaner ── */}
-        <section style={{ ...section, paddingTop: "clamp(32px, 5vw, 56px)", paddingBottom: "clamp(48px, 7vw, 80px)" }}>
+        {/* ── HERO: Clean, Centered, Quiz-First ── */}
+        <section style={{ ...section, paddingTop: "clamp(40px, 6vw, 72px)", paddingBottom: "clamp(56px, 8vw, 96px)" }}>
           <div className="dd-hero-grid" style={container}>
             <div className="dd-hero-content">
               {/* ── Eyebrow ── */}
@@ -277,40 +289,40 @@ const LandingPage = () => {
                 style={{
                   ...brutalEyebrow,
                   color: colors.primary,
-                  fontSize: "clamp(0.7rem, 1.2vw, 0.8rem)",
-                  letterSpacing: "0.12em",
+                  fontSize: "clamp(0.7rem, 1.1vw, 0.78rem)",
+                  letterSpacing: "0.14em",
                   textTransform: "uppercase",
                 }}
               >
-                For Gen X women reinventing themselves, digitally
+                For Gen X women building income without being online 24/7
               </p>
 
               {/* ── Headline ── */}
               <h1
                 style={{
                   ...brutalHeading,
-                  fontSize: "clamp(2.4rem, 5.5vw, 4.2rem)",
-                  lineHeight: 1.05,
+                  fontSize: "clamp(2.3rem, 5.5vw, 4rem)",
+                  lineHeight: 1.08,
                   color: colors.text,
                   fontWeight: 800,
-                  maxWidth: "900px",
+                  maxWidth: "880px",
                   margin: "0 auto",
                 }}
               >
-                Discover Your Digital Superpower
+                Find the faceless digital income path that fits you best
               </h1>
 
               {/* ── Subheadline ── */}
               <p
                 style={{
-                  fontSize: "clamp(1.05rem, 1.8vw, 1.25rem)",
-                  lineHeight: 1.6,
+                  fontSize: "clamp(1.05rem, 1.7vw, 1.22rem)",
+                  lineHeight: 1.65,
                   color: colors.textMuted,
                   maxWidth: "640px",
                   margin: "0 auto",
                 }}
               >
-                Take the 60-second quiz to find out which type of digital real estate fits your strengths, lifestyle, and income goals best.
+                Take the 60-second quiz to discover which type of digital asset matches your strengths, lifestyle, and income goals — so you can stop second-guessing and start building the right thing.
               </p>
 
               {/* ── PRIMARY CTA: Quiz ── */}
@@ -319,21 +331,21 @@ const LandingPage = () => {
                   href="/quiz"
                   style={{
                     ...brutalButtonPrimary,
-                    padding: "clamp(14px, 2vw, 18px) clamp(24px, 3vw, 36px)",
-                    fontSize: "clamp(0.95rem, 1.3vw, 1.05rem)",
+                    padding: "clamp(15px, 2vw, 20px) clamp(28px, 3.5vw, 40px)",
+                    fontSize: "clamp(0.95rem, 1.2vw, 1.05rem)",
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "10px",
                   }}
                 >
-                  Find My Superpower <Sparkles size={18} />
+                  Take the 60-Second Quiz <Sparkles size={18} />
                 </a>
                 <a
                   href="#how-it-works"
                   style={{
                     ...brutalButtonSecondary,
-                    padding: "clamp(14px, 2vw, 18px) clamp(24px, 3vw, 36px)",
-                    fontSize: "clamp(0.95rem, 1.3vw, 1.05rem)",
+                    padding: "clamp(15px, 2vw, 20px) clamp(28px, 3.5vw, 40px)",
+                    fontSize: "clamp(0.95rem, 1.2vw, 1.05rem)",
                   }}
                 >
                   See How It Works
@@ -345,7 +357,7 @@ const LandingPage = () => {
                 style={{
                   margin: 0,
                   color: colors.textMuted,
-                  fontSize: "clamp(0.78rem, 1.1vw, 0.85rem)",
+                  fontSize: "clamp(0.78rem, 1vw, 0.85rem)",
                   fontWeight: 700,
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
@@ -365,12 +377,12 @@ const LandingPage = () => {
                     key={item}
                     style={{
                       ...brutalCard,
-                      padding: "clamp(12px, 1.5vw, 16px)",
+                      padding: "clamp(12px, 1.4vw, 16px)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       gap: "10px",
-                      fontSize: "clamp(0.75rem, 1vw, 0.82rem)",
+                      fontSize: "clamp(0.72rem, 0.95vw, 0.8rem)",
                       fontWeight: 800,
                       textTransform: "uppercase",
                       textAlign: "center",
@@ -388,11 +400,9 @@ const LandingPage = () => {
 
         {/* ── HOW IT WORKS ── */}
         <section id="how-it-works" style={{ ...section, backgroundColor: colors.backgroundAlt }}>
-          <div style={{ ...container, display: "grid", gap: "clamp(24px, 4vw, 40px)" }}>
-            <div style={{ textAlign: "center", maxWidth: "700px", margin: "0 auto" }}>
-              <p style={{ ...brutalEyebrow, color: colors.primary }}>
-                How it works
-              </p>
+          <div style={{ ...container, display: "grid", gap: "clamp(28px, 4vw, 44px)" }}>
+            <div style={{ textAlign: "center", maxWidth: "680px", margin: "0 auto" }}>
+              <p style={{ ...brutalEyebrow, color: colors.primary }}>How it works</p>
               <h2
                 style={{
                   ...brutalHeading,
@@ -403,14 +413,14 @@ const LandingPage = () => {
               >
                 Three steps. Total clarity.
               </h2>
-              <p style={{ margin: "14px 0 0", color: colors.textMuted, lineHeight: 1.6 }}>
+              <p style={{ margin: "14px 0 0", color: colors.textMuted, lineHeight: 1.65 }}>
                 You're not starting from scratch. You're starting from experience. The quiz helps you identify which digital assets you already own and which path will give you the fastest return.
               </p>
             </div>
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
                 gap: "0",
                 border: `1px solid ${colors.border}`,
               }}
@@ -423,7 +433,7 @@ const LandingPage = () => {
                 },
                 {
                   number: "02",
-                  title: "Get your path",
+                  title: "Get your match",
                   text: "Receive your personalized digital real estate profile with a clear next-step recommendation.",
                 },
                 {
@@ -435,7 +445,7 @@ const LandingPage = () => {
                 <article
                   key={step.number}
                   style={{
-                    padding: "24px",
+                    padding: "28px",
                     border: `1px solid ${colors.border}`,
                     backgroundColor: colors.surface,
                   }}
@@ -443,19 +453,17 @@ const LandingPage = () => {
                   <div
                     style={{
                       color: colors.primary,
-                      fontSize: "2.4rem",
+                      fontSize: "2.6rem",
                       fontWeight: 900,
                       lineHeight: 1,
-                      opacity: 0.55,
-                      marginBottom: "16px",
+                      opacity: 0.5,
+                      marginBottom: "18px",
                     }}
                   >
                     {step.number}
                   </div>
-                  <h3 style={{ margin: "0 0 10px", color: colors.text }}>{step.title}</h3>
-                  <p style={{ margin: 0, color: colors.textMuted, lineHeight: 1.6 }}>
-                    {step.text}
-                  </p>
+                  <h3 style={{ margin: "0 0 10px", color: colors.text, fontSize: "1.15rem" }}>{step.title}</h3>
+                  <p style={{ margin: 0, color: colors.textMuted, lineHeight: 1.65 }}>{step.text}</p>
                 </article>
               ))}
             </div>
@@ -463,162 +471,11 @@ const LandingPage = () => {
         </section>
 
 
-        {/* ── WHO IT'S FOR ── */}
+        {/* ── ASSET PATHS ── */}
         <section style={section}>
-          <div
-            style={{
-              ...container,
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-              gap: "18px",
-            }}
-          >
-            {[
-              {
-                title: "For the reinventor",
-                text: "You know your value. This shows whether your digital footprint is carrying it.",
-              },
-              {
-                title: "For the local expert",
-                text: "Estimate revenue from calls, jobs, reviews, and the traffic you already earn.",
-              },
-              {
-                title: "For the operator",
-                text: "Move from vibes to numbers before you invest in your next growth play.",
-              },
-            ].map((card) => (
-              <article key={card.title} style={{ ...brutalCard, padding: "24px" }}>
-                <h3 style={{ margin: "0 0 10px", fontSize: "1.05rem" }}>{card.title}</h3>
-                <p style={{ margin: 0, color: colors.textMuted }}>{card.text}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-
-        {/* ── FACELESS MARKETING ── */}
-        <section style={{ ...section, backgroundColor: colors.backgroundAlt }}>
-          <div
-            style={{
-              ...container,
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-              gap: "28px",
-              alignItems: "start",
-            }}
-          >
-            <div style={{ display: "grid", gap: "18px" }}>
-              <p style={{ ...brutalEyebrow, color: colors.primary }}>
-                Faceless digital marketing
-              </p>
-              <h2
-                style={{
-                  ...brutalHeading,
-                  margin: 0,
-                  fontSize: "clamp(1.9rem, 4vw, 3rem)",
-                  lineHeight: 1.05,
-                }}
-              >
-                You don't need to be an influencer to win online.
-              </h2>
-              <p style={{ margin: 0, color: colors.textMuted, lineHeight: 1.65 }}>
-                DigitallyDefined teaches you how to build faceless digital assets that work even when you're offline. No camera. No performance. No hustle.
-              </p>
-              <p style={{ margin: 0, color: colors.textMuted, lineHeight: 1.65 }}>
-                Perfect for Gen X women who want privacy, freedom, and income that compounds over time.
-              </p>
-              <div style={{ display: "grid", gap: "10px" }}>
-                {[
-                  "Privacy: build without revealing your identity",
-                  "Freedom: assets that run on autopilot",
-                  "Passive visibility: found without being on 24/7",
-                  "Automated lead flow: systems that work while you sleep",
-                ].map((item) => (
-                  <div key={item} style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
-                    <CheckCircle2 size={18} color={colors.primary} style={{ marginTop: "3px", flexShrink: 0 }} />
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </div>
-              <a
-                href={contact.facebookCommunityUrl}
-                target="_blank"
-                rel="noreferrer"
-                style={{ ...brutalButtonPrimary, width: "fit-content" }}
-              >
-                Learn faceless digital marketing <Users size={16} />
-              </a>
-            </div>
-
-
-            <div style={{ ...brutalCard, padding: "28px" }}>
-              <p style={{ ...brutalEyebrow, color: colors.primary }}>
-                Faceless asset types
-              </p>
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "10px",
-                  marginTop: "20px",
-                }}
-              >
-                {[
-                  "SEO Content",
-                  "Review Authority",
-                  "Digital Templates",
-                  "Automated Funnels",
-                  "AI Content Engines",
-                  "Email Courses",
-                  "Notion Systems",
-                  "PDF Playbooks",
-                  "Reputation Signals",
-                  "Digital Calculators",
-                ].map((asset, index) => (
-                  <span
-                    key={asset}
-                    style={{
-                      border: brutalBorder,
-                      padding: "8px 12px",
-                      backgroundColor:
-                        index % 4 === 0
-                          ? colors.primary
-                          : index % 4 === 2
-                          ? colors.accent
-                          : colors.surface,
-                      color: index % 4 === 2 ? colors.surface : colors.text,
-                      fontSize: "0.72rem",
-                      fontWeight: 900,
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {asset}
-                  </span>
-                ))}
-              </div>
-              <p
-                style={{
-                  borderTop: brutalBorder,
-                  margin: "24px 0 0",
-                  paddingTop: "20px",
-                  color: colors.textMuted,
-                }}
-              >
-                Every one of these earns without your face, your voice, or your constant attention.
-              </p>
-            </div>
-          </div>
-        </section>
-
-
-        {/* ── FREE CALCULATOR (moved lower) ── */}
-        <section id="free-calculator" style={section}>
-          <div style={{ ...container, display: "grid", gap: "24px" }}>
-            <div style={{ maxWidth: "780px" }}>
-              <p style={{ ...brutalEyebrow, color: colors.warning }}>
-                Free tool
-              </p>
+          <div style={{ ...container, display: "grid", gap: "clamp(24px, 4vw, 40px)" }}>
+            <div style={{ textAlign: "center", maxWidth: "700px", margin: "0 auto" }}>
+              <p style={{ ...brutalEyebrow, color: colors.primary }}>Your possible paths</p>
               <h2
                 style={{
                   ...brutalHeading,
@@ -627,10 +484,153 @@ const LandingPage = () => {
                   lineHeight: 1.05,
                 }}
               >
-                Your digital presence is already generating value.
+                Four ways to build income without being on camera
               </h2>
-              <p style={{ margin: "10px 0 0", color: colors.textMuted, lineHeight: 1.6 }}>
-                Once you know which digital real estate path fits you, this calculator shows you exactly how much your current footprint is worth and what it could earn.
+              <p style={{ margin: "14px 0 0", color: colors.textMuted, lineHeight: 1.65 }}>
+                The quiz matches you to one of these paths based on your existing strengths and goals. Each path can become a sustainable income stream.
+              </p>
+            </div>
+            <div className="dd-asset-paths">
+              {assetPaths.map((path) => (
+                <div
+                  key={path.type}
+                  style={{
+                    ...brutalCard,
+                    padding: "clamp(20px, 2.5vw, 28px)",
+                    display: "grid",
+                    gap: "12px",
+                  }}
+                >
+                  <div style={{ fontSize: "2rem" }}>{path.icon}</div>
+                  <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 800 }}>{path.type}</h3>
+                  <p style={{ margin: 0, color: colors.textMuted, lineHeight: 1.6, fontSize: "0.95rem" }}>
+                    {path.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+
+        {/* ── FACELESS ADVANTAGE ── */}
+        <section style={{ ...section, backgroundColor: colors.backgroundAlt }}>
+          <div style={{ ...container, display: "grid", gap: "clamp(24px, 4vw, 40px)" }}>
+            <div style={{ textAlign: "center", maxWidth: "700px", margin: "0 auto" }}>
+              <p style={{ ...brutalEyebrow, color: colors.primary }}>The faceless advantage</p>
+              <h2
+                style={{
+                  ...brutalHeading,
+                  margin: "10px 0 0",
+                  fontSize: "clamp(1.9rem, 4vw, 3rem)",
+                  lineHeight: 1.05,
+                }}
+              >
+                Build income without the performance
+              </h2>
+              <p style={{ margin: "14px 0 0", color: colors.textMuted, lineHeight: 1.65 }}>
+                You don't need to be an influencer, content creator, or public figure to build meaningful income online. Faceless digital assets give you privacy, leverage, and compounding value.
+              </p>
+            </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                gap: "18px",
+              }}
+            >
+              {[
+                {
+                  title: "Privacy first",
+                  text: "Build without revealing your identity. Your business stays yours.",
+                },
+                {
+                  title: "True flexibility",
+                  text: "Assets that run on autopilot. Work when you want, not when the algorithm demands.",
+                },
+                {
+                  title: "Compounding value",
+                  text: "Content and systems that earn passively and grow in value over time.",
+                },
+                {
+                  title: "Less pressure",
+                  text: "No constant posting, no on-camera presence, no performative hustle.",
+                },
+              ].map((item) => (
+                <div key={item.title} style={{ ...brutalCard, padding: "24px", display: "grid", gap: "10px" }}>
+                  <h3 style={{ margin: 0, fontSize: "1.05rem" }}>{item.title}</h3>
+                  <p style={{ margin: 0, color: colors.textMuted, lineHeight: 1.6 }}>{item.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+
+        {/* ── WHO IT'S FOR ── */}
+        <section style={section}>
+          <div style={{ ...container, display: "grid", gap: "clamp(24px, 4vw, 40px)" }}>
+            <div style={{ textAlign: "center", maxWidth: "700px", margin: "0 auto" }}>
+              <p style={{ ...brutalEyebrow, color: colors.primary }}>Who this is for</p>
+              <h2
+                style={{
+                  ...brutalHeading,
+                  margin: "10px 0 0",
+                  fontSize: "clamp(1.9rem, 4vw, 3rem)",
+                  lineHeight: 1.05,
+                }}
+              >
+                For the woman who is done waiting
+              </h2>
+            </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+                gap: "18px",
+              }}
+            >
+              {[
+                {
+                  title: "The reinventor",
+                  text: "You're rebuilding after burnout, divorce, caregiving, or a career shift. You know your value. Now you need a digital footprint that reflects it.",
+                },
+                {
+                  title: "The operator",
+                  text: "You've built skills, businesses, or careers. Now you want systems that work as hard as you do without constant babysitting.",
+                },
+                {
+                  title: "The privacy seeker",
+                  text: "You want income and impact without becoming an influencer. No camera, no performance, no 24/7 visibility required.",
+                },
+              ].map((card) => (
+                <article key={card.title} style={{ ...brutalCard, padding: "28px", display: "grid", gap: "12px" }}>
+                  <h3 style={{ margin: 0, fontSize: "1.15rem" }}>{card.title}</h3>
+                  <p style={{ margin: 0, color: colors.textMuted, lineHeight: 1.65 }}>{card.text}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+
+        {/* ── ROI CALCULATOR (secondary, positioned lower) ── */}
+        <section id="free-calculator" style={{ ...section, backgroundColor: colors.backgroundAlt }}>
+          <div style={{ ...container, display: "grid", gap: "24px" }}>
+            <div style={{ maxWidth: "780px" }}>
+              <p style={{ ...brutalEyebrow, color: colors.warning }}>Optional next step</p>
+              <h2
+                style={{
+                  ...brutalHeading,
+                  margin: "10px 0 0",
+                  fontSize: "clamp(1.9rem, 4vw, 3rem)",
+                  lineHeight: 1.05,
+                }}
+              >
+                Once you know your path, estimate what your current digital footprint may already be worth.
+              </h2>
+              <p style={{ margin: "10px 0 0", color: colors.textMuted, lineHeight: 1.65 }}>
+                Take the quiz first to identify your best-fit asset type, then use this calculator to see your potential.
               </p>
             </div>
             <RoiCalculator
@@ -650,16 +650,14 @@ const LandingPage = () => {
               ...brutalCard,
               backgroundColor: colors.dark,
               color: colors.bone,
-              padding: "clamp(32px, 6vw, 64px)",
+              padding: "clamp(36px, 6vw, 72px)",
               textAlign: "center",
               display: "grid",
               justifyItems: "center",
-              gap: "22px",
+              gap: "24px",
             }}
           >
-            <p style={{ ...brutalEyebrow, color: colors.primary }}>
-              DigitallyDefined community
-            </p>
+            <p style={{ ...brutalEyebrow, color: colors.primary }}>DigitallyDefined community</p>
             <h2
               style={{
                 ...brutalHeading,
@@ -671,8 +669,8 @@ const LandingPage = () => {
             >
               Clarity, confidence, and control. Together.
             </h2>
-            <p style={{ margin: 0, maxWidth: "760px", color: colors.boneMuted }}>
-              Inside, you'll find Gen X women building businesses, pivoting careers, launching new ideas, and reclaiming their digital identity without the noise of traditional social media.
+            <p style={{ margin: 0, maxWidth: "680px", color: colors.boneMuted, lineHeight: 1.65 }}>
+              Inside, you'll find Gen X women building businesses, pivoting careers, and reclaiming their digital identity without the noise of traditional social media.
             </p>
             <div
               style={{
@@ -680,7 +678,7 @@ const LandingPage = () => {
                 gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
                 gap: "18px",
                 width: "100%",
-                maxWidth: "680px",
+                maxWidth: "640px",
               }}
             >
               {[
@@ -744,7 +742,7 @@ const LandingPage = () => {
                   fontSize: "clamp(1.9rem, 4vw, 3rem)",
                   lineHeight: 1.02,
                   color: colors.bone,
-                  margin: "0 0 16px",
+                  margin: "0 0 18px",
                 }}
               >
                 Stop managing by gut. Start commanding with data.
@@ -755,14 +753,14 @@ const LandingPage = () => {
                   lineHeight: 1.65,
                   color: colors.boneMuted,
                   maxWidth: "560px",
-                  margin: "0 0 18px",
+                  margin: "0 0 22px",
                 }}
               >
                 The quiz takes 60 seconds. The clarity lasts a lifetime. Find out which digital real estate path is built for your strengths, your season, and the income you want to build.
               </p>
               <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
                 <a href="/quiz" style={brutalButtonPrimary}>
-                  Find My Superpower <Sparkles size={16} />
+                  Take the 60-Second Quiz <Sparkles size={18} />
                 </a>
               </div>
               <p
