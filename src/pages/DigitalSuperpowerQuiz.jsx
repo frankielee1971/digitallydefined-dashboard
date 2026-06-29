@@ -203,6 +203,11 @@ const DigitalSuperpowerQuiz = () => {
     [currentQuestion],
   );
 
+  const progress = useMemo(() => {
+    const answeredCount = Object.keys(answers).length;
+    return (answeredCount / questions.length) * 100;
+  }, [answers]);
+
   useEffect(() => {
     document.title = "Digital Superpower Quiz | DigitallyDefined";
   }, []);
@@ -248,9 +253,309 @@ const DigitalSuperpowerQuiz = () => {
 
   return (
     <div className="dd-page">
-      <header className="dd-page__hero">
-        <div className="dd-page__hero-inner">
-          <div className="dd-page__hero-meta">
+      <style>{`
+        .dd-quiz-hero {
+          border-bottom: 1px solid #111111;
+          background: #fffaf5;
+          padding: clamp(32px, 5vw, 48px) 24px;
+        }
+
+        .dd-quiz-hero-inner {
+          max-width: 1100px;
+          margin: 0 auto;
+          display: grid;
+          gap: 28px;
+        }
+
+        .dd-quiz-hero-meta {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 16px;
+        }
+
+        .dd-quiz-hero-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 0.85rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+          color: #47b7d4;
+        }
+
+        .dd-quiz-hero-title {
+          font-family: "Inter", system-ui, sans-serif;
+          font-size: clamp(2.2rem, 5vw, 3.5rem);
+          font-weight: 800;
+          line-height: 1.08;
+          color: #111111;
+          margin: 0;
+          max-width: 800px;
+        }
+
+        .dd-quiz-hero-subtitle {
+          font-size: clamp(1.05rem, 1.7vw, 1.2rem);
+          line-height: 1.65;
+          color: #5f5f5f;
+          max-width: 680px;
+          margin: 0;
+        }
+
+        .dd-quiz-container {
+          max-width: 800px;
+          margin: 0 auto;
+          padding: clamp(32px, 5vw, 56px) 24px;
+          display: grid;
+          gap: 28px;
+        }
+
+        .dd-quiz-card {
+          background: #ffffff;
+          border: 1px solid #111111;
+          padding: clamp(28px, 4vw, 40px);
+          display: grid;
+          gap: 28px;
+        }
+
+        .dd-quiz-progress-wrapper {
+          display: grid;
+          gap: 12px;
+        }
+
+        .dd-quiz-progress-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 12px;
+        }
+
+        .dd-quiz-progress-label {
+          font-size: 0.85rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+          color: #5f5f5f;
+        }
+
+        .dd-quiz-progress-reassurance {
+          font-size: 0.8rem;
+          color: #5f5f5f;
+          font-style: italic;
+        }
+
+        .dd-quiz-progress-bar {
+          width: 100%;
+          height: 4px;
+          background: #f4efe8;
+          border: 1px solid #111111;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .dd-quiz-progress-fill {
+          height: 100%;
+          background: #47b7d4;
+          transition: width 0.4s ease;
+        }
+
+        .dd-quiz-question {
+          font-family: "Inter", system-ui, sans-serif;
+          font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+          font-weight: 800;
+          line-height: 1.3;
+          color: #111111;
+          margin: 0;
+        }
+
+        .dd-quiz-options {
+          display: grid;
+          gap: 14px;
+        }
+
+        .dd-quiz-option {
+          width: 100%;
+          text-align: left;
+          padding: clamp(16px, 2vw, 20px) clamp(18px, 2.5vw, 24px);
+          background: #ffffff;
+          border: 1px solid #111111;
+          color: #111111;
+          font-size: clamp(0.95rem, 1.2vw, 1.05rem);
+          font-weight: 600;
+          line-height: 1.5;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: flex-start;
+          gap: 14px;
+          font-family: "DM Sans", system-ui, sans-serif;
+        }
+
+        .dd-quiz-option:hover {
+          background: #f4efe8;
+          transform: translateY(-2px);
+        }
+
+        .dd-quiz-option:focus {
+          outline: 2px solid #47b7d4;
+          outline-offset: 2px;
+        }
+
+        .dd-quiz-option--selected {
+          background: rgba(71, 183, 212, 0.08);
+          border-color: #47b7d4;
+          border-width: 2px;
+        }
+
+        .dd-quiz-option-indicator {
+          flex-shrink: 0;
+          width: 24px;
+          height: 24px;
+          border: 2px solid #111111;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 14px;
+          line-height: 1;
+          margin-top: 2px;
+        }
+
+        .dd-quiz-option--selected .dd-quiz-option-indicator {
+          background: #47b7d4;
+          border-color: #47b7d4;
+          color: #ffffff;
+        }
+
+        .dd-quiz-actions {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 16px;
+          padding-top: 8px;
+          border-top: 1px solid #f4efe8;
+        }
+
+        .dd-quiz-actions-right {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+
+        .dd-quiz-result-card {
+          background: #ffffff;
+          border: 1px solid #111111;
+          padding: clamp(28px, 4vw, 40px);
+          display: grid;
+          gap: 24px;
+        }
+
+        .dd-quiz-result-header {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          flex-wrap: wrap;
+        }
+
+        .dd-quiz-result-emoji {
+          font-size: 3rem;
+          line-height: 1;
+        }
+
+        .dd-quiz-result-title {
+          font-family: "Inter", system-ui, sans-serif;
+          font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+          font-weight: 800;
+          line-height: 1.1;
+          color: #111111;
+          margin: 0;
+        }
+
+        .dd-quiz-result-tagline {
+          font-size: clamp(1.1rem, 1.5vw, 1.25rem);
+          font-weight: 600;
+          color: #47b7d4;
+          margin: 0;
+          line-height: 1.5;
+        }
+
+        .dd-quiz-result-description {
+          font-size: 1.05rem;
+          line-height: 1.7;
+          color: #5f5f5f;
+          margin: 0;
+        }
+
+        .dd-quiz-assets-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+          gap: 12px;
+        }
+
+        .dd-quiz-asset-item {
+          padding: 16px;
+          background: #f4efe8;
+          border: 1px solid #111111;
+          font-size: 0.95rem;
+          font-weight: 600;
+          line-height: 1.5;
+        }
+
+        .dd-quiz-next-step {
+          padding: 20px;
+          background: #fffaf5;
+          border-left: 3px solid #47b7d4;
+        }
+
+        .dd-quiz-next-step-label {
+          font-size: 0.85rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+          color: #47b7d4;
+          margin: 0 0 8px;
+        }
+
+        .dd-quiz-next-step-text {
+          font-size: 1.05rem;
+          line-height: 1.6;
+          color: #111111;
+          margin: 0;
+        }
+
+        .dd-quiz-footer-actions {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+          .dd-quiz-hero-meta {
+            justify-content: center;
+          }
+
+          .dd-quiz-actions {
+            flex-direction: column;
+            align-items: stretch;
+          }
+
+          .dd-quiz-actions-right {
+            width: 100%;
+          }
+
+          .dd-quiz-actions-right button {
+            width: 100%;
+          }
+        }
+      `}</style>
+
+      <header className="dd-quiz-hero">
+        <div className="dd-quiz-hero-inner">
+          <div className="dd-quiz-hero-meta">
             <Logo as="div" style={{ fontSize: "clamp(1.2rem, 2vw, 1.5rem)" }} />
             <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
               <a className="dd-button dd-button--secondary" href={CONFIG.routes.landing}>
@@ -262,72 +567,71 @@ const DigitalSuperpowerQuiz = () => {
             </div>
           </div>
 
-          <section className="dd-card dd-card--spaced">
-            <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
-              <span style={{ fontSize: "1.25rem" }}>{result ? result.emoji : "✨"}</span>
-              <div>
-                <div
-                  className="dd-text dd-text--muted"
-                  style={{ marginBottom: "8px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", fontSize: "0.85rem" }}
-                >
-                  Digital Superpower Quiz
-                </div>
-                <h1 className="dd-heading dd-heading--large">Discover the way you win online.</h1>
-              </div>
+          <div>
+            <div className="dd-quiz-hero-badge">
+              <Sparkles size={18} />
+              <span>Digital Superpower Quiz</span>
             </div>
-            <p className="dd-text dd-text--muted" style={{ maxWidth: "780px" }}>
+            <h1 className="dd-quiz-hero-title" style={{ marginTop: "16px" }}>
+              Discover the way you win online.
+            </h1>
+            <p className="dd-quiz-hero-subtitle" style={{ marginTop: "16px" }}>
               Answer 7 quick questions to uncover your digital superpower and get a clear next step for the business model that fits your experience, personality, and goals.
             </p>
-          </section>
+          </div>
         </div>
       </header>
 
       <main>
-        <div className="dd-page__container">
+        <div className="dd-quiz-container">
           {showInstructions && (
-            <section className="dd-card dd-card--spaced">
-              <h2 className="dd-heading dd-heading--medium">How it works</h2>
-              <p className="dd-text dd-text--muted" style={{ marginTop: "16px" }}>
-                Choose the option that feels most true for you in the moment. This quiz is about energy and focus, not perfection.
+            <section className="dd-quiz-card">
+              <h2 className="dd-quiz-question" style={{ fontSize: "clamp(1.3rem, 2.5vw, 1.7rem)" }}>
+                How it works
+              </h2>
+              <p style={{ margin: 0, color: "#5f5f5f", lineHeight: 1.7, fontSize: "1.05rem" }}>
+                Choose the option that feels most true for you in the moment. This quiz is about energy and focus, not perfection. Go with your first instinct — it's usually right.
               </p>
             </section>
           )}
 
           {!submitted ? (
-            <section className="dd-card dd-card--spaced">
-              <div className="dd-page__section-header">
-                <div>
-                  <p
-                    className="dd-text dd-text--muted"
-                    style={{ margin: 0, textTransform: "uppercase", letterSpacing: "0.12em", fontWeight: 700, fontSize: "0.85rem" }}
-                  >
+            <section className="dd-quiz-card">
+              {/* Progress */}
+              <div className="dd-quiz-progress-wrapper">
+                <div className="dd-quiz-progress-header">
+                  <span className="dd-quiz-progress-label">
                     Question {currentQuestion} of {questions.length}
-                  </p>
-                  <h2 className="dd-heading dd-heading--medium" style={{ marginTop: "12px" }}>{question.question}</h2>
+                  </span>
+                  <span className="dd-quiz-progress-reassurance">Go with your first instinct</span>
                 </div>
-                <div className="dd-text" style={{ fontWeight: 700, color: "var(--brand-accent-aqua)" }}>
-                  {answers[currentQuestion] ? "Answer selected" : "Choose an answer"}
+                <div className="dd-quiz-progress-bar">
+                  <div className="dd-quiz-progress-fill" style={{ width: `${progress}%` }} />
                 </div>
               </div>
 
-              <div className="dd-grid" style={{ marginTop: "28px" }}>
+              {/* Question */}
+              <h2 className="dd-quiz-question">{question.question}</h2>
+
+              {/* Options */}
+              <div className="dd-quiz-options">
                 {question.options.map((option, index) => (
                   <button
                     key={`${question.id}-${index}`}
                     type="button"
                     onClick={() => handleAnswer(option.value)}
-                    className={`dd-button dd-button--secondary ${answers[currentQuestion] === option.value ? "dd-button--selected" : ""}`}
-                    style={{ justifyContent: "flex-start" }}
+                    className={`dd-quiz-option ${answers[currentQuestion] === option.value ? "dd-quiz-option--selected" : ""}`}
                   >
-                    <span style={{ fontWeight: 700, marginRight: "10px" }}>
+                    <span className="dd-quiz-option-indicator">
                       {answers[currentQuestion] === option.value ? "●" : "○"}
                     </span>
-                    {option.text}
+                    <span>{option.text}</span>
                   </button>
                 ))}
               </div>
 
-              <div className="dd-page__actions" style={{ marginTop: "28px" }}>
+              {/* Actions */}
+              <div className="dd-quiz-actions">
                 <button
                   type="button"
                   onClick={handleBack}
@@ -336,9 +640,14 @@ const DigitalSuperpowerQuiz = () => {
                 >
                   <ArrowLeft size={16} /> Back
                 </button>
-                <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+                <div className="dd-quiz-actions-right">
                   {currentQuestion < questions.length ? (
-                    <button type="button" onClick={handleNext} className="dd-button dd-button--primary">
+                    <button
+                      type="button"
+                      onClick={handleNext}
+                      disabled={!answers[currentQuestion]}
+                      className="dd-button dd-button--primary"
+                    >
                       Next <ArrowRight size={16} />
                     </button>
                   ) : (
@@ -355,48 +664,62 @@ const DigitalSuperpowerQuiz = () => {
               </div>
             </section>
           ) : (
-            <section className="dd-card dd-card--spaced">
-              <div className="dd-grid" style={{ gap: "18px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
-                  <span style={{ fontSize: "1.5rem" }}>{result.emoji}</span>
-                  <div>
-                    <div
-                      className="dd-text dd-text--muted"
-                      style={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", fontSize: "0.85rem" }}
-                    >
-                      Your digital superpower
-                    </div>
-                    <h2 className="dd-heading dd-heading--large" style={{ marginTop: "8px" }}>{result.title}</h2>
-                  </div>
-                </div>
-
-                <p className="dd-text dd-text--muted" style={{ maxWidth: "720px" }}>{result.tagline}</p>
-                <p className="dd-text">{result.description}</p>
-
-                <div className="dd-grid" style={{ gap: "12px" }}>
-                  <h3 className="dd-heading" style={{ fontSize: "1.25rem" }}>Digital assets to build first</h3>
-                  <div className="dd-grid dd-grid--assets">
-                    {result.assets.map((asset) => (
-                      <div key={asset} className="dd-card" style={{ padding: "14px" }}>
-                        {asset}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
+            <section className="dd-quiz-result-card">
+              <div className="dd-quiz-result-header">
+                <span className="dd-quiz-result-emoji">{result.emoji}</span>
                 <div>
-                  <h3 className="dd-heading" style={{ fontSize: "1.25rem", margin: "0 0 10px" }}>Best next step</h3>
-                  <p className="dd-text">{result.nextStep}</p>
+                  <div
+                    style={{
+                      fontSize: "0.85rem",
+                      fontWeight: 700,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.12em",
+                      color: "#47b7d4",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    Your digital superpower
+                  </div>
+                  <h2 className="dd-quiz-result-title">{result.title}</h2>
                 </div>
+              </div>
 
-                <div className="dd-page__footer-actions" style={{ gap: "12px" }}>
-                  <button type="button" onClick={handleReset} className="dd-button dd-button--secondary">
-                    Retake the quiz
-                  </button>
-                  <button type="button" onClick={handleGoToDashboard} className="dd-button dd-button--primary">
-                    Go to dashboard <ArrowRight size={16} />
-                  </button>
+              <p className="dd-quiz-result-tagline">{result.tagline}</p>
+              <p className="dd-quiz-result-description">{result.description}</p>
+
+              <div style={{ display: "grid", gap: "16px" }}>
+                <h3
+                  style={{
+                    margin: 0,
+                    fontFamily: '"Inter", system-ui, sans-serif',
+                    fontSize: "clamp(1.2rem, 2vw, 1.4rem)",
+                    fontWeight: 800,
+                    color: "#111111",
+                  }}
+                >
+                  Digital assets to build first
+                </h3>
+                <div className="dd-quiz-assets-grid">
+                  {result.assets.map((asset) => (
+                    <div key={asset} className="dd-quiz-asset-item">
+                      {asset}
+                    </div>
+                  ))}
                 </div>
+              </div>
+
+              <div className="dd-quiz-next-step">
+                <p className="dd-quiz-next-step-label">Best next step</p>
+                <p className="dd-quiz-next-step-text">{result.nextStep}</p>
+              </div>
+
+              <div className="dd-quiz-footer-actions">
+                <button type="button" onClick={handleReset} className="dd-button dd-button--secondary">
+                  Retake the quiz
+                </button>
+                <button type="button" onClick={handleGoToDashboard} className="dd-button dd-button--primary">
+                  Go to dashboard <ArrowRight size={16} />
+                </button>
               </div>
             </section>
           )}
