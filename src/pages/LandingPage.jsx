@@ -142,9 +142,9 @@ const LandingPage = () => {
         .dd-hero-cta-row {
           display: flex;
           gap: 14px;
-          flexWrap: wrap;
-          justifyContent: center;
-          alignItems: center;
+          flex-wrap: wrap;
+          justify-content: center;
+          align-items: center;
         }
 
 
