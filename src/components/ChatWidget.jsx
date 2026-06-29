@@ -6,7 +6,7 @@ export default function ChatWidget() {
   const [input, setInput] = useState("");
   const [error, setError] = useState(null);
 
-  sendMessage = async () => {
+  const sendMessage = async () => {
     if (!input.trim() || error === "sending") return;
     setError("sending");
 

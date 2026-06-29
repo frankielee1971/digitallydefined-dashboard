@@ -43,7 +43,7 @@ export default async function handler(req, res) {
 
   if (!body || typeof body !== 'object') return res.status(400).json({ error: 'Invalid request body - must be JSON object' });
 
-  const backendUrl = '/api/hermes';
+  const backendUrl = process.env.VITE_HERMES_GATEWAY_URL || 'https://digitallydefined-os-backend.vercel.app/api/hermes';
 
   try {
     const response = await fetch(backendUrl, {
