@@ -16,46 +16,32 @@ import {
 
 
 const LandingPage = () => {
-  const [showUnderConstruction, setShowUnderConstruction] = useState(true);
+  const [showUnderConstruction, setShowUnderConstruction] = useState(false); // Reduced prominence
   const year = new Date().getFullYear();
   const { colors, contact, landing, routes, seo } = CONFIG;
   const fullCalculatorUrl = contact.fullCalculatorUrl || contact.gumroadUrl;
 
 
-  const facelessAssets = [
-    "SEO Content",
-    "Review Authority",
-    "Digital Templates",
-    "Automated Funnels",
-    "AI Content Engines",
-    "Email Courses",
-    "Notion Systems",
-    "PDF Playbooks",
-    "Reputation Signals",
-    "Digital Calculators",
-  ];
-
-
-  const realEstateSteps = [
+  const assetPaths = [
     {
-      number: "01",
-      title: "Claim It",
-      text: "Identify every digital property you already own or have a right to: Google Business, social profiles, content, reviews, listings, and search results.",
+      type: "Visibility Assets",
+      examples: "SEO content, reviews, listings, reputation signals",
+      icon: "🔍",
     },
     {
-      number: "02",
-      title: "Optimize It",
-      text: "Keyword-optimize every digital property. Turn low-performing assets into lead generators and fix visibility gaps that cost money.",
+      type: "Product Assets",
+      examples: "templates, calculators, Notion systems, playbooks",
+      icon: "📦",
     },
     {
-      number: "03",
-      title: "Expand It",
-      text: "Add new digital properties systematically. Build a portfolio of income-producing assets that grows in value every month.",
+      type: "Automation Assets",
+      examples: "funnels, email sequences, AI content engines",
+      icon: "⚙️",
     },
     {
-      number: "04",
-      title: "Monetize It",
-      text: "Convert digital real estate into recurring revenue through affiliate links, digital products, service packages, and passive income streams.",
+      type: "Audience Assets",
+      examples: "community, authority positioning, trust ecosystems",
+      icon: "👥",
     },
   ];
 
@@ -134,6 +120,13 @@ const LandingPage = () => {
         }
 
 
+        .dd-asset-paths {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 16px;
+        }
+
+
         @media (max-width: 920px) {
           .dd-hero-grid,
           .dd-roi-calculator__top,
@@ -171,9 +164,10 @@ const LandingPage = () => {
             zIndex: 25,
             backgroundColor: colors.warning,
             color: colors.surface,
-            padding: "12px 16px",
+            padding: "10px 16px",
             borderBottom: brutalBorder,
             transition: "all 0.3s ease",
+            fontSize: "0.85rem",
           }}
         >
           <div
@@ -186,14 +180,14 @@ const LandingPage = () => {
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <AlertCircle size={20} strokeWidth={2.5} />
-              <span style={{ fontWeight: 700, fontSize: "0.95rem" }}>
-                Under Construction - New features coming soon!
+              <AlertCircle size={18} strokeWidth={2.5} />
+              <span style={{ fontWeight: 700 }}>
+                New features coming soon
               </span>
             </div>
             <button
               onClick={() => setShowUnderConstruction(false)}
-              aria-label="Dismiss under construction banner"
+              aria-label="Dismiss banner"
               style={{
                 background: "none",
                 border: "none",
@@ -203,12 +197,9 @@ const LandingPage = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                transition: "opacity 0.2s",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
             >
-              <X size={20} strokeWidth={2.5} />
+              <X size={18} strokeWidth={2.5} />
             </button>
           </div>
         </div>
@@ -218,11 +209,11 @@ const LandingPage = () => {
       <header
         style={{
           position: "sticky",
-          top: showUnderConstruction ? "46px" : 0,
+          top: showUnderConstruction ? "38px" : 0,
           zIndex: 20,
           borderBottom: brutalBorder,
           backgroundColor: colors.surface,
-          padding: `18px ${theme.layout.spacing}`,
+          padding: `16px ${theme.layout.spacing}`,
           transition: "top 0.3s ease",
         }}
       >
@@ -248,7 +239,7 @@ const LandingPage = () => {
 
 
       <main>
-        {/* ── HERO ── */}
+        {/* ── HERO: Quiz-First ── */}
         <section style={section}>
           <div className="dd-hero-grid" style={container}>
             <div style={{ display: "grid", gap: "24px" }}>
@@ -266,8 +257,7 @@ const LandingPage = () => {
                     color: colors.text,
                   }}
                 >
-                  <span>Define Your&nbsp;</span>
-                  <span style={{ color: colors.accent }}>Digital Power.</span>
+                  Discover Your Digital Superpower
                 </h1>
                 <p
                   style={{
@@ -278,31 +268,17 @@ const LandingPage = () => {
                     color: colors.textMuted,
                   }}
                 >
-                  Your digital reputation is your most valuable asset. This is a
-                  clear, confident system for Gen X women who want to build digital
-                  real estate, grow faceless income streams, and unlock 10x ROI
-                  from their online presence.
+                  Take the 60-second quiz to find out which type of digital real estate fits your strengths, lifestyle, and income goals best.
                 </p>
               </div>
 
-              {/* ── THREE CTAs: calculator + community + quiz ── */}
-              <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
-                <a href="#free-calculator" style={brutalButtonPrimary}>
-                  Run the free calculator <TrendingUp size={16} />
+              {/* ── PRIMARY CTA: Quiz ── */}
+              <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "center" }}>
+                <a href="/quiz" style={brutalButtonPrimary}>
+                  Find My Superpower <Sparkles size={16} />
                 </a>
-                <a href={routes.quiz} style={brutalButtonSecondary}>
-                  Discover your digital superpower <Sparkles size={16} />
-                </a>
-                <a
-                  href={contact.facebookCommunityUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={brutalButtonSecondary}
-                >
-                  Join the community <Users size={16} />
-                </a>
-                <a href="/quiz" style={brutalButtonSecondary}>
-                  Find my superpower <Sparkles size={16} />
+                <a href="#how-it-works" style={brutalButtonSecondary}>
+                  See How It Works
                 </a>
               </div>
 
@@ -316,8 +292,10 @@ const LandingPage = () => {
                   textTransform: "uppercase",
                 }}
               >
-                You're not starting from scratch. You're starting from experience.
+                Free · Faceless-friendly · No credit card · Takes 60 seconds
               </p>
+
+              {/* ── Trust signals ── */}
               <div className="dd-proof-grid">
                 {[
                   "Quick revenue signal",
@@ -345,6 +323,7 @@ const LandingPage = () => {
             </div>
 
 
+            {/* ── Hero right column: Asset path preview ── */}
             <div
               style={{
                 ...brutalCard,
@@ -372,7 +351,7 @@ const LandingPage = () => {
               />
               <div style={{ position: "relative" }}>
                 <p style={{ ...brutalEyebrow, color: colors.primary }}>
-                  Reputation + digital real estate
+                  Four digital real estate paths
                 </p>
                 <h2
                   style={{
@@ -383,7 +362,7 @@ const LandingPage = () => {
                     lineHeight: 1.02,
                   }}
                 >
-                  Turn trust into a measurable asset.
+                  You already own more than you realize.
                 </h2>
               </div>
               <p
@@ -396,21 +375,42 @@ const LandingPage = () => {
                   maxWidth: "520px",
                 }}
               >
-                Every review, listing, article, search result, and piece of
-                content is a digital property. Most Gen X women already own more
-                than they realize.
+                The quiz maps your existing strengths and assets to one of four income-producing paths. No fluff. No personality tests. Just clarity on what to build next.
               </p>
+
+              {/* ── Asset path preview ── */}
+              <div className="dd-asset-paths" style={{ position: "relative" }}>
+                {assetPaths.map((path) => (
+                  <div
+                    key={path.type}
+                    style={{
+                      ...brutalCard,
+                      backgroundColor: "rgba(255,255,255,0.05)",
+                      padding: "14px",
+                      border: `1px solid ${colors.whiteBorderSoft}`,
+                    }}
+                  >
+                    <div style={{ fontSize: "1.5rem", marginBottom: "8px" }}>{path.icon}</div>
+                    <div style={{ fontWeight: 800, fontSize: "0.85rem", marginBottom: "4px" }}>
+                      {path.type}
+                    </div>
+                    <div style={{ fontSize: "0.75rem", color: colors.boneMuted, lineHeight: 1.4 }}>
+                      {path.examples}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
 
-        {/* ── FREE CALCULATOR ── */}
-        <section id="free-calculator" style={{ ...section, paddingTop: 0 }}>
-          <div style={{ ...container, display: "grid", gap: "24px" }}>
-            <div style={{ maxWidth: "780px" }}>
-              <p style={{ ...brutalEyebrow, color: colors.warning }}>
-                Free tool
+        {/* ── HOW IT WORKS ── */}
+        <section id="how-it-works" style={{ ...section, backgroundColor: colors.backgroundAlt }}>
+          <div style={{ ...container, display: "grid", gap: "28px" }}>
+            <div>
+              <p style={{ ...brutalEyebrow, color: colors.primary }}>
+                How it works
               </p>
               <h2
                 style={{
@@ -420,23 +420,70 @@ const LandingPage = () => {
                   lineHeight: 1.05,
                 }}
               >
-                Your digital presence is already generating value.
+                Three steps. Total clarity.
               </h2>
-              <p style={{ margin: "10px 0 0", color: colors.textMuted }}>
-                This calculator shows you how much, instantly.
+              <p style={{ margin: "14px 0 0", maxWidth: "760px", color: colors.textMuted, lineHeight: 1.6 }}>
+                You're not starting from scratch. You're starting from experience. The quiz helps you identify which digital assets you already own and which path will give you the fastest return.
               </p>
             </div>
-            <RoiCalculator
-              onFullCalculatorClick={() => {
-                window.open(fullCalculatorUrl, "_blank", "noopener,noreferrer");
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                gap: "0",
+                border: `1px solid ${colors.border}`,
               }}
-            />
+            >
+              {[
+                {
+                  number: "01",
+                  title: "Take the quiz",
+                  text: "Answer 6 quick questions about your skills, interests, and current digital footprint.",
+                },
+                {
+                  number: "02",
+                  title: "Get your path",
+                  text: "Receive your personalized digital real estate profile with a clear next-step recommendation.",
+                },
+                {
+                  number: "03",
+                  title: "Build with focus",
+                  text: "Start with the asset type that matches your strengths. No overwhelm. No guesswork.",
+                },
+              ].map((step) => (
+                <article
+                  key={step.number}
+                  style={{
+                    padding: "24px",
+                    border: `1px solid ${colors.border}`,
+                    backgroundColor: colors.surface,
+                  }}
+                >
+                  <div
+                    style={{
+                      color: colors.primary,
+                      fontSize: "2.4rem",
+                      fontWeight: 900,
+                      lineHeight: 1,
+                      opacity: 0.55,
+                      marginBottom: "16px",
+                    }}
+                  >
+                    {step.number}
+                  </div>
+                  <h3 style={{ margin: "0 0 10px", color: colors.text }}>{step.title}</h3>
+                  <p style={{ margin: 0, color: colors.textMuted, lineHeight: 1.6 }}>
+                    {step.text}
+                  </p>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
 
         {/* ── WHO IT'S FOR ── */}
-        <section style={{ ...section, backgroundColor: colors.backgroundAlt }}>
+        <section style={section}>
           <div
             style={{
               ...container,
@@ -469,7 +516,7 @@ const LandingPage = () => {
 
 
         {/* ── FACELESS MARKETING ── */}
-        <section style={section}>
+        <section style={{ ...section, backgroundColor: colors.backgroundAlt }}>
           <div
             style={{
               ...container,
@@ -494,13 +541,10 @@ const LandingPage = () => {
                 You don't need to be an influencer to win online.
               </h2>
               <p style={{ margin: 0, color: colors.textMuted, lineHeight: 1.65 }}>
-                DigitallyDefined teaches you how to build faceless digital assets
-                that work even when you're offline. No camera. No performance. No
-                hustle.
+                DigitallyDefined teaches you how to build faceless digital assets that work even when you're offline. No camera. No performance. No hustle.
               </p>
               <p style={{ margin: 0, color: colors.textMuted, lineHeight: 1.65 }}>
-                Perfect for Gen X women who want privacy, freedom, and income that
-                compounds over time.
+                Perfect for Gen X women who want privacy, freedom, and income that compounds over time.
               </p>
               <div style={{ display: "grid", gap: "10px" }}>
                 {[
@@ -538,7 +582,18 @@ const LandingPage = () => {
                   marginTop: "20px",
                 }}
               >
-                {facelessAssets.map((asset, index) => (
+                {[
+                  "SEO Content",
+                  "Review Authority",
+                  "Digital Templates",
+                  "Automated Funnels",
+                  "AI Content Engines",
+                  "Email Courses",
+                  "Notion Systems",
+                  "PDF Playbooks",
+                  "Reputation Signals",
+                  "Digital Calculators",
+                ].map((asset, index) => (
                   <span
                     key={asset}
                     style={{
@@ -569,82 +624,45 @@ const LandingPage = () => {
                   color: colors.textMuted,
                 }}
               >
-                Every one of these earns without your face, your voice, or your
-                constant attention.
+                Every one of these earns without your face, your voice, or your constant attention.
               </p>
             </div>
           </div>
         </section>
 
 
-        {/* ── DIGITAL REAL ESTATE ── */}
-        <section style={{ ...section, backgroundColor: colors.dark, color: colors.bone }}>
-          <div style={{ ...container, display: "grid", gap: "28px" }}>
-            <div>
+        {/* ── FREE CALCULATOR (moved lower) ── */}
+        <section id="free-calculator" style={section}>
+          <div style={{ ...container, display: "grid", gap: "24px" }}>
+            <div style={{ maxWidth: "780px" }}>
               <p style={{ ...brutalEyebrow, color: colors.warning }}>
-                Digital real estate
+                Free tool
               </p>
               <h2
                 style={{
                   ...brutalHeading,
                   margin: "10px 0 0",
-                  color: colors.bone,
                   fontSize: "clamp(1.9rem, 4vw, 3rem)",
                   lineHeight: 1.05,
                 }}
               >
-                Your digital footprint is real estate. Let's increase its value.
+                Your digital presence is already generating value.
               </h2>
-              <p style={{ margin: "14px 0 0", maxWidth: "760px", color: colors.boneMuted }}>
-                Every review, listing, article, search result, and piece of content
-                is a digital property. Most Gen X women already own more than they
-                realize.
+              <p style={{ margin: "10px 0 0", color: colors.textMuted, lineHeight: 1.6 }}>
+                Once you know which digital real estate path fits you, this calculator shows you exactly how much your current footprint is worth and what it could earn.
               </p>
             </div>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-                gap: "0",
-                border: `1px solid ${colors.whiteBorderSoft}`,
+            <RoiCalculator
+              onFullCalculatorClick={() => {
+                window.open(fullCalculatorUrl, "_blank", "noopener,noreferrer");
               }}
-            >
-              {realEstateSteps.map((step) => (
-                <article
-                  key={step.number}
-                  style={{
-                    padding: "24px",
-                    border: `1px solid ${colors.whiteBorderSoft}`,
-                    backgroundColor: "rgba(255,255,255,0.03)",
-                  }}
-                >
-                  <div
-                    style={{
-                      color: colors.primary,
-                      fontSize: "2.4rem",
-                      fontWeight: 900,
-                      lineHeight: 1,
-                      opacity: 0.55,
-                      marginBottom: "16px",
-                    }}
-                  >
-                    {step.number}
-                  </div>
-                  <h3 style={{ margin: "0 0 10px", color: colors.bone }}>
-                    {step.title}
-                  </h3>
-                  <p style={{ margin: 0, color: colors.boneMuted, lineHeight: 1.6 }}>
-                    {step.text}
-                  </p>
-                </article>
-              ))}
-            </div>
+            />
           </div>
         </section>
 
 
         {/* ── COMMUNITY ── */}
-        <section style={section}>
+        <section style={{ ...section, backgroundColor: colors.dark, color: colors.bone }}>
           <div
             style={{
               ...container,
@@ -673,9 +691,7 @@ const LandingPage = () => {
               Clarity, confidence, and control. Together.
             </h2>
             <p style={{ margin: 0, maxWidth: "760px", color: colors.boneMuted }}>
-              Inside, you'll find Gen X women building businesses, pivoting
-              careers, launching new ideas, and reclaiming their digital identity
-              without the noise of traditional social media.
+              Inside, you'll find Gen X women building businesses, pivoting careers, launching new ideas, and reclaiming their digital identity without the noise of traditional social media.
             </p>
             <div
               style={{
@@ -719,7 +735,7 @@ const LandingPage = () => {
         </section>
 
 
-        {/* ── QUIZ CTA ── */}
+        {/* ── FINAL CTA ── */}
         <section
           style={{
             ...section,
@@ -739,7 +755,7 @@ const LandingPage = () => {
           >
             <div>
               <p style={{ ...brutalEyebrow, color: colors.primary, marginBottom: "14px" }}>
-                Free 60-second quiz
+                Your move
               </p>
               <h2
                 style={{
@@ -750,7 +766,7 @@ const LandingPage = () => {
                   margin: "0 0 16px",
                 }}
               >
-                What&apos;s Your Digital Superpower?
+                Stop managing by gut. Start commanding with data.
               </h2>
               <p
                 style={{
@@ -761,22 +777,7 @@ const LandingPage = () => {
                   margin: "0 0 18px",
                 }}
               >
-                Take this quick quiz to find the digital path that fits your
-                strengths, your season of life, and the kind of work you actually
-                want to build.
-              </p>
-              <p
-                style={{
-                  fontSize: "1rem",
-                  lineHeight: 1.65,
-                  color: colors.boneMuted,
-                  maxWidth: "560px",
-                  margin: "0 0 28px",
-                }}
-              >
-                You do not need to be loud, young, on camera, or techy to build
-                something real online. You just need a path that fits you better
-                than the usual internet noise.
+                The quiz takes 60 seconds. The clarity lasts a lifetime. Find out which digital real estate path is built for your strengths, your season, and the income you want to build.
               </p>
               <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
                 <a href="/quiz" style={brutalButtonPrimary}>
@@ -810,11 +811,10 @@ const LandingPage = () => {
               }}
             >
               {[
-                { emoji: "📝", label: "The Content Creator" },
-                { emoji: "⚙️", label: "The Systems Builder" },
-                { emoji: "📚", label: "The Digital Educator" },
-                { emoji: "🤝", label: "The Community Builder" },
-                { emoji: "📣", label: "The Brand Strategist" },
+                { emoji: "🔍", label: "Visibility Assets" },
+                { emoji: "📦", label: "Product Assets" },
+                { emoji: "⚙️", label: "Automation Assets" },
+                { emoji: "👥", label: "Audience Assets" },
               ].map(({ emoji, label }) => (
                 <div
                   key={label}
