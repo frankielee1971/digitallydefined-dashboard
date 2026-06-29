@@ -26,31 +26,40 @@ export default function AssistantPage() {
     setInput("");
 
     try {
-            const API_URL = import.meta.env.VITE_HERMES_GATEWAY_URL || "";
+      const API_URL = '/api/hermes';
 
       const res = await fetch(API_URL, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          "x-api-key": import.meta.env.VITE_DASHBOARD_API_KEY || ""
+          'Content-Type': 'application/json',
+          'x-api-key': import.meta.env.VITE_DASHBOARD_API_KEY || '',
         },
-      body: JSON.stringify({
-        action: "hermes",
-        message: input.trim(),
-        messages: updated,
-        context: {},
-        conversation: updated,
-      }),
+        body: JSON.stringify({
+          message: input.trim(),
+          messages: updated,
+          context: {},
+          conversation: updated,
+        }),
       });
 
-      const data = await res.json();
+      const text = await res.text();
+      const data = res.headers.get('content-type')?.includes('application/json')
+        ? (() => { try { return JSON.parse(text); } catch { return null; } })()
+        : null;
+
       if (!res.ok) {
-        throw new Error(data?.error || `Request failed with status ${res.status}`);
+        const providerError = data?.error || data?.message || `Request failed with status ${res.status}`;
+        const snippet = text?.slice(0, 200);
+        throw new Error(snippet ? `${providerError} - ${snippet}` : providerError);
+      }
+
+      if (!data) {
+        throw new Error('Unexpected non-JSON response from Hermes backend.');
       }
 
       const assistant = {
-        role: "assistant",
-        content: typeof data?.reply === "string" && data.reply ? data.reply : "I’m here — but I didn’t get a response from the server.",
+        role: 'assistant',
+        content: typeof data?.reply === 'string' && data.reply ? data.reply : 'I didn’t get a response from Hermes.',
         provider: data?.provider || null,
         model: data?.model || null,
       };
@@ -59,8 +68,8 @@ export default function AssistantPage() {
       setMessages((prev) => [...prev, assistant]);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong while reaching Hermes.");
-      setMessages((prev) => [...prev, { role: "assistant", content: "I couldn’t reach the backend just now." }]);
+      setError(err instanceof Error ? err.message : 'Something went wrong while reaching Hermes.');
+      setMessages((prev) => [...prev, { role: 'assistant', content: 'I couldn’t reach Hermes just now.' }]);
     }
   };
 
