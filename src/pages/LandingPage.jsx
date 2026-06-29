@@ -86,9 +86,18 @@ const LandingPage = () => {
       <style>{`
         .dd-hero-grid {
           display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(320px, 0.82fr);
-          gap: clamp(28px, 5vw, 48px);
+          grid-template-columns: 1fr;
+          gap: clamp(36px, 6vw, 64px);
           align-items: center;
+          text-align: center;
+        }
+
+
+        .dd-hero-content {
+          max-width: 800px;
+          margin: 0 auto;
+          display: grid;
+          gap: clamp(20px, 3vw, 32px);
         }
 
 
@@ -97,6 +106,7 @@ const LandingPage = () => {
           flex-wrap: wrap;
           column-gap: 0;
           row-gap: 0;
+          justify-content: center;
         }
 
 
@@ -104,6 +114,8 @@ const LandingPage = () => {
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
           gap: 16px;
+          max-width: 700px;
+          margin: 0 auto;
         }
 
 
@@ -124,6 +136,23 @@ const LandingPage = () => {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
           gap: 16px;
+        }
+
+
+        .dd-hero-cta-row {
+          display: flex;
+          gap: 14px;
+          flexWrap: wrap;
+          justifyContent: center;
+          alignItems: center;
+        }
+
+
+        .dd-hero-trust {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          align-items: center;
         }
 
 
@@ -239,63 +268,93 @@ const LandingPage = () => {
 
 
       <main>
-        {/* ── HERO: Quiz-First ── */}
-        <section style={section}>
+        {/* ── HERO: Quiz-First, Centered, Cleaner ── */}
+        <section style={{ ...section, paddingTop: "clamp(32px, 5vw, 56px)", paddingBottom: "clamp(48px, 7vw, 80px)" }}>
           <div className="dd-hero-grid" style={container}>
-            <div style={{ display: "grid", gap: "24px" }}>
-              <p style={{ ...brutalEyebrow, color: colors.textMuted }}>
+            <div className="dd-hero-content">
+              {/* ── Eyebrow ── */}
+              <p
+                style={{
+                  ...brutalEyebrow,
+                  color: colors.primary,
+                  fontSize: "clamp(0.7rem, 1.2vw, 0.8rem)",
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                }}
+              >
                 For Gen X women reinventing themselves, digitally
               </p>
-              <div style={{ minWidth: 0 }}>
-                <h1
-                  className="dd-brand-hero"
-                  style={{
-                    ...brutalHeading,
-                    margin: 0,
-                    fontSize: "clamp(2.6rem, 5vw, 4rem)",
-                    lineHeight: 0.98,
-                    color: colors.text,
-                  }}
-                >
-                  Discover Your Digital Superpower
-                </h1>
-                <p
-                  style={{
-                    margin: "18px 0 0",
-                    maxWidth: "680px",
-                    fontSize: "clamp(1.1rem, 2vw, 1.3rem)",
-                    lineHeight: 1.55,
-                    color: colors.textMuted,
-                  }}
-                >
-                  Take the 60-second quiz to find out which type of digital real estate fits your strengths, lifestyle, and income goals best.
-                </p>
-              </div>
+
+              {/* ── Headline ── */}
+              <h1
+                style={{
+                  ...brutalHeading,
+                  fontSize: "clamp(2.4rem, 5.5vw, 4.2rem)",
+                  lineHeight: 1.05,
+                  color: colors.text,
+                  fontWeight: 800,
+                  maxWidth: "900px",
+                  margin: "0 auto",
+                }}
+              >
+                Discover Your Digital Superpower
+              </h1>
+
+              {/* ── Subheadline ── */}
+              <p
+                style={{
+                  fontSize: "clamp(1.05rem, 1.8vw, 1.25rem)",
+                  lineHeight: 1.6,
+                  color: colors.textMuted,
+                  maxWidth: "640px",
+                  margin: "0 auto",
+                }}
+              >
+                Take the 60-second quiz to find out which type of digital real estate fits your strengths, lifestyle, and income goals best.
+              </p>
 
               {/* ── PRIMARY CTA: Quiz ── */}
-              <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "center" }}>
-                <a href="/quiz" style={brutalButtonPrimary}>
-                  Find My Superpower <Sparkles size={16} />
+              <div className="dd-hero-cta-row">
+                <a
+                  href="/quiz"
+                  style={{
+                    ...brutalButtonPrimary,
+                    padding: "clamp(14px, 2vw, 18px) clamp(24px, 3vw, 36px)",
+                    fontSize: "clamp(0.95rem, 1.3vw, 1.05rem)",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}
+                >
+                  Find My Superpower <Sparkles size={18} />
                 </a>
-                <a href="#how-it-works" style={brutalButtonSecondary}>
+                <a
+                  href="#how-it-works"
+                  style={{
+                    ...brutalButtonSecondary,
+                    padding: "clamp(14px, 2vw, 18px) clamp(24px, 3vw, 36px)",
+                    fontSize: "clamp(0.95rem, 1.3vw, 1.05rem)",
+                  }}
+                >
                   See How It Works
                 </a>
               </div>
 
+              {/* ── Trust line ── */}
               <p
                 style={{
                   margin: 0,
                   color: colors.textMuted,
-                  fontSize: "0.82rem",
-                  fontWeight: 900,
-                  letterSpacing: "0.1em",
+                  fontSize: "clamp(0.78rem, 1.1vw, 0.85rem)",
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
                   textTransform: "uppercase",
                 }}
               >
                 Free · Faceless-friendly · No credit card · Takes 60 seconds
               </p>
 
-              {/* ── Trust signals ── */}
+              {/* ── Trust signals (simplified) ── */}
               <div className="dd-proof-grid">
                 {[
                   "Quick revenue signal",
@@ -306,97 +365,19 @@ const LandingPage = () => {
                     key={item}
                     style={{
                       ...brutalCard,
-                      padding: "14px",
+                      padding: "clamp(12px, 1.5vw, 16px)",
                       display: "flex",
                       alignItems: "center",
+                      justifyContent: "center",
                       gap: "10px",
-                      fontSize: "0.82rem",
-                      fontWeight: 900,
+                      fontSize: "clamp(0.75rem, 1vw, 0.82rem)",
+                      fontWeight: 800,
                       textTransform: "uppercase",
+                      textAlign: "center",
                     }}
                   >
                     <CheckCircle2 size={18} color={colors.primary} />
                     {item}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-
-            {/* ── Hero right column: Asset path preview ── */}
-            <div
-              style={{
-                ...brutalCard,
-                backgroundColor: colors.dark,
-                color: colors.bone,
-                padding: "clamp(24px, 4vw, 38px)",
-                minHeight: "340px",
-                display: "grid",
-                alignContent: "space-between",
-                gap: "28px",
-                overflow: "hidden",
-                position: "relative",
-              }}
-            >
-              <Sparkles
-                aria-hidden="true"
-                size={180}
-                strokeWidth={1}
-                style={{
-                  position: "absolute",
-                  right: "-18px",
-                  top: "20px",
-                  color: "rgba(71, 183, 212, 0.2)",
-                }}
-              />
-              <div style={{ position: "relative" }}>
-                <p style={{ ...brutalEyebrow, color: colors.primary }}>
-                  Four digital real estate paths
-                </p>
-                <h2
-                  style={{
-                    ...brutalHeading,
-                    margin: "14px 0 0",
-                    color: colors.bone,
-                    fontSize: "clamp(1.9rem, 3.8vw, 3.1rem)",
-                    lineHeight: 1.02,
-                  }}
-                >
-                  You already own more than you realize.
-                </h2>
-              </div>
-              <p
-                style={{
-                  position: "relative",
-                  margin: 0,
-                  color: colors.boneMuted,
-                  fontSize: "1.05rem",
-                  lineHeight: 1.6,
-                  maxWidth: "520px",
-                }}
-              >
-                The quiz maps your existing strengths and assets to one of four income-producing paths. No fluff. No personality tests. Just clarity on what to build next.
-              </p>
-
-              {/* ── Asset path preview ── */}
-              <div className="dd-asset-paths" style={{ position: "relative" }}>
-                {assetPaths.map((path) => (
-                  <div
-                    key={path.type}
-                    style={{
-                      ...brutalCard,
-                      backgroundColor: "rgba(255,255,255,0.05)",
-                      padding: "14px",
-                      border: `1px solid ${colors.whiteBorderSoft}`,
-                    }}
-                  >
-                    <div style={{ fontSize: "1.5rem", marginBottom: "8px" }}>{path.icon}</div>
-                    <div style={{ fontWeight: 800, fontSize: "0.85rem", marginBottom: "4px" }}>
-                      {path.type}
-                    </div>
-                    <div style={{ fontSize: "0.75rem", color: colors.boneMuted, lineHeight: 1.4 }}>
-                      {path.examples}
-                    </div>
                   </div>
                 ))}
               </div>
@@ -407,8 +388,8 @@ const LandingPage = () => {
 
         {/* ── HOW IT WORKS ── */}
         <section id="how-it-works" style={{ ...section, backgroundColor: colors.backgroundAlt }}>
-          <div style={{ ...container, display: "grid", gap: "28px" }}>
-            <div>
+          <div style={{ ...container, display: "grid", gap: "clamp(24px, 4vw, 40px)" }}>
+            <div style={{ textAlign: "center", maxWidth: "700px", margin: "0 auto" }}>
               <p style={{ ...brutalEyebrow, color: colors.primary }}>
                 How it works
               </p>
@@ -422,7 +403,7 @@ const LandingPage = () => {
               >
                 Three steps. Total clarity.
               </h2>
-              <p style={{ margin: "14px 0 0", maxWidth: "760px", color: colors.textMuted, lineHeight: 1.6 }}>
+              <p style={{ margin: "14px 0 0", color: colors.textMuted, lineHeight: 1.6 }}>
                 You're not starting from scratch. You're starting from experience. The quiz helps you identify which digital assets you already own and which path will give you the fastest return.
               </p>
             </div>
