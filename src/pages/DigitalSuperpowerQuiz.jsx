@@ -561,9 +561,6 @@ const DigitalSuperpowerQuiz = () => {
               <a className="dd-button dd-button--secondary" href={CONFIG.routes.landing}>
                 Home
               </a>
-              <a className="dd-button dd-button--secondary" href={CONFIG.routes.dashboard}>
-                Dashboard
-              </a>
             </div>
           </div>
 
@@ -716,9 +713,6 @@ const DigitalSuperpowerQuiz = () => {
               <div className="dd-quiz-footer-actions">
                 <button type="button" onClick={handleReset} className="dd-button dd-button--secondary">
                   Retake the quiz
-                </button>
-                <button type="button" onClick={handleGoToDashboard} className="dd-button dd-button--primary">
-                  Go to dashboard <ArrowRight size={16} />
                 </button>
               </div>
             </section>
