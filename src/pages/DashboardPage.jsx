@@ -1,5 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
+  Bell,
+  FileText,
+  ChevronRight,
+  CheckCircle2,
+  AlertTriangle,
+  ArrowRight,
   BarChart3,
   Bot,
   BrainCircuit,
@@ -18,7 +24,6 @@ import {
 } from "lucide-react";
 import CONFIG from "../config";
 import Logo from "../components/Logo";
-
 import {
   brutalBorder,
   brutalButtonPrimary,
@@ -130,6 +135,7 @@ const normalizeData = (payload = {}) => ({
   sourceHealth: payload.sourceHealth || null,
   aiBrief: payload.aiBrief || null,
   automations: normalizeArray(payload.automations),
+  notion: payload.notion || null,
 });
 
 const emptyData = normalizeData();
@@ -236,6 +242,241 @@ const EmptyState = ({ children }) => (
     {children}
   </p>
 );
+
+function NotionTab({ notion }) {
+  if (!notion) {
+    return (
+      <EmptyState>
+        Notion data will appear here after the next Sync Vault.
+      </EmptyState>
+    );
+  }
+
+  const ideas = Array.isArray(notion.ideas) ? notion.ideas : [];
+  const content = Array.isArray(notion.content) ? notion.content : [];
+  const automations = Array.isArray(notion.automations) ? notion.automations : [];
+  const intake = Array.isArray(notion.intake) ? notion.intake : [];
+  const publishingQueue = Array.isArray(notion.publishingQueue) ? notion.publishingQueue : [];
+  const approvals = Array.isArray(notion.approvals) ? notion.approvals : [];
+  const buyerSignals = Array.isArray(notion.buyerSignals) ? notion.buyerSignals : [];
+  const aiDrafts = Array.isArray(notion.aiDrafts) ? notion.aiDrafts : [];
+
+  const statusColor = (rawStatus) => {
+    const value = String(rawStatus || '').toLowerCase();
+    if (value.includes('build now') || value.includes('ready') || value.includes('published')) return theme.colors.success;
+    if (value.includes('pending') || value.includes('review') || value.includes('draft')) return theme.colors.warning;
+    if (value.includes('slipping') || value.includes('stuck')) return theme.colors.darkRed;
+    return theme.colors.muted;
+  };
+
+  return (
+    <div style={{ display: "grid", gap: "0.75rem" }}>
+      {intake.length > 0 && (
+        <section style={{ display: "grid", gap: "0.5rem" }}>
+          <h3 style={{ ...brutalHeading, margin: 0, fontSize: "0.95rem" }}>
+            Intake Queue
+          </h3>
+          {intake.slice(0, 20).map((idea, index) => (
+            <div
+              key={idea.id || index}
+              style={{ ...cardStyle, padding: "0.75rem", display: "grid", gap: "0.25rem" }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", flexWrap: "wrap" }}>
+                <strong>{idea.title || "Untitled idea"}</strong>
+                <span
+                  style={{
+                    color: statusColor(idea.score),
+                    fontSize: "0.72rem",
+                    fontWeight: 800,
+                  }}
+                >
+                  {idea.score || "unscored"} · {idea.route || "no route"}
+                </span>
+              </div>
+              {idea.status && (
+                <span style={{ color: theme.colors.muted, fontSize: "0.78rem" }}>
+                  Status: {idea.status}
+                </span>
+              )}
+            </div>
+          ))}
+        </section>
+      )}
+
+      {ideas.length > 0 && !intake.length && (
+        <section style={{ display: "grid", gap: "0.5rem" }}>
+          <h3 style={{ ...brutalHeading, margin: 0, fontSize: "0.95rem" }}>
+            Ideas DB ({ideas.length})
+          </h3>
+          {ideas.slice(0, 10).map((item, index) => (
+            <div key={item.id || index} style={{ ...cardStyle, padding: "0.75rem" }}>
+              <strong>{item.title || "Untitled"}</strong>
+              <span style={{ color: theme.colors.muted, fontSize: "0.78rem", marginLeft: "0.5rem" }}>
+                {item.status || "New"}
+              </span>
+              {item.url && (
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: theme.colors.aquaBlue, fontSize: "0.78rem", textDecoration: "none", marginTop: "0.25rem", display: "inline-block" }}
+                >
+                  Open in Notion ↗
+                </a>
+              )}
+            </div>
+          ))}
+        </section>
+      )}
+
+      {content.length > 0 && (
+        <section style={{ display: "grid", gap: "0.5rem" }}>
+          <h3 style={{ ...brutalHeading, margin: 0, fontSize: "0.95rem" }}>
+            Content Blocks ({content.length})
+          </h3>
+          {content.slice(0, 8).map((item, index) => (
+            <div key={item.id || index} style={{ ...cardStyle, padding: "0.75rem" }}>
+              <strong>{item.title || "Untitled"}</strong>
+              <span style={{ color: theme.colors.muted, fontSize: "0.78rem", marginLeft: "0.5rem" }}>
+                {item.status || ""}
+              </span>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {automations.length > 0 && (
+        <section style={{ display: "grid", gap: "0.5rem" }}>
+          <h3 style={{ ...brutalHeading, margin: 0, fontSize: "0.95rem" }}>
+            Automations ({automations.length})
+          </h3>
+          {automations.slice(0, 8).map((item, index) => (
+            <div key={item.id || index} style={{ ...cardStyle, padding: "0.75rem" }}>
+              <strong>{item.title || "Untitled"}</strong>
+              <span style={{ color: theme.colors.muted, fontSize: "0.78rem", marginLeft: "0.5rem" }}>
+                {item.status || "New"}
+              </span>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {publishingQueue.length > 0 && (
+        <section style={{ display: "grid", gap: "0.5rem" }}>
+          <h3 style={{ ...brutalHeading, margin: 0, fontSize: "0.95rem" }}>
+            Publishing Queue ({publishingQueue.length})
+          </h3>
+          {publishingQueue.slice(0, 20).map((item, index) => (
+            <div key={item.id || index} style={{ ...cardStyle, padding: "0.75rem", display: "grid", gap: "0.25rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", flexWrap: "wrap" }}>
+                <strong>{item.title || "Untitled"}</strong>
+                <span style={{ color: statusColor(item.status), fontSize: "0.72rem", fontWeight: 800 }}>
+                  {item.contentType || ""} {item.status ? `· ${item.status}` : ""}
+                </span>
+              </div>
+              {(item.source || item.due) && (
+                <span style={{ color: theme.colors.muted, fontSize: "0.78rem" }}>
+                  {item.source ? `Source: ${item.source}` : ""}
+                  {item.source && item.due ? " | " : ""}
+                  {item.due ? `Due: ${item.due}` : ""}
+                </span>
+              )}
+              {item.url && (
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: theme.colors.aquaBlue, fontSize: "0.78rem", textDecoration: "none", marginTop: "0.25rem", display: "inline-block" }}
+                >
+                  Open in Notion ↗
+                </a>
+              )}
+            </div>
+          ))}
+        </section>
+      )}
+
+      {approvals.length > 0 && (
+        <section style={{ display: "grid", gap: "0.5rem" }}>
+          <h3 style={{ ...brutalHeading, margin: 0, fontSize: "0.95rem" }}>
+            Content Approvals ({approvals.length})
+          </h3>
+          {approvals.slice(0, 20).map((item, index) => (
+            <div key={item.id || index} style={{ ...cardStyle, padding: "0.75rem", display: "grid", gap: "0.25rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", flexWrap: "wrap" }}>
+                <strong>{item.title || "Untitled"}</strong>
+                <span style={{ color: statusColor(item.status), fontSize: "0.72rem", fontWeight: 800 }}>
+                  {item.contentType || ""} {item.status ? `· ${item.status}` : ""}
+                </span>
+              </div>
+              {(item.requestedAt || item.approvedAt || item.notes) && (
+                <span style={{ color: theme.colors.muted, fontSize: "0.78rem" }}>
+                  {item.requestedAt ? `Requested: ${item.requestedAt}` : ""}
+                  {item.requestedAt && item.approvedAt ? " | " : ""}
+                  {item.approvedAt ? `Approved: ${item.approvedAt}` : ""}
+                  {(item.requestedAt || item.approvedAt) && item.notes ? " | " : ""}
+                  {item.notes || ""}
+                </span>
+              )}
+            </div>
+          ))}
+        </section>
+      )}
+
+      {buyerSignals.length > 0 && (
+        <section style={{ display: "grid", gap: "0.5rem" }}>
+          <h3 style={{ ...brutalHeading, margin: 0, fontSize: "0.95rem" }}>
+            Buyer Signals ({buyerSignals.length})
+          </h3>
+          {buyerSignals.slice(0, 20).map((item, index) => (
+            <div key={item.id || index} style={{ ...cardStyle, padding: "0.75rem", display: "grid", gap: "0.25rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", flexWrap: "wrap" }}>
+                <strong>{item.title || "Untitled"}</strong>
+                <span style={{ color: theme.colors.muted, fontSize: "0.72rem", fontWeight: 800 }}>
+                  {item.product || ""} {item.purchaseValue ? `· ${item.purchaseValue}` : ""}
+                </span>
+              </div>
+              {(item.source || item.quizResult || item.customerEmail) && (
+                <span style={{ color: theme.colors.muted, fontSize: "0.78rem" }}>
+                  {[item.source, item.quizResult, item.customerEmail].filter(Boolean).join(" | ")}
+                </span>
+              )}
+            </div>
+          ))}
+        </section>
+      )}
+
+      {aiDrafts.length > 0 && (
+        <section style={{ display: "grid", gap: "0.5rem" }}>
+          <h3 style={{ ...brutalHeading, margin: 0, fontSize: "0.95rem" }}>
+            AI Content Drafts ({aiDrafts.length})
+          </h3>
+          {aiDrafts.slice(0, 20).map((item, index) => (
+            <div key={item.id || index} style={{ ...cardStyle, padding: "0.75rem", display: "grid", gap: "0.25rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", flexWrap: "wrap" }}>
+                <strong>{item.title || "Untitled"}</strong>
+                <span style={{ color: statusColor(item.status), fontSize: "0.72rem", fontWeight: 800 }}>
+                  {item.status || "New"}
+                </span>
+              </div>
+              {(item.agent || item.model || item.timestamp) && (
+                <span style={{ color: theme.colors.muted, fontSize: "0.78rem" }}>
+                  {[item.agent, item.model, item.timestamp].filter(Boolean).join(" | ")}
+                </span>
+              )}
+            </div>
+          ))}
+        </section>
+      )}
+
+      {!intake.length && !ideas.length && !content.length && !automations.length && !publishingQueue.length && !approvals.length && !buyerSignals.length && !aiDrafts.length && (
+        <EmptyState>
+          No Notion database data available.
+        </EmptyState>
+      )}
+    </div>
+  );
+}
 
 function CommandTab({ data, stats }) {
   return (
@@ -408,7 +649,7 @@ function IntelTab({ data }) {
   );
 }
 
-function BrainTab({ aiBrief }) {
+function BrainTab({ aiBrief, notion }) {
   if (!aiBrief) {
     return <EmptyState>No AI brief available. Click Sync Vault to generate one.</EmptyState>;
   }
@@ -418,6 +659,10 @@ function BrainTab({ aiBrief }) {
     ["What's Slipping", aiBrief.slipping, theme.colors.darkRed],
     ["Next Actions", aiBrief.nextActions, theme.colors.orange],
   ];
+
+  const intake = Array.isArray(notion?.intake) ? notion.intake : [];
+  const buildNow = intake.filter((idea) => String(idea.route || '').toLowerCase().includes('build now'));
+  const validate = intake.filter((idea) => String(idea.route || '').toLowerCase().includes('validate first'));
 
   return (
     <div style={{ display: "grid", gap: "0.75rem" }}>
@@ -436,6 +681,42 @@ function BrainTab({ aiBrief }) {
             </ul>
           </section>
         ) : null,
+      )}
+
+      {buildNow.length > 0 && (
+        <section style={{ ...cardStyle, padding: "0.9rem", borderColor: theme.colors.success }}>
+          <h3 style={{ ...brutalHeading, margin: "0 0 0.5rem", color: theme.colors.success, fontSize: "0.95rem" }}>
+            Build Now Priority
+          </h3>
+          <ul style={{ margin: 0, paddingLeft: "1.1rem" }}>
+            {buildNow.slice(0, 4).map((idea, index) => (
+              <li key={idea.id || `build-${index}`} style={{ marginBottom: "0.25rem" }}>
+                <strong>{idea.title || "Untitled"}</strong>
+                <span style={{ color: theme.colors.muted, fontSize: "0.78rem" }}>
+                  {" "}— {idea.score || "High"} {idea.products?.length ? `· ${idea.products[0]}` : ""}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {validate.length > 0 && (
+        <section style={{ ...cardStyle, padding: "0.9rem", borderColor: theme.colors.warning }}>
+          <h3 style={{ ...brutalHeading, margin: "0 0 0.5rem", color: theme.colors.warning, fontSize: "0.95rem" }}>
+            Validate First
+          </h3>
+          <ul style={{ margin: 0, paddingLeft: "1.1rem" }}>
+            {validate.slice(0, 4).map((idea, index) => (
+              <li key={idea.id || `validate-${index}`} style={{ marginBottom: "0.25rem" }}>
+                <strong>{idea.title || "Untitled"}</strong>
+                <span style={{ color: theme.colors.muted, fontSize: "0.78rem" }}>
+                  {" "}— {idea.score || "Medium"} {idea.products?.length ? `· ${idea.products[0]}` : ""}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
     </div>
   );
@@ -651,12 +932,14 @@ const DashboardPage = () => {
   });
   const [automations, setAutomations] = useState([]);
   const [openRouterKey, setOpenRouterKey] = useState(
-    localStorage.getItem("openRouterKey") || "",
+    localStorage.getItem('openRouterKey') || '',
   );
   const [assistantMessages, setAssistantMessages] = useState([assistantWelcome]);
-  const [assistantInput, setAssistantInput] = useState("");
+  const [assistantInput, setAssistantInput] = useState('');
   const [isAssistantThinking, setIsAssistantThinking] = useState(false);
-  const [assistantError, setAssistantError] = useState("");
+  const [assistantError, setAssistantError] = useState('');
+  const [intakeData, setIntakeData] = useState(null);
+  const [intakeLoading, setIntakeLoading] = useState(false);
 
   useEffect(() => {
     document.title = `${CONFIG.brand.fullName} Dashboard`;
@@ -689,33 +972,26 @@ const DashboardPage = () => {
       }
 
       const payload = await res.json();
-      const nextData = normalizeData(payload);
+      const snapshot = payload.snapshot || payload;
+      const nextData = normalizeData(snapshot);
 
       setData(nextData);
 
-      const automationsRes = await fetch(API_URL, {
-        method: "POST",
-        headers: API_HEADERS,
-        body: JSON.stringify({ message: "automation.list" }),
-      });
-      if (!automationsRes.ok) {
-        setAutomations([]);
-      } else {
-        const automationsPayload = await automationsRes.json();
-        setAutomations(automationsPayload.automations || []);
-      }
+      const automations = Array.isArray(snapshot.automations) ? snapshot.automations : [];
+      setAutomations(automations);
 
+      const sourceStats = snapshot.stats || {};
       setStats({
-        revenue: payload.revenue || "$0",
-        leads: payload.leads || 0,
-        conversionRate: payload.conversionRate
-          ? formatConversion(payload.conversionRate)
-          : "0%",
-        assetValue: formatAssetValue(payload.assetValue),
-        topAsset: payload.topAsset || "N/A",
-        communityGrowth: payload.communityGrowth || "0%",
-        emailGrowth: payload.emailGrowth || "0%",
-        churnRisk: payload.churnRisk || "Low",
+        revenue: typeof sourceStats.revenue === 'string' ? sourceStats.revenue : '$0',
+        leads: typeof sourceStats.leads === 'number' ? sourceStats.leads : 0,
+        conversionRate: typeof sourceStats.conversionRate === 'number'
+          ? formatConversion(sourceStats.conversionRate)
+          : '0%',
+        assetValue: formatAssetValue(sourceStats.assetValue),
+        topAsset: sourceStats.topAsset || 'N/A',
+        communityGrowth: sourceStats.communityGrowth || '0%',
+        emailGrowth: sourceStats.emailGrowth || '0%',
+        churnRisk: sourceStats.churnRisk || 'Low',
       });
       setLastSync(new Date().toLocaleString());
     } catch (err) {
@@ -724,6 +1000,33 @@ const DashboardPage = () => {
       setIsSyncing(false);
     }
   };
+
+  const loadIntakeAlerts = async () => {
+    setIntakeLoading(true);
+    try {
+      const intakeUrl = `${API_URL.replace('/hermes', '')}/intake`;
+      const res = await fetch(intakeUrl, {
+        method: 'POST',
+        headers: API_HEADERS,
+        body: JSON.stringify({ action: 'read' }),
+      });
+
+      if (!res.ok) {
+        setIntakeData(null);
+      } else {
+        const payload = await res.json().catch(() => null);
+        setIntakeData(payload || null);
+      }
+    } catch (e) {
+      setIntakeData(null);
+    } finally {
+      setIntakeLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadIntakeAlerts();
+  }, [lastSync]);
 
   const handleSaveSettings = () => {
     localStorage.setItem("openRouterKey", openRouterKey.trim());
@@ -734,62 +1037,77 @@ const DashboardPage = () => {
     const trimmedMessage = messageText.trim();
     if (!trimmedMessage || isAssistantThinking) return;
 
-    const userMessage = { role: "user", content: trimmedMessage };
+    const userMessage = { role: 'user', content: trimmedMessage };
     const nextMessages = [...assistantMessages, userMessage];
 
     setAssistantMessages(nextMessages);
-    setAssistantInput("");
-    setAssistantError("");
+    setAssistantInput('');
+    setAssistantError('');
     setIsAssistantThinking(true);
 
     try {
-      // Build your dashboard snapshot (you already have this function)
       const snapshot = buildAssistantSnapshot({
         stats,
         data: { ...data, automations },
-        lastSync
+        lastSync,
       });
 
-      // Send to your Hermes backend
       const res = await fetch(API_URL, {
-          method: "POST",
-          headers: API_HEADERS,
-          body: JSON.stringify({
-            action: "hermes",
-            message: trimmedMessage,
-            messages: nextMessages,
-            context: {},
-            conversation: nextMessages,
-          }),
-        }
-      );
+        method: 'POST',
+        headers: API_HEADERS,
+        body: JSON.stringify({
+          message: trimmedMessage,
+          messages: nextMessages,
+          context: snapshot,
+          conversation: nextMessages,
+          agentKey: 'digitallydefined_partner',
+          agent: 'digitallydefined_partner',
+          notebooks: [
+            process.env.NOTEBOOKLM_BRAND_NOTEBOOK,
+            process.env.NOTEBOOKLM_REAL_ESTATE_NOTEBOOK,
+            process.env.NOTEBOOKLM_FACELESS_NOTEBOOK,
+          ].filter(Boolean),
+        }),
+      });
 
-      const dataRes = await res.json();
+      const dataRes = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        const errorMsg = dataRes.error || dataRes.message || 'Hermes request failed';
+        const errorMsg = dataRes?.error || dataRes?.message || 'Hermes request failed';
         throw new Error(errorMsg);
       }
 
-      setAssistantMessages((currentMessages) => [
-        ...currentMessages,
-        { role: "assistant", content: dataRes.reply }
-      ]);
+      const reply =
+        typeof dataRes?.reply === 'string' && dataRes.reply
+          ? dataRes.reply
+          : "I didn't get a usable response from Hermes.";
 
-    } catch (error) {
-      console.error("Hermes Dashboard Error:", error);
-      setAssistantError(error.message || "Hermes encountered an error.");
       setAssistantMessages((currentMessages) => [
         ...currentMessages,
         {
-          role: "assistant",
-          content: "I could not reach Hermes. Here is the local dashboard readout instead.\n\n" +
+          role: 'assistant',
+          content: reply,
+          provider: dataRes?.provider || null,
+          model: dataRes?.model || null,
+          agent: dataRes?.agent || 'digitallydefined_partner',
+        },
+      ]);
+      setAssistantError('');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Hermes encountered an error.';
+      setAssistantError(message);
+      setAssistantMessages((currentMessages) => [
+        ...currentMessages,
+        {
+          role: 'assistant',
+          content:
+            "I couldn't reach Hermes just now. Here is the current dashboard snapshot instead.\n\n" +
             createLocalAssistantReply({ stats, data, lastSync }),
         },
       ]);
+    } finally {
+      setIsAssistantThinking(false);
     }
-
-    setIsAssistantThinking(false);
   };
 
   const handleAssistantSubmit = (event) => {
@@ -800,9 +1118,9 @@ const DashboardPage = () => {
   const renderTab = () => {
     if (activeTab === "reputation") return <ReputationTab reviews={data.reviews} />;
     if (activeTab === "intel") return <IntelTab data={data} />;
-    if (activeTab === "brain") return <BrainTab aiBrief={data.aiBrief} />;
+    if (activeTab === "brain") return <BrainTab aiBrief={data.aiBrief} notion={data.notion} />;
     if (activeTab === "automations") return <AutomationsTab automations={data.automations} />;
-    if (activeTab === "notion") return <EmptyState>Notion database integration coming soon.</EmptyState>;
+    if (activeTab === "notion") return <NotionTab notion={data.notion} />;
     return <CommandTab data={data} stats={stats} />;
   };
 
@@ -913,6 +1231,12 @@ const DashboardPage = () => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
 
+              const badgeCount =
+                tab.id === 'notion' && intakeData
+                  ? (intakeData.alerts?.countUnscored || 0) +
+                    (intakeData.alerts?.countReadyForReview || 0)
+                  : 0;
+
               return (
                 <button
                   key={tab.id}
@@ -921,20 +1245,35 @@ const DashboardPage = () => {
                     border: brutalBorder,
                     backgroundColor: isActive ? theme.colors.orange : theme.colors.background,
                     color: theme.colors.textPrimary,
-                    padding: "0.7rem 0.75rem",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: "0.5rem",
+                    padding: '0.7rem 0.75rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '0.5rem',
                     fontWeight: 800,
-                    cursor: "pointer",
+                    cursor: 'pointer',
                     fontFamily: theme.fonts.body,
                   }}
                 >
-                  <span style={{ display: "flex", alignItems: "center", gap: "0.45rem" }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
                     <Icon size={16} />
                     {tab.label}
                   </span>
+                  {badgeCount > 0 && (
+                    <span
+                      style={{
+                        backgroundColor: theme.colors.darkRed,
+                        color: '#fff',
+                        fontSize: '0.68rem',
+                        fontWeight: 800,
+                        padding: '0.12rem 0.45rem',
+                        border: brutalBorder,
+                        backgroundColor: theme.colors.orange,
+                      }}
+                    >
+                      {badgeCount}
+                    </span>
+                  )}
                 </button>
               );
             })}

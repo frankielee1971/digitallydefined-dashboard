@@ -1,0 +1,31 @@
+# Hermes Configuration
+# Placeholder config for the Hermes system
+
+app:
+  name: "Hermes Content System"
+  version: "1.0.0"
+
+# AI Provider Configuration
+ai_provider:
+  # Options: openrouter, claude, gemini
+  provider: "openrouter"
+  api_key: "${OPENAI_API_KEY}"
+  model: "openai/gpt-4o-mini"
+
+# Content Generation Settings
+content:
+  niche_topic: ""
+  target_audience: ""
+  authority_keyword: ""
+  tone: "professional"
+
+# Product Packaging
+product:
+  filename: "authority_silo_architect.json"
+  price: 97
+  platform: "gumroad"  # or "notion"
+
+# Schema Library
+schema_library:
+  version: "1.0.0"
+  niches: []

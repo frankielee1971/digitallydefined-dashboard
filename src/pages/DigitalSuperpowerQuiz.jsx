@@ -11,7 +11,7 @@ const questions = [
   { id: 4, question: "Which digital income stream sounds most aligned with you?", options: [ { text: "Monetized content — affiliate links, brand deals, UGC", value: "creator" }, { text: "Notion templates, tools, automated funnels, dashboards", value: "builder" }, { text: "Online courses, workshops, PDF guides, coaching programs", value: "educator" }, { text: "Memberships, group programs, paid communities", value: "connector" }, { text: "Done-for-you services, consulting, digital strategy packages", value: "strategist" } ] },
   { id: 5, question: "Friends and colleagues would most likely describe you as:", options: [ { text: "Creative, expressive, and always making something", value: "creator" }, { text: "Organized, logical, and obsessed with efficiency", value: "builder" }, { text: "Knowledgeable, patient, and great at breaking things down", value: "educator" }, { text: "Warm, magnetic, and the one who brings people together", value: "connector" }, { text: "Visionary, bold, and always ten steps ahead", value: "strategist" } ] },
   { id: 6, question: "What's your biggest strength from your pre-digital life?", options: [ { text: "I've always had a creative eye and love for storytelling", value: "creator" }, { text: "I built processes, solved problems, and made things run smoother", value: "builder" }, { text: "I trained, mentored, or educated people in my field", value: "educator" }, { text: "I led teams, built culture, or was the hub of my community", value: "connector" }, { text: "I saw the big picture and knew how to position things for success", value: "strategist" } ] },
-  { id: 7, question: "Which statement sounds most like you?", options: [ { text: '"I want to create things that matter — content with real impact"', value: "creator" }, { text: '"I want to build once and earn while I sleep"', value: "builder" }, { text: '"My knowledge and experience deserve to be monetized"', value: "educator" }, { text: '"I want to build something people belong to"', value: "connector" }, { text: '"I want to be known as THE go-to expert in my space"', value: "strategist" } ] },
+  { id: 7, question: "Which statement sounds most like you?", options: [ { text: '"I want to create things that matter — content with real impact"', value: "creator" }, { text: '"I want to build once and earn while I sleep"', value: "builder" }, { text: '"My knowledge and experience deserve to be monetized"', value: "educator" }, { text: '"I want to build something people belong to"', value: "connector" }, { text: '"I want to be known as THE go-to expert in my space"', value: "strategist" } ] }
 ];
 
 const results = {
@@ -19,7 +19,7 @@ const results = {
   builder: { title: "The Systems Builder", emoji: "⚡", icon: Zap, tagline: "You don't just work smart — you build systems that work FOR you.", description: "You think in automations, frameworks, and repeatable processes. Your superpower is turning complexity into elegance — Notion templates, automated funnels, digital dashboards, and tools that solve real problems. You build digital products that save people time, and people will pay premium prices for that.", assets: [ "Automated lead funnels", "Notion templates and dashboards", "SaaS-adjacent workflows", "Content repurposing engines", "Premium process toolkits" ], nextStep: "Map your highest-value workflow and turn it into a sellable, repeatable system. Then start selling the transformation, not the task.", color: "#52C41A" },
   educator: { title: "The Expertise Educator", emoji: "📚", icon: BookOpen, tagline: "Your experience becomes the shortcut people pay for.", description: "You've spent decades accumulating expertise that others desperately need. Your superpower is transforming lived experience into structured learning — courses, workshops, playbooks, and coaching programs that shortcut other people's journeys.", assets: [ "Mini-course funnels", "Coaching container templates", "Paid workshop sequels", "Membership lesson libraries", "Signature programs" ], nextStep: "Pick one small, high-impact teaching topic and create a short lead magnet that proves your model. Then invite paid learners to go deeper.", color: "#3366FF" },
   connector: { title: "The Community Connector", emoji: "💫", icon: Users, tagline: "You build belonging, momentum, and repeat business.", description: "People are drawn to you. You create belonging, safety, and momentum wherever you show up. Your superpower is building communities — Facebook groups, memberships, group coaching containers — where people come for information and stay for connection.", assets: [ "Paid memberships", "Group coaching programs", "Community-led launches", "Membership content roadmaps", "Live event funnels" ], nextStep: "Choose a small group format, set a clear outcome, and invite the people who already trust you to join the first cohort.", color: "#FF6B6B" },
-  strategist: { title: "The Strategy Specialist", emoji: "⭐", icon: Star, tagline: "You see the gap between the current state and the next-level opportunity.", description: "You think in positioning, messaging, and market differentiation. Your superpower is seeing the gap between where someone is and where they could be — and building the bridge. You're wired for consulting, done-for-you services, and brand strategy work that commands premium prices.", assets: [ "Signature consulting offers", "Premium service packages", "Positioning frameworks", "Brand storytelling systems", "High-ticket launch plans" ], nextStep: "Start by clarifying the outcome you deliver, then package it in a premium offer for the clients who need it most.", color: "#A259FF" },
+  strategist: { title: "The Strategy Specialist", emoji: "⭐", icon: Star, tagline: "You see the gap between the current state and the next-level opportunity.", description: "You think in positioning, messaging, and market differentiation. Your superpower is seeing the gap between where someone is and where they could be — and building the bridge. You're wired for consulting, done-for-you services, and brand strategy work that commands premium prices.", assets: [ "Signature consulting offers", "Premium service packages", "Positioning frameworks", "Brand storytelling systems", "High-ticket launch plans" ], nextStep: "Start by clarifying the outcome you deliver, then package it in a premium offer for the clients who need it most.", color: "#A259FF" }
 };
 
 const calculateResult = (answers) => {
@@ -33,6 +33,39 @@ const calculateResult = (answers) => {
   entries.sort((a, b) => b[1] - a[1]);
   return entries[0][0];
 };
+
+export function getResultTitle(resultKey) {
+  const map = { creator: "The Content Creator", builder: "The Systems Builder", educator: "The Expertise Educator", connector: "The Community Connector", strategist: "The Strategy Specialist" };
+  return map[resultKey] || resultKey || "Quiz Result";
+}
+
+export function buildContextSummary(resultKey, answers = {}, contact = {}) {
+  const resultTitle = getResultTitle(resultKey);
+  const strengthEntries = Object.entries(answers).map(([questionId, value]) => {
+    const q = typeof questionId === "number" ? `Q${questionId}` : String(questionId);
+    return `${q}: ${value}`;
+  });
+
+  return {
+    resultKey,
+    resultTitle,
+    answers,
+    strengthEntries,
+    contact,
+    summary: `Quiz result: ${resultTitle}. Strengths signal: ${strengthEntries.join(", ")}${contact?.email ? ` | Contact: ${contact.email}` : ""}`
+  };
+}
+
+export function getSystemPrompt(resultKey, answers = {}) {
+  if (!resultKey) {
+    return "You are the DigitallyDefined website assistant. Use the visitor's quiz answers and result to recommend the best first digital real estate asset for them. Be supportive, specific, and practical. Do not execute any backend actions.";
+  }
+  const resultTitle = getResultTitle(resultKey);
+  const guidance = resultKey === "creator" ? "Help them move from result to first real asset: niche, content pillars, 30-day batch system, and monetization bridge." : resultKey === "builder" ? "Help them pick one workflow to productize, outline a sellable system, and position it as a premium tool or template." : resultKey === "educator" ? "Help them convert lived experience into a small teachable model, then a lead magnet and paid container." : resultKey === "connector" ? "Help them design a small group format with a clear outcome, launch sequence, and membership bridge." : resultKey === "strategist" ? "Help them clarify the outcome they sell, package it as a premium offer, and draft positioning language." : "Use their quiz answers to recommend specific digital real estate next steps.";
+  return `You are the DigitallyDefined website assistant. The visitor just completed the Digital Superpower Quiz and their result is ${resultTitle}. ${guidance} Stay practical and specific. Do not execute backend actions.`;
+}
+
+export const DEFAULT_SYSTEM_PROMPT = "You are the DigitallyDefined website assistant. The visitor just completed the Digital Superpower Quiz. Use their quiz answers and result to recommend the best first digital real estate asset for them. Be supportive, specific, and practical. Do not execute any backend actions.";
 
 const QuizAutomationNotice = ({ stored, onApply }) => (
   <div style={{ display: "grid", gap: "10px", padding: "14px", border: "1px solid #111111", background: "#ffFAF5" }}>
@@ -69,8 +102,13 @@ const DigitalSuperpowerQuiz = () => {
 
   const result = resultKey ? results[resultKey] : null;
 
-  const persistResult = async (payload) => {
-    setApplyState({ stored: payload.stored, busy: false });
+  const emitQuizContext = () => {
+    try {
+      const context = buildContextSummary(resultKey, answers, contact);
+      window.sessionStorage.setItem("dd_quiz_context", JSON.stringify(context));
+    } catch {
+      // ignore session storage failures
+    }
   };
 
   const handleQuizSubmit = async () => {
@@ -79,6 +117,7 @@ const DigitalSuperpowerQuiz = () => {
     setSubmitted(true);
     setShowInstructions(false);
     setApplyState({ stored: null, busy: false });
+    emitQuizContext();
 
     try {
       const API_URL = "/api/hermes";
@@ -90,13 +129,13 @@ const DigitalSuperpowerQuiz = () => {
         resultKey: key,
         resultTitle: results[key].title,
         name: contact.name || null,
-        email: contact.email || null,
+        email: contact.email || null
       };
 
       const res = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-api-key": import.meta.env.VITE_DASHBOARD_API_KEY || "" },
-        body: JSON.stringify(body),
+        body: JSON.stringify(body)
       });
 
       const text = await res.text();
@@ -123,7 +162,7 @@ const DigitalSuperpowerQuiz = () => {
     try {
       const API_URL = "/api/hermes";
       const context = {
-        quiz: { resultKey, resultTitle: result.title, answers, contact, source: "dashboard.quiz.apply" },
+        quiz: { resultKey, resultTitle: result.title, answers, contact, source: "dashboard.quiz.apply" }
       };
 
       const res = await fetch(API_URL, {
@@ -133,8 +172,8 @@ const DigitalSuperpowerQuiz = () => {
           action: "dashboard",
           agent: "digitallydefined_partner",
           context,
-          message: `Create an automation entry for quiz result ${result.title} (${resultKey}) with contact ${contact.email || "anonymous"} and recommend the next best follow-up step.`,
-        }),
+          message: `Create an automation entry for quiz result ${result.title} (${resultKey}) with contact ${contact.email || "anonymous"} and recommend the next best follow-up step.`
+        })
       });
 
       const text = await res.text();
@@ -338,7 +377,10 @@ const DigitalSuperpowerQuiz = () => {
 
               <QuizAutomationNotice stored={applyState.stored} onApply={handleApplyToDashboard} />
 
-              <div className="dd-quiz-footer-actions">
+              <div className="dd-quiz-footer-actions" style={{ gap: "12px", flexWrap: "wrap" }}>
+                <a className="dd-button dd-button--primary" href="/quiz/next-steps-chat">
+                  Continue with your AI partner
+                </a>
                 <button type="button" onClick={handleReset} className="dd-button dd-button--secondary">Retake the quiz</button>
               </div>
             </section>
