@@ -5,6 +5,7 @@ import CONFIG from "./config";
 import DashboardPage from "./pages/DashboardPage";
 import DigitalSuperpowerQuiz from "./pages/DigitalSuperpowerQuiz";
 import AssistantPage from "./pages/AssistantPage";
+import QuizFollowUpChat from "./pages/QuizFollowUpChat";
 import ChatWidget from "./components/ChatWidget";
 import LandingPage from "./pages/LandingPage";
 
@@ -29,6 +30,7 @@ function App() {
         <Route path="/" element={homePage} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/quiz" element={<DigitalSuperpowerQuiz />} />
+        <Route path="/quiz/next-steps-chat" element={<QuizFollowUpChat />} />
 
         {/* ⭐ NEW: AI Assistant Page (dashboard only) */}
         {isDashboardDomain && (
