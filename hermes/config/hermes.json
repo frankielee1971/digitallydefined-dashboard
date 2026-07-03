@@ -1,0 +1,12 @@
+{
+  "adapters": [
+    "hermes-paperclip-adapter"
+  ],
+  "llm_providers": {
+    "openrouter": {},
+    "groq": {},
+    "ollama": {
+      "model": "qwen2.5:7b"
+    }
+  }
+}
