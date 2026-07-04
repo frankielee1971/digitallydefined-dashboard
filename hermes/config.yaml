@@ -12,6 +12,10 @@ ai_provider:
   api_key: "${OPENAI_API_KEY}"
   model: "openai/gpt-4o-mini"
 
+# Provider Routing Configuration
+provider_routing:
+  file: "routing.yaml"
+
 # Content Generation Settings
 content:
   niche_topic: ""
