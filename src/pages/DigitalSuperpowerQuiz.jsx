@@ -193,6 +193,22 @@ const DigitalSuperpowerQuiz = () => {
     }
   };
 
+  const handleAnswer = (value) => {
+    setAnswers((prev) => ({ ...prev, [currentQuestion]: value }));
+  };
+
+  const handleBack = () => {
+    if (currentQuestion > 1) {
+      setCurrentQuestion((prev) => prev - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentQuestion < questions.length) {
+      setCurrentQuestion((prev) => prev + 1);
+    }
+  };
+
   const handleReset = () => {
     setAnswers({});
     setCurrentQuestion(1);

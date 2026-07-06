@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import CONFIG from "../config";
 import Logo from "./Logo";
 import { theme } from "../theme";
@@ -7,13 +8,15 @@ const Footer = ({
   colors,
   containerStyle,
   footerStyle,
-  navigate,
   routes,
   landing,
   contact,
   year,
   showDashboardLink = true,
-}) => (
+}) => {
+  const navigate = useNavigate();
+
+  return (
   <footer style={footerStyle}>
     <div style={{ ...containerStyle, display: "grid", gap: theme.layout.spacing }}>
       <Logo
@@ -65,6 +68,7 @@ const Footer = ({
       </p>
     </div>
   </footer>
-);
+  );
+};
 
 export default Footer;
