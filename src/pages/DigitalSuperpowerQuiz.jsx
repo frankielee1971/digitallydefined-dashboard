@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, Sparkles, Zap, Users, BookOpen, Star } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles, Zap, Users, BookOpen, Star, Check, Loader2 } from "lucide-react";
 import CONFIG from "../config";
 import Footer from "../components/Footer";
 import Logo from "../components/Logo";
 
-const questions = [
+// Personality questions (original 7)
+const personalityQuestions = [
   { id: 1, question: "When you imagine your ideal digital business, what excites you most?", options: [ { text: "Creating content that helps and inspires people", value: "creator" }, { text: "Building systems that run without me", value: "builder" }, { text: "Teaching what I know and packaging my expertise", value: "educator" }, { text: "Growing a loyal community of like-minded women", value: "connector" }, { text: "Crafting a powerful personal brand that opens doors", value: "strategist" } ] },
   { id: 2, question: "Which of these feels most natural to you right now?", options: [ { text: "Writing, filming, or sharing stories and ideas", value: "creator" }, { text: "Automating, organizing, and optimizing workflows", value: "builder" }, { text: "Explaining things clearly so others can learn fast", value: "educator" }, { text: "Connecting people and building relationships", value: "connector" }, { text: "Positioning, messaging, and standing out online", value: "strategist" } ] },
   { id: 3, question: "If you had a free afternoon to work on your business, you'd spend it:", options: [ { text: "Batch creating content — posts, reels, carousels", value: "creator" }, { text: "Setting up automations, tools, and workflows", value: "builder" }, { text: "Writing a guide, course outline, or PDF playbook", value: "educator" }, { text: "Showing up live, engaging, or hosting a session", value: "connector" }, { text: "Researching competitors, refining my offer, storytelling", value: "strategist" } ] },
@@ -13,6 +14,21 @@ const questions = [
   { id: 6, question: "What's your biggest strength from your pre-digital life?", options: [ { text: "I've always had a creative eye and love for storytelling", value: "creator" }, { text: "I built processes, solved problems, and made things run smoother", value: "builder" }, { text: "I trained, mentored, or educated people in my field", value: "educator" }, { text: "I led teams, built culture, or was the hub of my community", value: "connector" }, { text: "I saw the big picture and knew how to position things for success", value: "strategist" } ] },
   { id: 7, question: "Which statement sounds most like you?", options: [ { text: '"I want to create things that matter — content with real impact"', value: "creator" }, { text: '"I want to build once and earn while I sleep"', value: "builder" }, { text: '"My knowledge and experience deserve to be monetized"', value: "educator" }, { text: '"I want to build something people belong to"', value: "connector" }, { text: '"I want to be known as THE go-to expert in my space"', value: "strategist" } ] }
 ];
+
+// Hermes schema questions (additional questions for roadmap generation)
+const hermesQuestions = [
+  { id: 8, question: "How visible do you want to be online?", options: [ { text: "Completely faceless - no personal branding", value: "faceless" }, { text: "Somewhat visible - limited personal presence", value: "limited" }, { text: "Fully visible - I want to be the face of my brand", value: "full" } ] },
+  { id: 9, question: "What's your current digital skill level?", options: [ { text: "Beginner - Just starting out", value: "beginner" }, { text: "Intermediate - Some experience", value: "intermediate" }, { text: "Advanced - Very comfortable with digital tools", value: "advanced" } ] },
+  { id: 10, question: "Which niche categories interest you most? (Select up to 3)", options: [ { text: "AI & Automation", value: "ai_automation" }, { text: "Business & Entrepreneurship", value: "business_entrepreneurship" }, { text: "Health & Wellness", value: "health_wellness" }, { text: "Finance & Investing", value: "finance_investing" }, { text: "Education & Learning", value: "education_learning" } ], multiSelect: true },
+  { id: 11, question: "What's your primary goal for your digital business?", options: [ { text: "Replace my current income", value: "replace_income" }, { text: "Create a side income", value: "side_income" }, { text: "Build a scalable empire", value: "scalable_empire" }, { text: "Share my knowledge", value: "share_knowledge" } ] },
+  { id: 12, question: "How much time can you dedicate weekly to your digital business?", options: [ { text: "Less than 5 hours", value: "<5" }, { text: "5-10 hours", value: "5-10" }, { text: "10-20 hours", value: "10-20" }, { text: "20+ hours", value: "20+" } ] },
+  { id: 13, question: "What's your target income goal?", options: [ { text: "$500-$2,000/month", value: "500-2000" }, { text: "$2,000-$5,000/month", value: "2000-5000" }, { text: "$5,000-$10,000/month", value: "5000-10000" }, { text: "$10,000+/month", value: "10000+" } ] },
+  { id: 14, question: "How do you prefer to work?", options: [ { text: "Solo - I like working independently", value: "solo" }, { text: "Collaborative - I prefer working with others", value: "collaborative" }, { text: "Hybrid - Both solo and team work", value: "hybrid" } ] },
+  { id: 15, question: "What's your privacy preference?", options: [ { text: "Completely anonymous", value: "anonymous" }, { text: "Some privacy but open to connection", value: "semi_private" }, { text: "Fully public - I want to be known", value: "public" } ] }
+];
+
+// Combine all questions
+const questions = [...personalityQuestions, ...hermesQuestions];
 
 const results = {
   creator: { title: "The Content Creator", emoji: "✨", icon: Sparkles, tagline: "Your creativity IS your digital real estate.", description: "You have a natural gift for storytelling, visuals, and creating content that connects. Your superpower is your ability to turn ideas into scroll-stopping digital assets that attract an audience — and an income. Faceless content, affiliate marketing, brand partnerships, and UGC are all in your wheelhouse.", assets: [ "Faceless YouTube / Reels content", "Affiliate marketing funnels", "Pinterest SEO content", "UGC brand partnerships", "Email newsletter" ], nextStep: "Start by identifying your niche content pillars and batch-creating 30 days of content. Your content is your currency.", color: "#F18B25" },
@@ -56,6 +72,182 @@ export function buildContextSummary(resultKey, answers = {}, contact = {}) {
   };
 }
 
+// Map quiz answers to Hermes schema
+const mapToHermesSchema = (answers, contact, resultKey) => {
+  // Get personality type from first 7 questions
+  const personalityAnswers = {};
+  for (let i = 1; i <= 7; i++) {
+    if (answers[i]) personalityAnswers[i] = answers[i];
+  }
+  const personalityType = calculateResult(personalityAnswers);
+
+  // Map individual answers to schema fields
+  return {
+    email: contact.email || "",
+    identity: {
+      age_range: answers[8] || "",
+      career_stage: mapCareerStage(personalityType),
+      experience_level: answers[9] || ""
+    },
+    preferences: {
+      visibility: answers[8] || "", // Same as identity.age_range for now
+      content_style: mapContentStyle(personalityType),
+      work_style: answers[14] || "",
+      time_available: answers[12] || "",
+      income_goal: answers[13] || ""
+    },
+    skills: {
+      digital_skills: mapDigitalSkills(personalityType),
+      marketable_skills: mapMarketableSkills(personalityType),
+      tech_comfort: answers[9] || ""
+    },
+    interests: {
+      niche_categories: answers[10] ? (Array.isArray(answers[10]) ? answers[10] : [answers[10]]) : [],
+      audience_focus: mapAudienceFocus(personalityType)
+    },
+    constraints: {
+      privacy_needs: answers[15] || "",
+      energy_level: mapEnergyLevel(personalityType),
+      burnout_risk: mapBurnoutRisk(personalityType)
+    },
+    goals: {
+      primary_goal: answers[11] || "",
+      timeline: mapTimeline(answers[12])
+    },
+    // Include personality result for context
+    personality_type: personalityType,
+    result_title: getResultTitle(personalityType)
+  };
+};
+
+// Helper mapping functions
+const mapCareerStage = (personalityType) => {
+  const mapping = {
+    creator: "content_creator",
+    builder: "systems_builder", 
+    educator: "expert_educator",
+    connector: "community_connector",
+    strategist: "strategy_specialist"
+  };
+  return mapping[personalityType] || "unknown";
+};
+
+const mapContentStyle = (personalityType) => {
+  const mapping = {
+    creator: "storytelling",
+    builder: "structured",
+    educator: "educational", 
+    connector: "engaging",
+    strategist: "persuasive"
+  };
+  return mapping[personalityType] || "balanced";
+};
+
+const mapDigitalSkills = (personalityType) => {
+  const mapping = {
+    creator: ["content_creation", "social_media", "storytelling"],
+    builder: ["automation", "systems_design", "workflow_optimization"],
+    educator: ["teaching", "curriculum_design", "mentoring"],
+    connector: ["community_building", "relationship_management", "engagement"],
+    strategist: ["strategic_planning", "positioning", "market_analysis"]
+  };
+  return mapping[personalityType] || [];
+};
+
+const mapMarketableSkills = (personalityType) => {
+  const mapping = {
+    creator: ["content_strategy", "brand_storytelling", "audience_growth"],
+    builder: ["process_automation", "tool_creation", "system_architecture"],
+    educator: ["knowledge_packaging", "course_creation", "training_program_design"],
+    connector: ["community_management", "network_building", "group_facilitation"],
+    strategist: ["business_strategy", "positioning_strategy", "market_differentiation"]
+  };
+  return mapping[personalityType] || [];
+};
+
+const mapAudienceFocus = (personalityType) => {
+  const mapping = {
+    creator: ["content_consumers", "social_media_audiences"],
+    builder: ["business_owners", "entrepreneurs"],
+    educator: ["learners", "students", "professionals"],
+    connector: ["community_members", "network_participants"],
+    strategist: ["business_leaders", "executives", "decision_makers"]
+  };
+  return mapping[personalityType] || [];
+};
+
+const mapEnergyLevel = (personalityType) => {
+  const mapping = {
+    creator: "high",
+    builder: "high",
+    educator: "moderate",
+    connector: "high", 
+    strategist: "high"
+  };
+  return mapping[personalityType] || "moderate";
+};
+
+const mapBurnoutRisk = (personalityType) => {
+  const mapping = {
+    creator: "low",
+    builder: "low",
+    educator: "moderate", 
+    connector: "high",
+    strategist: "moderate"
+  };
+  return mapping[personalityType] || "low";
+};
+
+const mapTimeline = (timeAvailable) => {
+  const mapping = {
+    "<5": "long_term",
+    "5-10": "medium_term",
+    "10-20": "short_term", 
+    "20+": "immediate"
+  };
+  return mapping[timeAvailable] || "medium_term";
+};
+
+// Hermes API URL - Update this with your actual Hermes server URL
+const HERMES_API_URL = import.meta.env.VITE_HERMES_URL || "https://hermes.digitallydefined.online";
+
+// Submit quiz data to Hermes for personalized roadmap generation
+const submitQuiz = async (allAnswers, contact) => {
+  try {
+    // Map answers to Hermes schema
+    const resultKey = calculateResult(Object.fromEntries(
+      Object.entries(allAnswers).filter(([key]) => parseInt(key) <= 7)
+    ));
+    
+    const hermesData = mapToHermesSchema(allAnswers, contact, resultKey);
+
+    // Validate required fields
+    if (!hermesData.email) {
+      throw new Error("Email is required to generate your personalized roadmap");
+    }
+
+    // POST to Hermes task endpoint
+    const response = await fetch(`${HERMES_API_URL}/run-task/generate_personalized_roadmap`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(hermesData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || errorData.message || `HTTP error! status: ${response.status}`);
+    }
+
+    return { success: true, message: "Your personalized roadmap is being generated and will arrive in your email shortly." };
+    
+  } catch (error) {
+    console.error("Hermes submission error:", error);
+    return { success: false, message: error.message || "Failed to submit quiz for roadmap generation." };
+  }
+};
+
 export function getSystemPrompt(resultKey, answers = {}) {
   if (!resultKey) {
     return "You are the DigitallyDefined website assistant. Use the visitor's quiz answers and result to recommend the best first digital real estate asset for them. Be supportive, specific, and practical. Do not execute any backend actions.";
@@ -92,6 +284,9 @@ const DigitalSuperpowerQuiz = () => {
   const [showInstructions, setShowInstructions] = useState(true);
   const [applyState, setApplyState] = useState({ stored: null, busy: false });
   const [contact, setContact] = useState({ name: "", email: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState('');
+  const [submitError, setSubmitError] = useState('');
 
   const question = useMemo(() => questions.find((item) => item.id === currentQuestion), [currentQuestion]);
   const progress = useMemo(() => (Object.keys(answers).length / questions.length) * 100, [answers]);
@@ -117,9 +312,22 @@ const DigitalSuperpowerQuiz = () => {
     setSubmitted(true);
     setShowInstructions(false);
     setApplyState({ stored: null, busy: false });
+    setIsSubmitting(true);
+    setSubmitSuccess('');
+    setSubmitError('');
     emitQuizContext();
 
     try {
+      // First, submit to Hermes for personalized roadmap generation
+      const hermesResult = await submitQuiz(answers, contact);
+      
+      if (hermesResult.success) {
+        setSubmitSuccess(hermesResult.message);
+      } else {
+        setSubmitError(hermesResult.message);
+      }
+
+      // Then, also submit to the original dashboard API
       const API_URL = "/api/hermes";
       const body = {
         action: "quiz-submit",
@@ -152,6 +360,9 @@ const DigitalSuperpowerQuiz = () => {
     } catch (err) {
       console.error("[Quiz] submit failed:", err);
       setApplyState({ stored: false, busy: false });
+      setSubmitError(err.message || "Failed to submit quiz.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -194,7 +405,20 @@ const DigitalSuperpowerQuiz = () => {
   };
 
   const handleAnswer = (value) => {
-    setAnswers((prev) => ({ ...prev, [currentQuestion]: value }));
+    const currentQ = questions.find(q => q.id === currentQuestion);
+    if (currentQ?.multiSelect) {
+      // Handle multi-select: toggle the value in an array
+      setAnswers((prev) => {
+        const currentValues = prev[currentQuestion] || [];
+        const newValues = currentValues.includes(value)
+          ? currentValues.filter(v => v !== value)
+          : [...currentValues, value];
+        return { ...prev, [currentQuestion]: newValues };
+      });
+    } else {
+      // Single select: replace the value
+      setAnswers((prev) => ({ ...prev, [currentQuestion]: value }));
+    }
   };
 
   const handleBack = () => {
@@ -312,17 +536,25 @@ const DigitalSuperpowerQuiz = () => {
               <h2 className="dd-quiz-question">{question.question}</h2>
 
               <div className="dd-quiz-options">
-                {question.options.map((option, index) => (
-                  <button
-                    key={`${question.id}-${index}`}
-                    type="button"
-                    onClick={() => handleAnswer(option.value)}
-                    className={`dd-quiz-option ${answers[currentQuestion] === option.value ? "dd-quiz-option--selected" : ""}`}
-                  >
-                    <span className="dd-quiz-option-indicator">{answers[currentQuestion] === option.value ? "●" : "○"}</span>
-                    <span>{option.text}</span>
-                  </button>
-                ))}
+                {question.options.map((option, index) => {
+                  const isMultiSelect = question.multiSelect;
+                  const currentValues = answers[currentQuestion] || (isMultiSelect ? [] : '');
+                  const isSelected = isMultiSelect 
+                    ? currentValues.includes(option.value)
+                    : currentValues === option.value;
+                  
+                  return (
+                    <button
+                      key={`${question.id}-${index}`}
+                      type="button"
+                      onClick={() => handleAnswer(option.value)}
+                      className={`dd-quiz-option ${isSelected ? "dd-quiz-option--selected" : ""}`}
+                    >
+                      <span className="dd-quiz-option-indicator">{isSelected ? "●" : "○"}</span>
+                      <span>{option.text}</span>
+                    </button>
+                  );
+                })}
               </div>
 
               <div className="dd-quiz-actions">
@@ -348,12 +580,19 @@ const DigitalSuperpowerQuiz = () => {
                         type="email"
                         value={contact.email}
                         onChange={(e) => setContact((prev) => ({ ...prev, email: e.target.value }))}
-                        placeholder="Email (optional)"
+                        placeholder="Email (required for roadmap)"
                         className="dd-quiz-option"
                         style={{ padding: "12px 14px" }}
+                        required
                       />
-                      <button type="button" onClick={handleQuizSubmit} disabled={Object.keys(answers).length < questions.length} className="dd-button dd-button--primary">
-                        See my superpower <ArrowRight size={16} />
+                      <button type="button" onClick={handleQuizSubmit} disabled={Object.keys(answers).length < questions.length || !contact.email || isSubmitting} className="dd-button dd-button--primary">
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 size={16} className="spin" /> Generating Roadmap...
+                          </>
+                        ) : (
+                          <>See my superpower <ArrowRight size={16} /></>
+                        )}
                       </button>
                     </div>
                   )}
@@ -390,6 +629,35 @@ const DigitalSuperpowerQuiz = () => {
                 <p className="dd-quiz-next-step-label">Best next step</p>
                 <p className="dd-quiz-next-step-text">{result.nextStep}</p>
               </div>
+
+              {submitSuccess && (
+                <div style={{ 
+                  padding: "16px", 
+                  background: "#d4edda", 
+                  border: "1px solid #c3e6cb", 
+                  borderRadius: "4px", 
+                  color: "#155724", 
+                  fontSize: "1rem", 
+                  fontWeight: "600"
+                }}>
+                  <Check size={20} style={{ display: "inline", marginRight: "8px", verticalAlign: "middle" }} />
+                  {submitSuccess}
+                </div>
+              )}
+              
+              {submitError && (
+                <div style={{ 
+                  padding: "16px", 
+                  background: "#f8d7da", 
+                  border: "1px solid #f5c6cb", 
+                  borderRadius: "4px", 
+                  color: "#721c24", 
+                  fontSize: "1rem", 
+                  fontWeight: "600"
+                }}>
+                  {submitError}
+                </div>
+              )}
 
               <QuizAutomationNotice stored={applyState.stored} onApply={handleApplyToDashboard} />
 
