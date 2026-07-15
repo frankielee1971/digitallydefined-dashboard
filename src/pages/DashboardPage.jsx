@@ -961,7 +961,7 @@ const DashboardPage = () => {
       const res = await fetch(syncUrl, {
         method: "POST",
         headers: API_HEADERS,
-        body: JSON.stringify({ message: "sync" }),
+        body: JSON.stringify({ action: "sync" }),
       });
 
       if (!res.ok) {
