@@ -8,6 +8,7 @@ import AssistantPage from "./pages/AssistantPage";
 import QuizFollowUpChat from "./pages/QuizFollowUpChat";
 import ChatWidget from "./components/ChatWidget";
 import LandingPage from "./pages/LandingPage";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 function App() {
   const hostname = window.location.hostname;
@@ -28,7 +29,14 @@ function App() {
 
       <Routes>
         <Route path="/" element={homePage} />
-        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route 
+          path="/dashboard" 
+          element={
+            <ErrorBoundary>
+              <DashboardPage />
+            </ErrorBoundary>
+          } 
+        />
         <Route path="/quiz" element={<DigitalSuperpowerQuiz />} />
         <Route path="/quiz/next-steps-chat" element={<QuizFollowUpChat />} />
 

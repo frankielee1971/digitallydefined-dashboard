@@ -1,11 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  Bell,
-  FileText,
-  ChevronRight,
-  CheckCircle2,
-  AlertTriangle,
-  ArrowRight,
   BarChart3,
   Bot,
   BrainCircuit,
@@ -20,10 +14,10 @@ import {
   TrendingUp,
   Users,
   Workflow,
-  X,
 } from "lucide-react";
 import CONFIG from "../config";
 import Logo from "../components/Logo";
+import { hermesSystemPrompt } from "../prompts/hermesSystemPrompt";
 import {
   brutalBorder,
   brutalButtonPrimary,
@@ -37,16 +31,8 @@ const dashboardConfig = CONFIG.dashboard;
 
 const dashboardLabels = {
   syncButton: dashboardConfig.syncButtonLabel || "Sync Vault",
-  settings:
-    dashboardConfig.settingsLabel ||
-    dashboardConfig.systemKeysLabel ||
-    "Settings",
   navigation: dashboardConfig.navigationTitle || "Navigation",
   noSync: dashboardConfig.noSyncLabel || "No sync yet",
-  saveSettings:
-    dashboardConfig.saveSettingsLabel ||
-    dashboardConfig.saveKeysLabel ||
-    "Save Settings",
   metrics: {
     revenue: dashboardConfig.metrics?.revenue || "Revenue",
     leads: dashboardConfig.metrics?.leads || "Leads",
@@ -74,7 +60,7 @@ const ASSISTANT_MODEL =
 const assistantWelcome = {
   role: "assistant",
   content:
-    "I am ready. Sync the Vault, then ask me what needs attention, what automations look stuck, or what move should come next.",
+    "Hermes online. I'm your strategic business partner. Sync the Vault to load your dashboard data, then ask me what needs attention, what's blocking growth, or what move to make next.",
 };
 
 const tabIcons = {
@@ -179,35 +165,35 @@ const buildAssistantSnapshot = ({ stats, data, lastSync }) => ({
   ),
 });
 
-const createLocalAssistantReply = ({ stats, data, lastSync }) => {
-  const alerts = data.alerts.length
-    ? data.alerts.slice(0, 2).map((alert) => alert.message).join(" ")
-    : "No active alerts are showing.";
-  const negativeReviews = data.reviews.filter((review) =>
-    String(review.sentiment || review.rating || "").toLowerCase().includes("negative"),
-  );
-  const nextAction =
-    data.aiBrief?.nextActions?.[0] ||
-    (negativeReviews.length
-      ? "Start with the reviews that need a public reply."
-      : "Review the latest stats, then pick one growth or retention action to push today.");
+  const createLocalAssistantReply = ({ stats, data, lastSync }) => {
+    const alerts = data.alerts.length
+      ? data.alerts.slice(0, 2).map((alert) => alert.message).join(" ")
+      : "No active alerts are showing.";
+    const negativeReviews = data.reviews.filter((review) =>
+      String(review.sentiment || review.rating || "").toLowerCase().includes("negative"),
+    );
+    const nextAction =
+      data.aiBrief?.nextActions?.[0] ||
+      (negativeReviews.length
+        ? "Start with the reviews that need a public reply."
+        : "Review the latest stats, then pick one growth or retention action to push today.");
 
-  const automationSummary = data.automations.length
-    ? data.automations
-        .slice(0, 3)
-        .map((a) => `${a.name || "Automation"}: ${a.status || "unknown"}`)
-        .join(", ")
-    : "No automations running.";
+    const automationSummary = data.automations.length
+      ? data.automations
+          .slice(0, 3)
+          .map((a) => `${a.name || "Automation"}: ${a.status || "unknown"}`)
+          .join(", ")
+      : "No automations running.";
 
-  return [
-    `Last sync: ${lastSync || "No sync yet"}.`,
-    `Revenue is ${stats.revenue}, leads are ${stats.leads}, conversion is ${stats.conversionRate}, and asset value is ${stats.assetValue}.`,
-    alerts,
-    `Automations: ${automationSummary}`,
-    `Best next move: ${nextAction}`,
-    "Add your OpenRouter key in Settings when you want me to answer follow-up questions with full AI reasoning.",
-  ].join("\n\n");
-};
+    return [
+      `Last sync: ${lastSync || "No sync yet"}.`,
+      `Revenue is ${stats.revenue}, leads are ${stats.leads}, conversion is ${stats.conversionRate}, and asset value is ${stats.assetValue}.`,
+      alerts,
+      `Automations: ${automationSummary}`,
+      `Best next move: ${nextAction}`,
+      "I'm here to help you analyze your dashboard. Ask me anything about your stats, reviews, or automations.",
+    ].join("\n\n");
+  };
 
 const MetricCard = ({ icon: Icon, label, value }) => (
   <div style={{ ...cardStyle, padding: "0.9rem" }}>
@@ -915,7 +901,6 @@ function DashboardAssistant({
 
 const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [showSettings, setShowSettings] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSync, setLastSync] = useState(null);
   const [syncError, setSyncError] = useState("");
@@ -931,9 +916,6 @@ const DashboardPage = () => {
     churnRisk: "Low",
   });
   const [automations, setAutomations] = useState([]);
-  const [openRouterKey, setOpenRouterKey] = useState(
-    localStorage.getItem('openRouterKey') || '',
-  );
   const [assistantMessages, setAssistantMessages] = useState([assistantWelcome]);
   const [assistantInput, setAssistantInput] = useState('');
   const [isAssistantThinking, setIsAssistantThinking] = useState(false);
@@ -943,6 +925,11 @@ const DashboardPage = () => {
 
   useEffect(() => {
     document.title = `${CONFIG.brand.fullName} Dashboard`;
+  }, []);
+
+  // Auto-sync on mount
+  useEffect(() => {
+    syncEmpireData();
   }, []);
 
   const tabs = useMemo(
@@ -957,7 +944,8 @@ const DashboardPage = () => {
     setSyncError("");
 
     try {
-      const syncUrl = API_URL.replace("/hermes", "/sync");
+      const baseUrl = API_URL.replace(/\/api\/hermes$/, '');
+      const syncUrl = `${baseUrl}/api/sync`;
       const res = await fetch(syncUrl, {
         method: "POST",
         headers: API_HEADERS,
@@ -1004,7 +992,8 @@ const DashboardPage = () => {
   const loadIntakeAlerts = async () => {
     setIntakeLoading(true);
     try {
-      const intakeUrl = `${API_URL.replace('/hermes', '')}/intake`;
+      const baseUrl = API_URL.replace(/\/api\/hermes$/, '');
+      const intakeUrl = `${baseUrl}/api/intake`;
       const res = await fetch(intakeUrl, {
         method: 'POST',
         headers: API_HEADERS,
@@ -1027,11 +1016,6 @@ const DashboardPage = () => {
   useEffect(() => {
     loadIntakeAlerts();
   }, [lastSync]);
-
-  const handleSaveSettings = () => {
-    localStorage.setItem("openRouterKey", openRouterKey.trim());
-    setShowSettings(false);
-  };
 
   const sendAssistantMessage = async (messageText) => {
     const trimmedMessage = messageText.trim();
@@ -1062,6 +1046,7 @@ const DashboardPage = () => {
           conversation: nextMessages,
           agentKey: 'digitallydefined_partner',
           agent: 'digitallydefined_partner',
+          systemPrompt: hermesSystemPrompt,
           notebooks: [
             process.env.NOTEBOOKLM_BRAND_NOTEBOOK,
             process.env.NOTEBOOKLM_REAL_ESTATE_NOTEBOOK,
@@ -1329,86 +1314,6 @@ const DashboardPage = () => {
           />
         </section>
       </main>
-
-      {showSettings && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(17,17,17,0.35)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 40,
-            padding: "1rem",
-          }}
-        >
-          <div
-            style={{
-              ...cardStyle,
-              padding: "1rem",
-              width: "min(420px, 100%)",
-              backgroundColor: theme.colors.background,
-              position: "relative",
-            }}
-          >
-            <button
-              onClick={() => setShowSettings(false)}
-              aria-label="Close settings"
-              style={{
-                position: "absolute",
-                top: 8,
-                right: 8,
-                border: brutalBorder,
-                background: theme.colors.card,
-                cursor: "pointer",
-                width: 32,
-                height: 32,
-                display: "grid",
-                placeItems: "center",
-              }}
-            >
-              <X size={16} />
-            </button>
-
-            <h2 style={{ ...brutalHeading, fontSize: "1rem", margin: "0 2.2rem 0.5rem 0" }}>
-              {dashboardConfig.settingsTitle}
-            </h2>
-
-            <p style={{ fontSize: "0.85rem", margin: "0 0 0.85rem", color: theme.colors.muted }}>
-              {dashboardConfig.settingsDescription}
-            </p>
-
-            <label style={{ display: "grid", gap: "0.35rem", fontSize: "0.85rem" }}>
-              <span>{dashboardConfig.openRouterLabel}</span>
-              <input
-                type="password"
-                value={openRouterKey}
-                onChange={(event) => setOpenRouterKey(event.target.value)}
-                placeholder={dashboardConfig.openRouterPlaceholder}
-                style={{
-                  border: brutalBorder,
-                  padding: "0.6rem 0.7rem",
-                  backgroundColor: theme.colors.card,
-                  fontFamily: theme.fonts.body,
-                }}
-              />
-            </label>
-
-            <button
-              onClick={handleSaveSettings}
-              style={{
-                ...brutalButtonPrimary,
-                width: "100%",
-                marginTop: "0.9rem",
-                padding: "0.65rem 0.75rem",
-              }}
-            >
-              {dashboardLabels.saveSettings}
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
