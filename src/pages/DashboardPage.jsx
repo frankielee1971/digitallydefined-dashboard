@@ -1247,13 +1247,12 @@ const DashboardPage = () => {
                   {badgeCount > 0 && (
                     <span
                       style={{
-                        backgroundColor: theme.colors.darkRed,
+                        backgroundColor: theme.colors.orange,
                         color: '#fff',
                         fontSize: '0.68rem',
                         fontWeight: 800,
                         padding: '0.12rem 0.45rem',
                         border: brutalBorder,
-                        backgroundColor: theme.colors.orange,
                       }}
                     >
                       {badgeCount}
