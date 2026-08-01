@@ -1,0 +1,346 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-background: #fffcf9;
+  --brand-panel: #fffaf5;
+  --brand-card: #ffffff;
+  --brand-text-primary: #111111;
+  --brand-text-dark: #111111;
+  --brand-text-muted: #5f5f5f;
+  --brand-accent-orange: #f18b25;
+  --brand-accent-aqua: #47b7d4;
+  --brand-accent-red: #8b1a0a;
+  --brand-border-width: 1px;
+  --brand-border-color: #111111;
+  --brand-border-radius: 0px;
+  --brand-spacing: 24px;
+  --brand-grid-gap: 32px;
+  --brand-container-max-width: 1100px;
+  --brand-shadow: none;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  background-color: var(--brand-background);
+  color: var(--brand-text-primary);
+  font-family: "DM Sans", system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Inter", system-ui, sans-serif;
+  font-weight: 900;
+  font-style: normal;
+  letter-spacing: 0;
+}
+
+a {
+  color: inherit;
+}
+
+.dd-card {
+  background: var(--brand-card);
+  border: var(--brand-border-width) solid var(--brand-border-color);
+  padding: 20px;
+}
+
+.dd-page {
+  min-height: 100vh;
+  background: var(--brand-background);
+  color: var(--brand-text-primary);
+  font-family: "DM Sans", system-ui, sans-serif;
+}
+
+.dd-page__container {
+  max-width: var(--brand-container-max-width);
+  margin: 0 auto;
+  display: grid;
+  gap: 32px;
+  padding: 32px 24px;
+}
+
+.dd-page__hero {
+  border-bottom: var(--brand-border-width) solid var(--brand-border-color);
+  background: var(--brand-panel);
+  padding: 32px 24px;
+}
+
+.dd-page__hero-inner {
+  max-width: var(--brand-container-max-width);
+  margin: 0 auto;
+  display: grid;
+  gap: 24px;
+}
+
+.dd-page__hero-meta,
+.dd-page__section-header,
+.dd-page__actions,
+.dd-page__footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.dd-heading {
+  margin: 0;
+  font-family: "Inter", system-ui, sans-serif;
+  font-weight: 900;
+  letter-spacing: 0;
+  color: var(--brand-text-primary);
+}
+
+.dd-heading--large {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.dd-heading--medium {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.dd-text {
+  margin: 0;
+  color: var(--brand-text-primary);
+  line-height: 1.7;
+}
+
+.dd-text--muted {
+  color: var(--brand-text-muted);
+}
+
+.dd-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: var(--brand-border-width) solid var(--brand-border-color);
+  background: transparent;
+  color: var(--brand-text-primary);
+  padding: 14px 20px;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 700;
+  transition: opacity 0.2s ease;
+}
+
+.dd-button:hover {
+  opacity: 0.95;
+}
+
+.dd-button--primary {
+  background: var(--brand-accent-orange);
+  color: #ffffff;
+  border-color: var(--brand-accent-orange);
+}
+
+.dd-button--secondary {
+  background: transparent;
+}
+
+.dd-button--selected {
+  border-color: var(--brand-accent-aqua);
+  background: rgba(71, 183, 212, 0.08);
+}
+
+.dd-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dd-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.dd-grid--assets {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.dd-card--spaced {
+  padding: 28px;
+}
+
+.dd-chat-toggle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 52px;
+  height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-text-primary);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 9999;
+}
+
+.dd-chat-window {
+  position: fixed;
+  bottom: 90px;
+  right: 24px;
+  width: 320px;
+  max-height: 420px;
+  background: var(--brand-card);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.16);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.dd-chat-header {
+  padding: 16px;
+  background: var(--brand-text-primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+.dd-chat-body {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  display: grid;
+  gap: 10px;
+}
+
+.dd-chat-message {
+  display: flex;
+}
+
+.dd-chat-message--user {
+  justify-content: flex-end;
+}
+
+.dd-chat-bubble {
+  display: inline-block;
+  padding: 12px 14px;
+  border-radius: 0;
+  max-width: 80%;
+  line-height: 1.4;
+}
+
+.dd-chat-message--user .dd-chat-bubble {
+  background: var(--brand-text-primary);
+  color: #fff;
+}
+
+.dd-chat-message--assistant .dd-chat-bubble {
+  background: var(--brand-panel);
+  color: var(--brand-text-primary);
+}
+
+.dd-chat-footer {
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  background: var(--brand-panel);
+}
+
+.dd-chat-input {
+  flex: 1;
+  padding: 12px;
+  border: var(--brand-border-width) solid var(--brand-border-color);
+  border-radius: 0;
+  background: var(--brand-card);
+  color: var(--brand-text-primary);
+}
+
+.dd-page--assistant {
+  min-height: 100vh;
+  background: var(--brand-background);
+  display: flex;
+  flex-direction: column;
+}
+
+.dd-assistant-header {
+  padding: 24px;
+  background: var(--brand-text-primary);
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+.dd-assistant-body {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  display: grid;
+  gap: 14px;
+}
+
+.dd-assistant-message {
+  display: flex;
+}
+
+.dd-assistant-message--user {
+  justify-content: flex-end;
+}
+
+.dd-assistant-message--assistant {
+  justify-content: flex-start;
+}
+
+.dd-assistant-message-bubble {
+  display: inline-block;
+  padding: 12px 14px;
+  border-radius: 0;
+  max-width: 80%;
+  line-height: 1.4;
+}
+
+.dd-assistant-message-bubble--user {
+  background: var(--brand-text-primary);
+  color: #fff;
+}
+
+.dd-assistant-message-bubble--assistant {
+  background: var(--brand-panel);
+  color: var(--brand-text-primary);
+}
+
+.dd-assistant-input-row {
+  padding: 24px;
+  display: flex;
+  gap: 12px;
+  background: var(--brand-card);
+  border-top: var(--brand-border-width) solid var(--brand-border-color);
+}
+
+.dd-assistant-input {
+  flex: 1;
+  padding: 14px;
+  border: var(--brand-border-width) solid var(--brand-border-color);
+  border-radius: 0;
+  background: var(--brand-background);
+  color: var(--brand-text-primary);
+}
