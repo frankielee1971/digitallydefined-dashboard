@@ -9,7 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "export:zip": "node scripts/export.js",
-    "vercel-build": "vite build"
+    "vercel-build": "npm rebuild && vite build"
   },
   "dependencies": {
     "@notionhq/client": "^5.18.0",
