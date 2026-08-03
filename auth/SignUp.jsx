@@ -1,11 +1,11 @@
 // src/pages/auth/Signup.jsx
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../firebase";
+import { useAuth } from "../src/context/AuthContext";
 
 export default function Signup() {
   const navigate = useNavigate();
+  const { signup } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -57,11 +57,7 @@ export default function Signup() {
     setAuthError("");
 
     try {
-      await createUserWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password
-      );
+      await signup(formData.email, formData.password, formData.email.split("@")[0]);
 
       setSuccess(true);
 

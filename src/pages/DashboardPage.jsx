@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import {
   BarChart3,
   Bot,
@@ -59,6 +60,11 @@ const API_HEADERS = {
   "Content-Type": "application/json",
   "x-api-key": API_KEY,
 };
+
+// Validate API_KEY is set
+if (!API_KEY) {
+  console.warn("[Dashboard] VITE_DASHBOARD_API_KEY not configured");
+}
 
 const ASSISTANT_MODEL =
   import.meta.env.VITE_DASHBOARD_ASSISTANT_MODEL ||
@@ -632,10 +638,14 @@ function DashboardAssistant({
 }
 
 const DashboardPage = () => {
+  const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [showSettings, setShowSettings] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [lastSync, setLastSync] = useState(null);
+  const [initialLoad, setInitialLoad] = useState(true);
+  const [lastSync, setLastSync] = useState(
+    localStorage.getItem("lastSync") || null,
+  );
   const [syncError, setSyncError] = useState("");
   const [data, setData] = useState(emptyData);
   const [stats, setStats] = useState({
@@ -669,14 +679,24 @@ const DashboardPage = () => {
   const currentTabConfig = tabs.find((tab) => tab.id === activeTab);
 
   const syncEmpireData = async () => {
+    if (isSyncing) {
+      console.log("[Dashboard] Sync already in progress, skipping");
+      return;
+    }
     setIsSyncing(true);
     setSyncError("");
 
     try {
       const res = await fetch(API_URL, {
         method: "POST",
-        headers: API_HEADERS,
-        body: JSON.stringify({ action: "dashboard" }),
+        headers: {
+          ...API_HEADERS,
+          "x-user-id": currentUser?.id || "anonymous",
+        },
+        body: JSON.stringify({
+          action: "dashboard",
+          userId: currentUser?.id,
+        }),
       });
 
       if (!res.ok) {
@@ -687,14 +707,26 @@ const DashboardPage = () => {
       }
 
       const payload = await res.json();
+
+      // Validate payload structure
+      if (!payload.revenue && !payload.leads) {
+        throw new Error("Invalid dashboard data received");
+      }
+
       const nextData = normalizeData(payload);
 
       setData(nextData);
 
       const automationsRes = await fetch(API_URL, {
         method: "POST",
-        headers: API_HEADERS,
-        body: JSON.stringify({ action: "automation.list" }),
+        headers: {
+          ...API_HEADERS,
+          "x-user-id": currentUser?.id || "anonymous",
+        },
+        body: JSON.stringify({
+          action: "automation.list",
+          userId: currentUser?.id,
+        }),
       });
       if (!automationsRes.ok) {
         setAutomations([]);
@@ -715,13 +747,20 @@ const DashboardPage = () => {
         emailGrowth: payload.emailGrowth || "0%",
         churnRisk: payload.churnRisk || "Low",
       });
-      setLastSync(new Date().toLocaleString());
+      const syncTime = new Date().toLocaleString();
+      localStorage.setItem("lastSync", syncTime);
+      setLastSync(syncTime);
     } catch (err) {
       setSyncError(err.message || dashboardConfig.syncError);
     } finally {
       setIsSyncing(false);
     }
   };
+
+  useEffect(() => {
+    syncEmpireData().finally(() => setInitialLoad(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSaveSettings = () => {
     localStorage.setItem("openRouterKey", openRouterKey.trim());
@@ -802,6 +841,27 @@ const DashboardPage = () => {
     if (activeTab === "notion") return <EmptyState>Notion database integration coming soon.</EmptyState>;
     return <CommandTab data={data} stats={stats} />;
   };
+
+  if (initialLoad) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          backgroundColor: theme.colors.background,
+          color: theme.colors.textPrimary,
+          fontFamily: theme.fonts.app,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+          <Loader2 size={20} style={{ animation: "dd-spin 0.8s linear infinite" }} />
+          <span>Loading dashboard...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

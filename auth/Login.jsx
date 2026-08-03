@@ -1,11 +1,11 @@
 // src/pages/auth/Login.jsx
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { auth, googleProvider } from "../../firebase";
+import { useAuth } from "../src/context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login, signInWithGoogle } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -42,7 +42,7 @@ export default function Login() {
     setAuthError("");
 
     try {
-      await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      await login(formData.email, formData.password);
       navigate("/dashboard");
     } catch (err) {
       setAuthError(err.message || "Login failed. Please try again.");
@@ -56,11 +56,10 @@ export default function Login() {
     setAuthError("");
 
     try {
-      await signInWithPopup(auth, googleProvider);
-      navigate("/dashboard");
+      await signInWithGoogle();
+      // OAuth redirects, so no navigate needed
     } catch (err) {
       setAuthError(err.message || "Google login failed.");
-    } finally {
       setLoading(false);
     }
   };
@@ -141,7 +140,7 @@ export default function Login() {
           </div>
 
           <p className="text-center text-sm text-gray-500 mt-6">
-            Don’t have an account?{" "}
+            Don't have an account?{" "}
             <Link to="/signup" className="text-[#c9a84c] font-semibold">
               Create one
             </Link>

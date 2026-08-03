@@ -26,7 +26,8 @@ export default function AssistantPage() {
     setInput("");
 
     try {
-      const res = await fetch("/api/hermes", {
+      const API_URL = `${import.meta.env.VITE_SUPABASE_URL || "https://dijjlppdljpcgyoakdnq.supabase.co"}/functions/v1/hermes`;
+      const res = await fetch(API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

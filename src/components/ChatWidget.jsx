@@ -17,7 +17,7 @@ export default function ChatWidget() {
     setInput("");
 
     try {
-      const API_URL = `${import.meta.env.VITE_DASHBOARD_API_URL || "https://digitallydefined-os-backend.vercel.app/api"}/hermes`;
+      const API_URL = `${import.meta.env.VITE_SUPABASE_URL || "https://dijjlppdljpcgyoakdnq.supabase.co"}/functions/v1/hermes`;
       const res = await fetch(API_URL, {
         method: "POST",
         headers: {
