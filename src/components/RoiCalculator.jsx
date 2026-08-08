@@ -113,7 +113,7 @@ const RoiCalculator = ({ mode = "free", onFullCalculatorClick }) => {
 
   return (
     <section
-      className="dd-roi-calculator"
+      className="dd-roi-calculator dd-tool"
       style={{
         ...brutalCard,
         overflow: "hidden",
@@ -157,7 +157,7 @@ const RoiCalculator = ({ mode = "free", onFullCalculatorClick }) => {
 
           <div style={{ display: "grid", gap: "18px" }}>
             {fields.map((field) => (
-              <label key={field.key} style={{ display: "grid", gap: "10px" }}>
+              <label key={field.key} className="dd-label" style={{ display: "grid", gap: "10px" }}>
                 <span
                   style={{
                     display: "flex",
@@ -174,6 +174,7 @@ const RoiCalculator = ({ mode = "free", onFullCalculatorClick }) => {
                   <span style={{ color: colors.accent }}>{renderValue(field)}</span>
                 </span>
                 <input
+                  className="dd-input"
                   type="range"
                   min={field.min}
                   max={field.max}
@@ -220,6 +221,7 @@ const RoiCalculator = ({ mode = "free", onFullCalculatorClick }) => {
               Total yield capability
             </p>
             <strong
+              className="dd-result"
               style={{
                 display: "block",
                 color: colors.surface,
@@ -304,7 +306,12 @@ const RoiCalculator = ({ mode = "free", onFullCalculatorClick }) => {
             Gumroad adds retention, reputation lift, annualized upside, and the
             numbers you need for a serious decision.
           </p>
-          <button type="button" onClick={onFullCalculatorClick} style={brutalButtonPrimary}>
+          <button
+            className="dd-btn"
+            type="button"
+            onClick={onFullCalculatorClick}
+            style={brutalButtonPrimary}
+          >
             Buy the full calculator <ArrowRight size={16} />
           </button>
         </div>
@@ -334,7 +341,11 @@ const RoiCalculator = ({ mode = "free", onFullCalculatorClick }) => {
               reputation work, or a full local visibility campaign.
             </p>
           </div>
-          <a href={`mailto:${CONFIG.contact.email}`} style={brutalButtonSecondary}>
+          <a
+            className="dd-btn dd-btn--secondary"
+            href={`mailto:${CONFIG.contact.email}`}
+            style={brutalButtonSecondary}
+          >
             Send me my numbers <ArrowRight size={16} />
           </a>
         </div>

@@ -19,10 +19,8 @@ export async function getPuter() {
     });
   }
 
-  // Initialize Puter.js UI
-  if (window.puter && window.puter.ui) {
-    window.puter.ui.onLoad();
-  }
+  // IMPORTANT: Do NOT call puter.ui.onLoad() - this triggers Puter's generic auth UI
+  // We want to use our custom login/signup pages instead
 
   puterInstance = window.puter;
   return puterInstance;
