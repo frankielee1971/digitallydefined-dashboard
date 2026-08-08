@@ -1,5 +1,8 @@
+// src/context/AuthContext.jsx
+// Puter.js authentication context
+
 import { createContext, useContext, useEffect, useState } from "react";
-import { supabase, signIn, signUp, signInWithGoogle, signOut } from "../supabase";
+import { getCurrentUser, signIn as puterSignIn, signOut as puterSignOut, isSignedIn } from "../lib/auth";
 
 const AuthContext = createContext();
 
@@ -8,25 +11,48 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setCurrentUser(session?.user ?? null);
-      setLoading(false);
-    });
+    // Check if user is already signed in
+    async function checkAuth() {
+      try {
+        const user = await getCurrentUser();
+        setCurrentUser(user);
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        setCurrentUser(null);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setCurrentUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    checkAuth();
   }, []);
 
   const value = {
     currentUser,
-    signup: (email, password, name) => signUp(email, password, name),
-    login: (email, password) => signIn(email, password),
-    logout: () => signOut(),
-    signInWithGoogle,
+    signup: async (email, password, name) => {
+      // Puter.js handles signup through signIn()
+      // The actual signup is handled by Puter's auth flow
+      throw new Error("Sign up is handled by Puter.js authentication flow");
+    },
+    login: async (email, password) => {
+      // Puter.js uses its own auth flow, not email/password
+      // This is kept for compatibility but actual auth uses puter.auth.signIn()
+      await puterSignIn();
+      const user = await getCurrentUser();
+      setCurrentUser(user);
+      return user;
+    },
+    logout: async () => {
+      await puterSignOut();
+      setCurrentUser(null);
+    },
+    signInWithGoogle: async () => {
+      // Google sign-in is handled by Puter.js
+      await puterSignIn();
+      const user = await getCurrentUser();
+      setCurrentUser(user);
+      return user;
+    },
   };
 
   return (

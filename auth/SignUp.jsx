@@ -1,170 +1,113 @@
-// src/pages/auth/Signup.jsx
+// auth/SignUp.jsx
+// Updated for Puter.js authentication
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../src/context/AuthContext";
 
 export default function Signup() {
   const navigate = useNavigate();
-  const { signup } = useAuth();
+  const { signInWithGoogle } = useAuth();
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-
-  const [errors, setErrors] = useState({});
-  const [authError, setAuthError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: "" }));
-    setAuthError("");
-  };
-
-  const validate = () => {
-    const newErrors = {};
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!formData.email) newErrors.email = "Email is required.";
-    else if (!emailRegex.test(formData.email))
-      newErrors.email = "Enter a valid email.";
-
-    if (!formData.password) newErrors.password = "Password is required.";
-    else if (formData.password.length < 6)
-      newErrors.password = "Minimum 6 characters.";
-
-    if (!formData.confirmPassword)
-      newErrors.confirmPassword = "Please confirm your password.";
-    else if (formData.password !== formData.confirmPassword)
-      newErrors.confirmPassword = "Passwords do not match.";
-
-    return newErrors;
-  };
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
     setLoading(true);
-    setAuthError("");
 
     try {
-      await signup(formData.email, formData.password, formData.email.split("@")[0]);
-
+      // Puter.js handles signup through its auth flow
+      await signInWithGoogle();
       setSuccess(true);
-
       setTimeout(() => navigate("/dashboard"), 1200);
     } catch (err) {
-      setAuthError(err.message || "Signup failed.");
+      console.error("Signup failed:", err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f0e8] flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12" style={{ background: '#F5F0E8', fontFamily: "'Inter', system-ui, sans-serif" }}>
       <div className="w-full max-w-md">
 
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-black tracking-tight text-[#111111]">
-            DIGITALLY<span className="text-[#c9a84c]">DEFINED</span>
+          <h1 className="text-2xl font-black tracking-widest text-[#1A1A1A]" style={{ letterSpacing: '0.15em' }}>
+            DIGITALLY<span className="text-[#C9A84C]">DEFINED</span>
           </h1>
-          <p className="mt-1 text-sm text-gray-500 tracking-widest uppercase">
-            Reputation & Revenue Engine
+          <p className="mt-2 text-xs text-[#525252] tracking-widest uppercase font-bold">
+            Faceless Digital Real Estate
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-          <h2 className="text-xl font-bold text-[#111111] mb-1">
+        <div className="bg-white border-2 border-[#1A1A1A] p-8" style={{ borderRadius: '0', boxShadow: 'none' }}>
+          <h2 className="text-xl font-black text-[#1A1A1A] mb-1 uppercase tracking-wider">
             Create your account
           </h2>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-sm text-[#525252] mb-6 font-medium">
             Start owning your digital presence.
           </p>
 
           {success && (
-            <div className="mb-4 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 font-medium">
+            <div className="mb-4 border-2 border-[#15803d] px-4 py-3 text-sm text-[#15803d] font-bold uppercase tracking-wide">
               Account created! Redirecting…
-            </div>
-          )}
-
-          {authError && (
-            <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 font-medium">
-              {authError}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-semibold text-[#111111] mb-1">
+              <label className="block text-xs font-black uppercase tracking-widest text-[#1A1A1A] mb-2">
                 Email Address
               </label>
               <input
                 name="email"
                 type="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full border-2 border-[#1A1A1A] px-4 py-3 text-[#1A1A1A] outline-none"
+                style={{ borderRadius: '0', background: '#FFFFFF' }}
+                readOnly
               />
-              {errors.email && (
-                <p className="text-red-600 text-sm mt-1">{errors.email}</p>
-              )}
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#111111] mb-1">
+              <label className="block text-xs font-black uppercase tracking-widest text-[#1A1A1A] mb-2">
                 Password
               </label>
               <input
                 name="password"
                 type="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full border-2 border-[#1A1A1A] px-4 py-3 text-[#1A1A1A] outline-none"
+                style={{ borderRadius: '0', background: '#FFFFFF' }}
+                readOnly
               />
-              {errors.password && (
-                <p className="text-red-600 text-sm mt-1">{errors.password}</p>
-              )}
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#111111] mb-1">
+              <label className="block text-xs font-black uppercase tracking-widest text-[#1A1A1A] mb-2">
                 Confirm Password
               </label>
               <input
                 name="confirmPassword"
                 type="password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full border-2 border-[#1A1A1A] px-4 py-3 text-[#1A1A1A] outline-none"
+                style={{ borderRadius: '0', background: '#FFFFFF' }}
+                readOnly
               />
-              {errors.confirmPassword && (
-                <p className="text-red-600 text-sm mt-1">
-                  {errors.confirmPassword}
-                </p>
-              )}
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#111111] text-white py-3 rounded-lg font-semibold hover:bg-black/80 transition"
+              className="w-full bg-[#C9A84C] text-[#1A1A1A] py-3 font-black uppercase tracking-widest text-sm border-2 border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-colors"
+              style={{ borderRadius: '0' }}
             >
-              {loading ? "Creating account…" : "Create Account"}
+              {loading ? "Creating account..." : "Create Account with Puter"}
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-500 mt-6">
+          <p className="text-center text-sm text-[#525252] mt-6 font-medium">
             Already have an account?{" "}
-            <Link to="/login" className="text-[#c9a84c] font-semibold">
+            <Link to="/login" className="text-[#C9A84C] font-black uppercase tracking-wider">
               Sign in
             </Link>
           </p>
