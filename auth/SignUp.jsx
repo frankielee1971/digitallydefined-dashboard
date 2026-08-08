@@ -65,7 +65,8 @@ export default function Signup() {
                 type="email"
                 className="w-full border-2 border-[#1A1A1A] px-4 py-3 text-[#1A1A1A] outline-none"
                 style={{ borderRadius: '0', background: '#FFFFFF' }}
-                readOnly
+                placeholder="Enter your email"
+                required
               />
             </div>
 
@@ -78,7 +79,8 @@ export default function Signup() {
                 type="password"
                 className="w-full border-2 border-[#1A1A1A] px-4 py-3 text-[#1A1A1A] outline-none"
                 style={{ borderRadius: '0', background: '#FFFFFF' }}
-                readOnly
+                placeholder="Enter your password"
+                required
               />
             </div>
 
@@ -91,7 +93,8 @@ export default function Signup() {
                 type="password"
                 className="w-full border-2 border-[#1A1A1A] px-4 py-3 text-[#1A1A1A] outline-none"
                 style={{ borderRadius: '0', background: '#FFFFFF' }}
-                readOnly
+                placeholder="Confirm your password"
+                required
               />
             </div>
 
@@ -101,7 +104,7 @@ export default function Signup() {
               className="w-full bg-[#C9A84C] text-[#1A1A1A] py-3 font-black uppercase tracking-widest text-sm border-2 border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-colors"
               style={{ borderRadius: '0' }}
             >
-              {loading ? "Creating account..." : "Create Account with Puter"}
+              {loading ? "Creating account..." : "Create Account"}
             </button>
           </form>
 

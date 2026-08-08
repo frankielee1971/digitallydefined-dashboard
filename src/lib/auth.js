@@ -1,37 +1,57 @@
 // src/lib/auth.js
-// Puter.js authentication module
+// Supabase authentication module for DigitallyDefined Dashboard
 
-import { getPuter } from './puter.js';
+import { supabase } from '../supabase.js';
+import { signIn, signUp, signInWithGoogle as supabaseSignInWithGoogle, signOut as supabaseSignOut } from '../supabase.js';
 
 let currentUser = null;
 
 export async function getCurrentUser() {
   try {
-    const puter = await getPuter();
-    currentUser = await puter.auth.getUser();
-    return currentUser;
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error) throw error;
+    currentUser = user;
+    return user;
   } catch (error) {
     console.error('Failed to get current user:', error);
     return null;
   }
 }
 
-export async function signIn() {
+export async function signInWithEmail(email, password) {
   try {
-    const puter = await getPuter();
-    const user = await puter.auth.signIn();
-    currentUser = user;
+    const user = await signIn(email, password);
+    currentUser = user.user;
     return user;
   } catch (error) {
-    console.error('Sign in failed:', error);
+    console.error('Email sign in failed:', error);
+    throw error;
+  }
+}
+
+export async function signUpWithEmail(email, password, name) {
+  try {
+    const user = await signUp(email, password, name);
+    currentUser = user.user;
+    return user;
+  } catch (error) {
+    console.error('Email sign up failed:', error);
+    throw error;
+  }
+}
+
+export async function signInWithGoogle() {
+  try {
+    await supabaseSignInWithGoogle();
+  } catch (error) {
+    console.error('Google sign in failed:', error);
     throw error;
   }
 }
 
 export async function signOut() {
   try {
-    const puter = await getPuter();
-    await puter.auth.signOut();
+    await supabaseSignOut();
     currentUser = null;
   } catch (error) {
     console.error('Sign out failed:', error);

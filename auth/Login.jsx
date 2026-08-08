@@ -73,7 +73,8 @@ export default function Login() {
                 type="email"
                 className="w-full border-2 border-[#1A1A1A] px-4 py-3 text-[#1A1A1A] outline-none"
                 style={{ borderRadius: '0', background: '#FFFFFF' }}
-                readOnly
+                placeholder="Enter your email"
+                required
               />
             </div>
 
@@ -86,7 +87,8 @@ export default function Login() {
                 type="password"
                 className="w-full border-2 border-[#1A1A1A] px-4 py-3 text-[#1A1A1A] outline-none"
                 style={{ borderRadius: '0', background: '#FFFFFF' }}
-                readOnly
+                placeholder="Enter your password"
+                required
               />
             </div>
 
@@ -96,7 +98,7 @@ export default function Login() {
               className="w-full bg-[#C9A84C] text-[#1A1A1A] py-3 font-black uppercase tracking-widest text-sm border-2 border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-colors"
               style={{ borderRadius: '0' }}
             >
-              {loading ? "Signing in..." : "Sign In with Puter"}
+              {loading ? "Signing in..." : "Sign In"}
             </button>
           </form>
 
@@ -107,7 +109,7 @@ export default function Login() {
               className="w-full bg-white border-2 border-[#1A1A1A] py-3 font-black uppercase tracking-widest text-sm text-[#1A1A1A] hover:bg-[#F5F0E8] transition-colors"
               style={{ borderRadius: '0' }}
             >
-              Continue with Google (via Puter)
+              Continue with Google
             </button>
           </div>
 
