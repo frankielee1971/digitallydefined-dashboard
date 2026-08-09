@@ -45,7 +45,7 @@ export function AuthProvider({ children }) {
     signInWithGoogle: async () => {
       await signInWithGoogle();
       // OAuth redirects, so no need to update currentUser here
-    }.bind(this),
+    },
     logout: async () => {
       await signOut();
       setCurrentUser(null);
