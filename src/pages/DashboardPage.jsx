@@ -53,7 +53,7 @@ const dashboardLabels = {
   },
 };
 
-const API_URL = `${import.meta.env.VITE_SUPABASE_URL || "https://dijjlppdljpcgyoakdnq.supabase.co"}/functions/v1/hermes`;
+const API_URL = "/api/hermes";
 
 const API_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "";
 const API_HEADERS = {

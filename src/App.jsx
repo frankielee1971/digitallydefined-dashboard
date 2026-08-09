@@ -8,8 +8,8 @@ import AssistantPage from "./pages/AssistantPage";
 import ChatWidget from "./components/ChatWidget";
 import LandingPage from "./pages/LandingPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Login from "../auth/Login";
-import SignUp from "../auth/SignUp";
+import Login from "./pages/auth/Login";
+import SignUp from "./pages/auth/SignUp";
 
 function App() {
   const hostname = window.location.hostname;
@@ -41,6 +41,8 @@ function App() {
           }
         />
         <Route path="/quiz" element={<DigitalSuperpowerQuiz />} />
+        <Route path="/automations" element={<AssistantPage />} />
+        <Route path="/thank-you-calculator" element={<AssistantPage />} />
 
         {/* ⭐ NEW: AI Assistant Page (dashboard only) */}
         {isDashboardDomain && (

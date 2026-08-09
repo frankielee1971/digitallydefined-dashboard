@@ -237,12 +237,29 @@ const LandingPage = () => {
           }}
         >
           <Logo as="div" style={{ fontSize: "clamp(1.1rem, 2vw, 1.45rem)" }} />
-          <a
-            href="/quiz"
-            style={{ ...brutalButtonSecondary, display: "flex", alignItems: "center", gap: "8px" }}
-          >
-            Take the quiz <Sparkles size={16} />
-          </a>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <a
+              href="https://digitallydefined.online"
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                color: colors.textMuted,
+                textDecoration: "none",
+              }}
+            >
+              DigitallyDefined.com
+            </a>
+            <a
+              href="/quiz"
+              style={{ ...brutalButtonSecondary, display: "flex", alignItems: "center", gap: "8px" }}
+            >
+              Take the quiz <Sparkles size={16} />
+            </a>
+          </div>
         </div>
       </header>
 
