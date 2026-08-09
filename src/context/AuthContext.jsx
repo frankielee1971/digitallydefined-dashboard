@@ -3,7 +3,13 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../supabase.js";
-import { getCurrentUser, signInWithEmail, signUpWithEmail, signInWithGoogle, signOut } from "../lib/auth";
+import {
+  getCurrentUser,
+  signInWithEmail,
+  signUpWithEmail,
+  signInWithGoogle,
+  signOut,
+} from "../lib/auth";
 
 const AuthContext = createContext();
 
@@ -12,19 +18,39 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already signed in via Supabase
-    getCurrentUser().then((user) => {
-      setCurrentUser(user);
-    }).catch((error) => {
-      console.error('Auth check failed:', error);
-      setCurrentUser(null);
-    }).finally(() => {
-      setLoading(false);
-    });
+    async function loadSession() {
+      try {
+        // First: check active session (required for Google OAuth)
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setCurrentUser(session?.user || null);
+        if (session?.user) {
+          setCurrentUser(session.user);
+        } else {
+          // Fallback: check user via getCurrentUser()
+          const user = await getCurrentUser();
+          setCurrentUser(user || null);
+        }
+      } catch (error) {
+        console.error("Auth check failed:", error);
+        setCurrentUser(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadSession();
+
+    // Listen for auth state changes (login, logout, Google OAuth callback)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setCurrentUser(session.user);
+      } else {
+        setCurrentUser(null);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -32,20 +58,24 @@ export function AuthProvider({ children }) {
 
   const value = {
     currentUser,
+
     login: async (email, password) => {
       const user = await signInWithEmail(email, password);
       setCurrentUser(user.user);
       return user;
     },
+
     signup: async (email, password, name) => {
       const user = await signUpWithEmail(email, password, name);
       setCurrentUser(user.user);
       return user;
     },
+
     signInWithGoogle: async () => {
       await signInWithGoogle();
-      // OAuth redirects, so no need to update currentUser here
+      // OAuth redirects, session will be picked up by getSession() + onAuthStateChange
     },
+
     logout: async () => {
       await signOut();
       setCurrentUser(null);
