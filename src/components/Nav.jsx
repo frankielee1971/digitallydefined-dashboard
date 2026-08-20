@@ -1,6 +1,6 @@
 import React from "react";
 import Logo from "./Logo";
-import { brutalBorder, theme } from "../theme";
+import { brutalBorder, containerWidth, spacingScale, theme } from "../theme";
 
 const Nav = ({ colors, containerStyle, buttonStyle, onDashboardClick, ctaLabel }) => (
   <nav
@@ -10,12 +10,14 @@ const Nav = ({ colors, containerStyle, buttonStyle, onDashboardClick, ctaLabel }
       zIndex: 20,
       borderBottom: brutalBorder,
       backgroundColor: colors.surface,
-      padding: `20px ${theme.layout.spacing}`,
+      padding: `${spacingScale.md} ${containerWidth}`,
     }}
   >
     <div
       style={{
         ...containerStyle,
+        maxWidth: containerWidth,
+        width: "100%",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -27,7 +29,7 @@ const Nav = ({ colors, containerStyle, buttonStyle, onDashboardClick, ctaLabel }
         as="div"
         style={{
           fontSize: "clamp(1.25rem, 2vw, 1.5rem)",
-          letterSpacing: "-0.05em",
+          letterSpacing: "-0.03em", // brand heading spacing (was -0.05em)
         }}
       />
       <button type="button" onClick={onDashboardClick} style={buttonStyle}>

@@ -89,3 +89,58 @@ export const brutalButtonSecondary = {
   backgroundColor: theme.colors.aquaBlue,
   color: theme.colors.textDark,
 };
+/* --- DD Design System additions (non-breaking upgrades) ---------- */
+
+export const brutalButtonOutline = {
+  ...brutalButtonBase,
+  backgroundColor: theme.colors.background,
+  color: theme.colors.textPrimary,
+};
+
+/* Full spacing + type scales locked to the brand system */
+export const spacingScale = {
+  xs: "8px",
+  sm: "16px",
+  md: "24px",
+  lg: "40px",
+  xl: "60px",
+  gridGap: "32px",
+  container: tokens.layout.containerMaxWidth || "1100px",
+};
+
+export const typeScale = {
+  h1: { ...brutalHeading, fontSize: "clamp(2.25rem, 5vw, 3rem)" },
+  h2: { ...brutalHeading, fontSize: "clamp(1.75rem, 4vw, 2rem)" },
+  h3: { ...brutalHeading, fontSize: "clamp(1.2rem, 3vw, 1.5rem)" },
+  body: {
+    fontFamily: theme.fonts.body,
+    fontSize: "1rem",
+    fontWeight: 400,
+    lineHeight: "1.6",
+    color: theme.colors.textPrimary,
+  },
+  muted: {
+    fontFamily: theme.fonts.body,
+    fontSize: "0.9rem",
+    fontWeight: 400,
+    color: theme.colors.muted,
+  },
+  eyebrow: brutalEyebrow,
+};
+
+/* Flat geometric icon system — NO silhouettes, NO human shapes */
+export const flatIcon = {
+  style: "flat-line-geometric",
+  stroke: "1.5px",
+  radius: 0,
+  gradients: "none",
+};
+
+export const flatIllustration = {
+  style: "flat-abstract",
+  radius: 0,
+  figures: "none", // no human forms
+  gradients: "none",
+};
+
+export const containerWidth = spacingScale.container;
