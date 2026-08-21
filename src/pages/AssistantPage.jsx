@@ -1,15 +1,40 @@
 import { useState, useEffect, useRef } from "react";
 import Groq from "groq-sdk";
+import { getAnalyticsBrief, formatBriefAsContext } from "../lib/analytics";
+
+const PARTNER_SYSTEM_PROMPT = `You are Hermes, the AI Business Partner inside DigitallyDefined.
+You help Francesca scale digitallydefined.online using REAL website data supplied below.
+- Summarize incoming data when asked "how is the site doing".
+- Detect opportunities and high-performing content.
+- Warn about failing funnels (low quiz completion, high bounce, weak visitor→lead rate).
+- Suggest new pages, products, or automations grounded in observed behavior.
+- Always propose a concrete next step. Never invent numbers not present in the data.`;
 
 export default function AssistantPage() {
+  const [analyticsContext, setAnalyticsContext] = useState("");
   const [messages, setMessages] = useState([
-    { role: "assistant", content: "Hi! I'm your DigitallyDefined assistant. What should we move on next?" }
+    { role: "assistant", content: "Hi! I'm your DigitallyDefined AI Business Partner. I read your live website analytics. What should we move on next?" }
   ]);
   const [input, setInput] = useState("");
   const [error, setError] = useState(null);
   const [provider, setProvider] = useState(null);
   const [model, setModel] = useState(null);
   const messagesEndRef = useRef(null);
+
+  // Load the live analytics snapshot so every reply is grounded in real data.
+  useEffect(() => {
+    let cancelled = false;
+    getAnalyticsBrief(30)
+      .then((brief) => {
+        if (!cancelled) setAnalyticsContext(formatBriefAsContext(brief));
+      })
+      .catch(() => {
+        if (!cancelled) setAnalyticsContext("Website analytics are currently unavailable.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY || import.meta.env.VITE_GROQ_API_KEY || ''
@@ -34,7 +59,13 @@ export default function AssistantPage() {
     try {
       const response = await groq.chat.completions.create({
         model: "llama-3.3-70b-versatile", // free + strong
-        messages: updatedMessages,
+        messages: [
+          {
+            role: "system",
+            content: `${PARTNER_SYSTEM_PROMPT}\n\n${analyticsContext}`,
+          },
+          ...updatedMessages,
+        ],
         temperature: 0.3,
         stream: false
       });

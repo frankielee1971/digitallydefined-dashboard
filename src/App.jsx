@@ -7,6 +7,7 @@ import DigitalSuperpowerQuiz from "./pages/DigitalSuperpowerQuiz";
 import AssistantPage from "./pages/AssistantPage";
 import ThankYouCalculatorPage from "./pages/ThankYouCalculatorPage";
 import IntelligencePage from "./pages/IntelligencePage";
+import AnalyticsPage from "./pages/AnalyticsPage";
 import ChatWidget from "./components/ChatWidget";
 import ScrollProgress from "./components/ScrollProgress";
 import LandingPage from "./pages/LandingPage";
@@ -48,6 +49,18 @@ function App() {
         <Route path="/automations" element={<AssistantPage />} />
         <Route path="/thank-you-calculator" element={<ThankYouCalculatorPage />} />
         <Route path="/intelligence" element={<IntelligencePage />} />
+
+        {/* ⭐ Live website analytics (AI Business Partner data source) */}
+        {isDashboardDomain && (
+          <Route
+            path="/analytics"
+            element={
+              <ProtectedRoute>
+                <AnalyticsPage />
+              </ProtectedRoute>
+            }
+          />
+        )}
 
         {/* ⭐ NEW: AI Assistant Page (dashboard only) */}
         {isDashboardDomain && (
