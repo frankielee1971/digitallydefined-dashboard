@@ -675,8 +675,48 @@ export default function DashboardPageUnified() {
   const [isThinking, setIsThinking] = useState(false);
   const [assistantError, setAssistantError] = useState("");
 
-  // ... existing data fetching and assistant logic stays intact ...
-  // This file focuses on unifying brand presentation and interactivity.
+  // Data fetching restored: keeps unified UI, removes blank dashboard
+  useEffect(() => {
+    let isMounted = true;
+    async function loadDashboard() {
+      try {
+        const response = await fetch("/api/hermes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "dashboard" }),
+        });
+        const result = await response.json();
+        if (!isMounted) return;
+        if (result?.success && result.data) {
+          const payload = result.data;
+          setPayload(payload);
+          setStats({
+            revenue: formatCurrency(payload.revenue),
+            leads: formatCount(payload.leads),
+            conversionRate: formatConversion(payload.conversionRate),
+            assetValue: formatAssetValue(payload.assetValue),
+            topAsset: payload.topAsset || "N/A",
+            communityGrowth: formatCount(payload.communityGrowth),
+            emailGrowth: formatCount(payload.emailGrowth),
+            churnRisk: payload.churnRisk || "N/A",
+          });
+          setData(normalizeData(payload));
+          setLastSync(new Date().toLocaleString());
+        } else {
+          setData((current) => ({ ...current, sourceHealth: { api: result?.error || "Unavailable" } }));
+        }
+      } catch (error) {
+        if (isMounted) {
+          setData((current) => ({ ...current, sourceHealth: { api: error.message || "Unavailable" } }));
+        }
+      }
+    }
+
+    loadDashboard();
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
 
   const tabs = [
     { id: "dashboard", label: "Command", icon: LayoutDashboard },
