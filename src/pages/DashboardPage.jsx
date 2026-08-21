@@ -16,6 +16,8 @@ import {
   Users,
   Workflow,
   X,
+  ExternalLink,
+  Plug,
 } from "lucide-react";
 import CONFIG from "../config";
 import Logo from "../components/Logo";
@@ -28,6 +30,14 @@ import {
   theme,
 } from "../theme";
 import { getSupabaseEdgeUrl, getSupabaseEdgeHeaders } from "../lib/supabase-edge";
+import GrowthTab from "./GrowthTab";
+import IntegrationsTab from "./IntegrationsTab";
+import {
+  fetchGoogleAnalytics,
+  fetchSocialStats,
+  fetchEmailStats,
+  fetchCommunityStats,
+} from "../lib/integrations";
 
 const dashboardConfig = CONFIG.dashboard;
 
@@ -82,9 +92,10 @@ const tabIcons = {
   dashboard: LayoutDashboard,
   reputation: ShieldCheck,
   intel: BarChart3,
+  growth: TrendingUp,
   brain: BrainCircuit,
   automations: Workflow,
-  notion: Bot,
+  integrations: Settings,
 };
 
 const formatConversion = (value) => {
@@ -140,10 +151,11 @@ const normalizeData = (payload = {}) => ({
 
 const emptyData = normalizeData();
 
-const buildAssistantSnapshot = ({ stats, data, lastSync }) => ({
+const buildAssistantSnapshot = ({ stats, data, lastSync, integrations }) => ({
   lastSync: lastSync || "No sync yet",
   stats,
   sourceHealth: data.sourceHealth || {},
+  integrations: integrations || {},
   alerts: summarizeList(
     data.alerts,
     (alert) => `${alert.type || "info"} from ${alert.source || "System"}: ${alert.message}`,
@@ -660,6 +672,13 @@ const DashboardPage = () => {
     churnRisk: "Low",
   });
   const [automations, setAutomations] = useState([]);
+  const [integrations, setIntegrations] = useState({
+    googleAnalytics: { connected: false, error: null },
+    social: { connected: false, error: null },
+    email: { connected: false, error: null },
+    community: { connected: false, error: null },
+    fetchedAt: null,
+  });
   const [openRouterKey, setOpenRouterKey] = useState(
     localStorage.getItem("openRouterKey") || "",
   );
@@ -758,8 +777,27 @@ const DashboardPage = () => {
     }
   };
 
+  const syncIntegrations = async () => {
+    const [ga, social, email, community] = await Promise.all([
+      fetchGoogleAnalytics(),
+      fetchSocialStats(),
+      fetchEmailStats(),
+      fetchCommunityStats(),
+    ]);
+
+    setIntegrations({
+      googleAnalytics: ga,
+      social,
+      email,
+      community,
+      fetchedAt: new Date().toLocaleString(),
+    });
+  };
+
   useEffect(() => {
-    syncEmpireData().finally(() => setInitialLoad(false));
+    syncEmpireData()
+      .then(syncIntegrations)
+      .finally(() => setInitialLoad(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -785,7 +823,8 @@ const DashboardPage = () => {
       const snapshot = buildAssistantSnapshot({
         stats,
         data: { ...data, automations },
-        lastSync
+        lastSync,
+        integrations,
       });
 
       // Send to your Hermes backend
@@ -795,6 +834,7 @@ const DashboardPage = () => {
           body: JSON.stringify({
             message: trimmedMessage,
             messages: nextMessages,
+            snapshot,
             context: {},
             conversation: nextMessages,
           }),
@@ -837,9 +877,10 @@ const DashboardPage = () => {
   const renderTab = () => {
     if (activeTab === "reputation") return <ReputationTab reviews={data.reviews} />;
     if (activeTab === "intel") return <IntelTab data={data} />;
+    if (activeTab === "growth") return <GrowthTab integrations={integrations} />;
     if (activeTab === "brain") return <BrainTab aiBrief={data.aiBrief} />;
     if (activeTab === "automations") return <AutomationsTab automations={data.automations} />;
-    if (activeTab === "notion") return <EmptyState>Notion database integration coming soon.</EmptyState>;
+    if (activeTab === "integrations") return <IntegrationsTab integrations={integrations} />;
     return <CommandTab data={data} stats={stats} />;
   };
 
@@ -906,7 +947,20 @@ const DashboardPage = () => {
           </p>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+          <button
+            onClick={syncIntegrations}
+            disabled={isSyncing}
+            style={{
+              ...brutalButtonPrimary,
+              padding: "0.55rem 0.8rem",
+              backgroundColor: theme.colors.aquaBlue,
+              opacity: isSyncing ? 0.72 : 1,
+            }}
+          >
+            <Plug size={16} />
+            <span>Sync Integrations</span>
+          </button>
           <button
             onClick={syncEmpireData}
             disabled={isSyncing}

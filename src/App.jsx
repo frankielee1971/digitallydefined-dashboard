@@ -2,17 +2,17 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import CONFIG from "./config";
-import DashboardPage from "./pages/DashboardPageUnified";
-import DigitalSuperpowerQuiz from "./pages/DigitalSuperpowerQuizUnified";
-import AssistantPage from "./pages/AssistantPageUnified";
-import ThankYouCalculatorPage from "./pages/ThankYouCalculatorPageUnified";
-import IntelligencePage from "./pages/IntelligencePageUnified";
+import DashboardPage from "./pages/DashboardPage";
+import DigitalSuperpowerQuiz from "./pages/DigitalSuperpowerQuiz";
+import AssistantPage from "./pages/AssistantPage";
+import ThankYouCalculatorPage from "./pages/ThankYouCalculatorPage";
+import IntelligencePage from "./pages/IntelligencePage";
 import ChatWidget from "./components/ChatWidget";
 import ScrollProgress from "./components/ScrollProgress";
 import LandingPage from "./pages/LandingPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Login from "./pages/auth/LoginUnified";
-import SignUp from "./pages/auth/SignUpUnified";
+import Login from "./pages/auth/Login";
+import SignUp from "./pages/auth/SignUp";
 
 function App() {
   const hostname = window.location.hostname;

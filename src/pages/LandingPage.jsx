@@ -13,14 +13,14 @@ import {
   brutalHeading,
   theme,
 } from "../theme";
-import FadeInSection from "../components/FadeInSection";
-import { ddBrand, ddSection, ddContainer, ddGrid } from "../brand/dd-brand-tokens";
+
 
 const LandingPage = () => {
   const [showUnderConstruction, setShowUnderConstruction] = useState(true);
   const year = new Date().getFullYear();
   const { colors, contact, landing, routes, seo } = CONFIG;
   const fullCalculatorUrl = contact.fullCalculatorUrl || contact.gumroadUrl;
+
 
   const facelessAssets = [
     "SEO Content",
@@ -34,6 +34,7 @@ const LandingPage = () => {
     "Reputation Signals",
     "Digital Calculators",
   ];
+
 
   const realEstateSteps = [
     {
@@ -58,9 +59,11 @@ const LandingPage = () => {
     },
   ];
 
+
   useEffect(() => {
     document.title = "DigitallyDefined | Build Your Digital Empire";
     let metaDescription = document.querySelector('meta[name="description"]');
+
 
     if (!metaDescription) {
       metaDescription = document.createElement("meta");
@@ -68,19 +71,30 @@ const LandingPage = () => {
       document.head.appendChild(metaDescription);
     }
 
+
     metaDescription.setAttribute(
       "content",
       "For Gen X women reinventing themselves digitally. Build faceless digital assets, grow passive income, and multiply your digital reputation 10x.",
     );
   }, [seo.description, seo.title]);
 
+
+  const container = {
+    maxWidth: theme.layout.containerMaxWidth,
+    margin: "0 auto",
+  };
+  const section = {
+    padding: `clamp(44px, 7vw, 84px) clamp(${theme.layout.spacing}, 4vw, 32px)`,
+  };
+
+
   return (
     <div
       style={{
         minHeight: "100vh",
-        backgroundColor: ddBrand.tokens.background,
-        color: ddBrand.tokens.text,
-        fontFamily: ddBrand.typography.body.fontFamily,
+        backgroundColor: colors.background,
+        color: colors.text,
+        fontFamily: theme.fonts.app,
       }}
     >
       <style>{`
@@ -91,6 +105,7 @@ const LandingPage = () => {
           align-items: center;
         }
 
+
         .dd-brand-hero {
           display: flex;
           flex-wrap: wrap;
@@ -98,11 +113,13 @@ const LandingPage = () => {
           row-gap: 0;
         }
 
+
         .dd-proof-grid {
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
           gap: 16px;
         }
+
 
         .dd-quiz-cta-grid {
           display: grid;
@@ -111,9 +128,11 @@ const LandingPage = () => {
           align-items: center;
         }
 
+
         .dd-quiz-stat {
           display: grid;
         }
+
 
         @media (max-width: 920px) {
           .dd-hero-grid,
@@ -122,11 +141,13 @@ const LandingPage = () => {
             grid-template-columns: 1fr !important;
           }
 
+
           .dd-roi-calculator__top > div:first-child {
             border-right: 0 !important;
             border-bottom: ${brutalBorder};
           }
         }
+
 
         @media (max-width: 720px) {
           .dd-proof-grid,
@@ -134,11 +155,13 @@ const LandingPage = () => {
             grid-template-columns: 1fr !important;
           }
 
+
           .dd-quiz-stat {
             display: none !important;
           }
         }
       `}</style>
+
 
       {showUnderConstruction && (
         <div
@@ -146,16 +169,16 @@ const LandingPage = () => {
             position: "sticky",
             top: 0,
             zIndex: 25,
-            backgroundColor: ddBrand.tokens.warning,
-            color: "#000000",
+            backgroundColor: colors.warning,
+            color: colors.surface,
             padding: "12px 16px",
-            borderBottom: ddBrand.border,
+            borderBottom: brutalBorder,
             transition: "all 0.3s ease",
           }}
         >
           <div
             style={{
-              ...ddContainer,
+              ...container,
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
@@ -174,7 +197,7 @@ const LandingPage = () => {
               style={{
                 background: "none",
                 border: "none",
-                color: "#000000",
+                color: colors.surface,
                 cursor: "pointer",
                 padding: "4px",
                 display: "flex",
@@ -191,20 +214,21 @@ const LandingPage = () => {
         </div>
       )}
 
+
       <header
         style={{
           position: "sticky",
           top: showUnderConstruction ? "46px" : 0,
           zIndex: 20,
-          borderBottom: ddBrand.border,
-          backgroundColor: ddBrand.tokens.surface,
-          padding: `18px ${ddContainer.width ? '24px' : '24px'}`,
+          borderBottom: brutalBorder,
+          backgroundColor: colors.surface,
+          padding: `18px ${theme.layout.spacing}`,
           transition: "top 0.3s ease",
         }}
       >
         <div
           style={{
-            ...ddContainer,
+            ...container,
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -223,7 +247,7 @@ const LandingPage = () => {
                 fontWeight: 700,
                 textTransform: "uppercase",
                 letterSpacing: "0.08em",
-                color: ddBrand.tokens.textMuted,
+                color: colors.textMuted,
                 textDecoration: "none",
               }}
             >
@@ -239,283 +263,612 @@ const LandingPage = () => {
         </div>
       </header>
 
+
       <main>
-        <FadeInSection>
-          <section style={ddSection}>
-            <div className="dd-hero-grid" style={ddContainer}>
-              <div style={{ display: "grid", gap: "24px" }}>
-                <p style={{ ...brutalEyebrow, color: ddBrand.tokens.textMuted }}>
-                  For Gen X women reinventing themselves, digitally
-                </p>
-                <div style={{ minWidth: 0 }}>
-                  <h1
-                    className="dd-brand-hero"
-                    style={{
-                      ...brutalHeading,
-                      margin: 0,
-                      fontSize: "clamp(2.6rem, 5vw, 4rem)",
-                      lineHeight: 0.98,
-                      color: ddBrand.tokens.text,
-                    }}
-                  >
-                    <span>Define Your&nbsp;</span>
-                    <span style={{ color: ddBrand.tokens.orange }}>Digital Power.</span>
-                  </h1>
-                  <p
-                    style={{
-                      margin: "18px 0 0",
-                      maxWidth: "680px",
-                      fontSize: "clamp(1.1rem, 2vw, 1.3rem)",
-                      lineHeight: 1.55,
-                      color: ddBrand.tokens.textMuted,
-                    }}
-                  >
-                    Your digital reputation is your most valuable asset. This is a
-                    clear, confident system for Gen X women who want to build digital
-                    real estate, grow faceless income streams, and unlock 10x ROI
-                    from their online presence.
-                  </p>
-                </div>
-
-                <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
-                  <a href="#free-calculator" style={brutalButtonPrimary}>
-                    Run the free calculator <TrendingUp size={16} />
-                  </a>
-                  <a href={routes.quiz} style={brutalButtonSecondary}>
-                    Discover your digital superpower <Sparkles size={16} />
-                  </a>
-                  <a
-                    href={contact.facebookCommunityUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={brutalButtonSecondary}
-                  >
-                    Join the community <Users size={16} />
-                  </a>
-                  <a href="/quiz" style={brutalButtonSecondary}>
-                    Find my superpower <Sparkles size={16} />
-                  </a>
-                </div>
-
-                <p
-                  style={{
-                    margin: 0,
-                    color: ddBrand.tokens.textMuted,
-                    fontSize: "0.82rem",
-                    fontWeight: 900,
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  You're not starting from scratch. You're starting from experience.
-                </p>
-                <div className="dd-proof-grid">
-                  {[
-                    "Quick revenue signal",
-                    "No spreadsheet required",
-                    "Built for service businesses",
-                  ].map((item) => (
-                    <div
-                      key={item}
-                      style={{
-                        ...brutalCard,
-                        padding: "14px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "10px",
-                        fontSize: "0.82rem",
-                        fontWeight: 900,
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      <CheckCircle2 size={18} color={ddBrand.tokens.orange} />
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div
-                style={{
-                  ...brutalCard,
-                  backgroundColor: ddBrand.tokens.text,
-                  color: ddBrand.tokens.background,
-                  padding: "clamp(24px, 4vw, 38px)",
-                  minHeight: "340px",
-                  display: "grid",
-                  alignContent: "space-between",
-                  gap: "28px",
-                  overflow: "hidden",
-                  position: "relative",
-                }}
-              >
-                <Sparkles
-                  aria-hidden="true"
-                  size={180}
-                  strokeWidth={1}
-                  style={{
-                    position: "absolute",
-                    right: "-18px",
-                    top: "20px",
-                    color: "rgba(71, 183, 212, 0.2)",
-                  }}
-                />
-                <div style={{ position: "relative" }}>
-                  <p style={{ ...brutalEyebrow, color: ddBrand.tokens.orange }}>
-                    Reputation + digital real estate
-                  </p>
-                  <h2
-                    style={{
-                      ...brutalHeading,
-                      margin: "14px 0 0",
-                      color: ddBrand.tokens.background,
-                      fontSize: "clamp(1.9rem, 3.8vw, 3.1rem)",
-                      lineHeight: 1.02,
-                    }}
-                  >
-                    Turn trust into a measurable asset.
-                  </h2>
-                </div>
-                <p
-                  style={{
-                    position: "relative",
-                    margin: 0,
-                    color: "rgba(255, 252, 249, 0.85)",
-                    fontSize: "1.05rem",
-                    lineHeight: 1.6,
-                    maxWidth: "520px",
-                  }}
-                >
-                  Every review, listing, article, search result, and piece of
-                  content is a digital property. Most Gen X women already own more
-                  than they realize.
-                </p>
-              </div>
-            </div>
-          </section>
-        </FadeInSection>
-
-        <FadeInSection delay={100}>
-          <section id="free-calculator" style={{ ...ddSection, paddingTop: 0 }}>
-            <div style={{ ...ddContainer, display: "grid", gap: "24px" }}>
-              <div style={{ maxWidth: "780px" }}>
-                <p style={{ ...brutalEyebrow, color: ddBrand.tokens.warning }}>
-                  Free tool
-                </p>
-                <h2
+        {/* ── HERO ── */}
+        <section style={section}>
+          <div className="dd-hero-grid" style={container}>
+            <div style={{ display: "grid", gap: "24px" }}>
+              <p style={{ ...brutalEyebrow, color: colors.textMuted }}>
+                For Gen X women reinventing themselves, digitally
+              </p>
+              <div style={{ minWidth: 0 }}>
+                <h1
+                  className="dd-brand-hero"
                   style={{
                     ...brutalHeading,
-                    margin: "10px 0 0",
-                    fontSize: "clamp(1.9rem, 4vw, 3rem)",
-                    lineHeight: 1.05,
+                    margin: 0,
+                    fontSize: "clamp(2.6rem, 5vw, 4rem)",
+                    lineHeight: 0.98,
+                    color: colors.text,
                   }}
                 >
-                  Your digital presence is already generating value.
-                </h2>
-                <p style={{ margin: "10px 0 0", color: ddBrand.tokens.textMuted }}>
-                  This calculator shows you how much, instantly.
-                </p>
-              </div>
-              <RoiCalculator
-                onFullCalculatorClick={() => {
-                  window.open(fullCalculatorUrl, "_blank", "noopener,noreferrer");
-                }}
-              />
-            </div>
-          </section>
-        </FadeInSection>
-
-        <FadeInSection delay={100}>
-          <section style={{ ...ddSection, backgroundColor: "#F4EFE8" }}>
-            <div
-              style={{
-                ...ddContainer,
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-                gap: "18px",
-              }}
-            >
-              {[
-                {
-                  title: "For the reinventor",
-                  text: "You know your value. This shows whether your digital footprint is carrying it.",
-                },
-                {
-                  title: "For the local expert",
-                  text: "Estimate revenue from calls, jobs, reviews, and the traffic you already earn.",
-                },
-                {
-                  title: "For the operator",
-                  text: "Move from vibes to numbers before you invest in your next growth play.",
-                },
-              ].map((card) => (
-                <article key={card.title} style={{ ...brutalCard, padding: "24px" }}>
-                  <h3 style={{ margin: "0 0 10px", fontSize: "1.05rem" }}>{card.title}</h3>
-                  <p style={{ margin: 0, color: ddBrand.tokens.textMuted }}>{card.text}</p>
-                </article>
-              ))}
-            </div>
-          </section>
-        </FadeInSection>
-
-        <FadeInSection delay={100}>
-          <section style={ddSection}>
-            <div
-              style={{
-                ...ddContainer,
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-                gap: "28px",
-                alignItems: "start",
-              }}
-            >
-              <div style={{ display: "grid", gap: "18px" }}>
-                <p style={{ ...brutalEyebrow, color: ddBrand.tokens.aquaBlue }}>
-                  Faceless marketing
-                </p>
-                <h2
+                  <span>Define Your&nbsp;</span>
+                  <span style={{ color: colors.accent }}>Digital Power.</span>
+                </h1>
+                <p
                   style={{
-                    ...brutalHeading,
-                    margin: "10px 0 0",
-                    fontSize: "clamp(1.9rem, 4vw, 3rem)",
-                    lineHeight: 1.05,
+                    margin: "18px 0 0",
+                    maxWidth: "680px",
+                    fontSize: "clamp(1.1rem, 2vw, 1.3rem)",
+                    lineHeight: 1.55,
+                    color: colors.textMuted,
                   }}
                 >
-                  Build once. Sell forever.
-                </h2>
-                <p style={{ margin: "10px 0 0", color: ddBrand.tokens.textMuted }}>
-                  These are the digital assets that keep working while you sleep.
+                  Your digital reputation is your most valuable asset. This is a
+                  clear, confident system for Gen X women who want to build digital
+                  real estate, grow faceless income streams, and unlock 10x ROI
+                  from their online presence.
                 </p>
               </div>
-              <div
+
+              {/* ── THREE CTAs: calculator + community + quiz ── */}
+              <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
+                <a href="#free-calculator" style={brutalButtonPrimary}>
+                  Run the free calculator <TrendingUp size={16} />
+                </a>
+                <a href={routes.quiz} style={brutalButtonSecondary}>
+                  Discover your digital superpower <Sparkles size={16} />
+                </a>
+                <a
+                  href={contact.facebookCommunityUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={brutalButtonSecondary}
+                >
+                  Join the community <Users size={16} />
+                </a>
+                <a href="/quiz" style={brutalButtonSecondary}>
+                  Find my superpower <Sparkles size={16} />
+                </a>
+              </div>
+
+              <p
                 style={{
-                  ...ddGrid,
-                  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                  margin: 0,
+                  color: colors.textMuted,
+                  fontSize: "0.82rem",
+                  fontWeight: 900,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
                 }}
               >
-                {facelessAssets.map((item) => (
+                You're not starting from scratch. You're starting from experience.
+              </p>
+              <div className="dd-proof-grid">
+                {[
+                  "Quick revenue signal",
+                  "No spreadsheet required",
+                  "Built for service businesses",
+                ].map((item) => (
                   <div
                     key={item}
                     style={{
                       ...brutalCard,
-                      padding: "16px",
-                      fontWeight: 800,
-                      fontSize: "0.85rem",
+                      padding: "14px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      fontSize: "0.82rem",
+                      fontWeight: 900,
                       textTransform: "uppercase",
                     }}
                   >
+                    <CheckCircle2 size={18} color={colors.primary} />
                     {item}
                   </div>
                 ))}
               </div>
             </div>
-          </section>
-        </FadeInSection>
+
+
+            <div
+              style={{
+                ...brutalCard,
+                backgroundColor: colors.dark,
+                color: colors.bone,
+                padding: "clamp(24px, 4vw, 38px)",
+                minHeight: "340px",
+                display: "grid",
+                alignContent: "space-between",
+                gap: "28px",
+                overflow: "hidden",
+                position: "relative",
+              }}
+            >
+              <Sparkles
+                aria-hidden="true"
+                size={180}
+                strokeWidth={1}
+                style={{
+                  position: "absolute",
+                  right: "-18px",
+                  top: "20px",
+                  color: "rgba(71, 183, 212, 0.2)",
+                }}
+              />
+              <div style={{ position: "relative" }}>
+                <p style={{ ...brutalEyebrow, color: colors.primary }}>
+                  Reputation + digital real estate
+                </p>
+                <h2
+                  style={{
+                    ...brutalHeading,
+                    margin: "14px 0 0",
+                    color: colors.bone,
+                    fontSize: "clamp(1.9rem, 3.8vw, 3.1rem)",
+                    lineHeight: 1.02,
+                  }}
+                >
+                  Turn trust into a measurable asset.
+                </h2>
+              </div>
+              <p
+                style={{
+                  position: "relative",
+                  margin: 0,
+                  color: colors.boneMuted,
+                  fontSize: "1.05rem",
+                  lineHeight: 1.6,
+                  maxWidth: "520px",
+                }}
+              >
+                Every review, listing, article, search result, and piece of
+                content is a digital property. Most Gen X women already own more
+                than they realize.
+              </p>
+            </div>
+          </div>
+        </section>
+
+
+        {/* ── FREE CALCULATOR ── */}
+        <section id="free-calculator" style={{ ...section, paddingTop: 0 }}>
+          <div style={{ ...container, display: "grid", gap: "24px" }}>
+            <div style={{ maxWidth: "780px" }}>
+              <p style={{ ...brutalEyebrow, color: colors.warning }}>
+                Free tool
+              </p>
+              <h2
+                style={{
+                  ...brutalHeading,
+                  margin: "10px 0 0",
+                  fontSize: "clamp(1.9rem, 4vw, 3rem)",
+                  lineHeight: 1.05,
+                }}
+              >
+                Your digital presence is already generating value.
+              </h2>
+              <p style={{ margin: "10px 0 0", color: colors.textMuted }}>
+                This calculator shows you how much, instantly.
+              </p>
+            </div>
+            <RoiCalculator
+              onFullCalculatorClick={() => {
+                window.open(fullCalculatorUrl, "_blank", "noopener,noreferrer");
+              }}
+            />
+          </div>
+        </section>
+
+
+        {/* ── WHO IT'S FOR ── */}
+        <section style={{ ...section, backgroundColor: colors.backgroundAlt }}>
+          <div
+            style={{
+              ...container,
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+              gap: "18px",
+            }}
+          >
+            {[
+              {
+                title: "For the reinventor",
+                text: "You know your value. This shows whether your digital footprint is carrying it.",
+              },
+              {
+                title: "For the local expert",
+                text: "Estimate revenue from calls, jobs, reviews, and the traffic you already earn.",
+              },
+              {
+                title: "For the operator",
+                text: "Move from vibes to numbers before you invest in your next growth play.",
+              },
+            ].map((card) => (
+              <article key={card.title} style={{ ...brutalCard, padding: "24px" }}>
+                <h3 style={{ margin: "0 0 10px", fontSize: "1.05rem" }}>{card.title}</h3>
+                <p style={{ margin: 0, color: colors.textMuted }}>{card.text}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+
+        {/* ── FACELESS MARKETING ── */}
+        <section style={section}>
+          <div
+            style={{
+              ...container,
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: "28px",
+              alignItems: "start",
+            }}
+          >
+            <div style={{ display: "grid", gap: "18px" }}>
+              <p style={{ ...brutalEyebrow, color: colors.primary }}>
+                Faceless digital marketing
+              </p>
+              <h2
+                style={{
+                  ...brutalHeading,
+                  margin: 0,
+                  fontSize: "clamp(1.9rem, 4vw, 3rem)",
+                  lineHeight: 1.05,
+                }}
+              >
+                You don't need to be an influencer to win online.
+              </h2>
+              <p style={{ margin: 0, color: colors.textMuted, lineHeight: 1.65 }}>
+                DigitallyDefined teaches you how to build faceless digital assets
+                that work even when you're offline. No camera. No performance. No
+                hustle.
+              </p>
+              <p style={{ margin: 0, color: colors.textMuted, lineHeight: 1.65 }}>
+                Perfect for Gen X women who want privacy, freedom, and income that
+                compounds over time.
+              </p>
+              <div style={{ display: "grid", gap: "10px" }}>
+                {[
+                  "Privacy: build without revealing your identity",
+                  "Freedom: assets that run on autopilot",
+                  "Passive visibility: found without being on 24/7",
+                  "Automated lead flow: systems that work while you sleep",
+                ].map((item) => (
+                  <div key={item} style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                    <CheckCircle2 size={18} color={colors.primary} style={{ marginTop: "3px", flexShrink: 0 }} />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+              <a
+                href={contact.facebookCommunityUrl}
+                target="_blank"
+                rel="noreferrer"
+                style={{ ...brutalButtonPrimary, width: "fit-content" }}
+              >
+                Learn faceless digital marketing <Users size={16} />
+              </a>
+            </div>
+
+
+            <div style={{ ...brutalCard, padding: "28px" }}>
+              <p style={{ ...brutalEyebrow, color: colors.primary }}>
+                Faceless asset types
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "10px",
+                  marginTop: "20px",
+                }}
+              >
+                {facelessAssets.map((asset, index) => (
+                  <span
+                    key={asset}
+                    style={{
+                      border: brutalBorder,
+                      padding: "8px 12px",
+                      backgroundColor:
+                        index % 4 === 0
+                          ? colors.primary
+                          : index % 4 === 2
+                          ? colors.accent
+                          : colors.surface,
+                      color: index % 4 === 2 ? colors.surface : colors.text,
+                      fontSize: "0.72rem",
+                      fontWeight: 900,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {asset}
+                  </span>
+                ))}
+              </div>
+              <p
+                style={{
+                  borderTop: brutalBorder,
+                  margin: "24px 0 0",
+                  paddingTop: "20px",
+                  color: colors.textMuted,
+                }}
+              >
+                Every one of these earns without your face, your voice, or your
+                constant attention.
+              </p>
+            </div>
+          </div>
+        </section>
+
+
+        {/* ── DIGITAL REAL ESTATE ── */}
+        <section style={{ ...section, backgroundColor: colors.dark, color: colors.bone }}>
+          <div style={{ ...container, display: "grid", gap: "28px" }}>
+            <div>
+              <p style={{ ...brutalEyebrow, color: colors.warning }}>
+                Digital real estate
+              </p>
+              <h2
+                style={{
+                  ...brutalHeading,
+                  margin: "10px 0 0",
+                  color: colors.bone,
+                  fontSize: "clamp(1.9rem, 4vw, 3rem)",
+                  lineHeight: 1.05,
+                }}
+              >
+                Your digital footprint is real estate. Let's increase its value.
+              </h2>
+              <p style={{ margin: "14px 0 0", maxWidth: "760px", color: colors.boneMuted }}>
+                Every review, listing, article, search result, and piece of content
+                is a digital property. Most Gen X women already own more than they
+                realize.
+              </p>
+            </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                gap: "0",
+                border: `1px solid ${colors.whiteBorderSoft}`,
+              }}
+            >
+              {realEstateSteps.map((step) => (
+                <article
+                  key={step.number}
+                  style={{
+                    padding: "24px",
+                    border: `1px solid ${colors.whiteBorderSoft}`,
+                    backgroundColor: "rgba(255,255,255,0.03)",
+                  }}
+                >
+                  <div
+                    style={{
+                      color: colors.primary,
+                      fontSize: "2.4rem",
+                      fontWeight: 900,
+                      lineHeight: 1,
+                      opacity: 0.55,
+                      marginBottom: "16px",
+                    }}
+                  >
+                    {step.number}
+                  </div>
+                  <h3 style={{ margin: "0 0 10px", color: colors.bone }}>
+                    {step.title}
+                  </h3>
+                  <p style={{ margin: 0, color: colors.boneMuted, lineHeight: 1.6 }}>
+                    {step.text}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+
+        {/* ── COMMUNITY ── */}
+        <section style={section}>
+          <div
+            style={{
+              ...container,
+              ...brutalCard,
+              backgroundColor: colors.dark,
+              color: colors.bone,
+              padding: "clamp(32px, 6vw, 64px)",
+              textAlign: "center",
+              display: "grid",
+              justifyItems: "center",
+              gap: "22px",
+            }}
+          >
+            <p style={{ ...brutalEyebrow, color: colors.primary }}>
+              DigitallyDefined community
+            </p>
+            <h2
+              style={{
+                ...brutalHeading,
+                margin: 0,
+                color: colors.bone,
+                fontSize: "clamp(1.9rem, 4vw, 3rem)",
+                lineHeight: 1.05,
+              }}
+            >
+              Clarity, confidence, and control. Together.
+            </h2>
+            <p style={{ margin: 0, maxWidth: "760px", color: colors.boneMuted }}>
+              Inside, you'll find Gen X women building businesses, pivoting
+              careers, launching new ideas, and reclaiming their digital identity
+              without the noise of traditional social media.
+            </p>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+                gap: "18px",
+                width: "100%",
+                maxWidth: "680px",
+              }}
+            >
+              {[
+                { value: "100%", label: "Faceless friendly" },
+                { value: "Gen X", label: "Women focused" },
+                { value: "Free", label: "To join" },
+              ].map((stat) => (
+                <div key={stat.label}>
+                  <strong
+                    style={{
+                      display: "block",
+                      color: colors.primary,
+                      fontSize: "clamp(1.6rem, 3vw, 2.4rem)",
+                    }}
+                  >
+                    {stat.value}
+                  </strong>
+                  <span style={{ ...brutalEyebrow, color: colors.boneFaint, fontSize: "0.62rem" }}>
+                    {stat.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <a
+              href={contact.facebookCommunityUrl}
+              target="_blank"
+              rel="noreferrer"
+              style={brutalButtonPrimary}
+            >
+              Join the community <Users size={16} />
+            </a>
+          </div>
+        </section>
+
+
+        {/* ── QUIZ CTA ── */}
+        <section
+          style={{
+            ...section,
+            backgroundColor: colors.dark,
+            color: colors.bone,
+          }}
+        >
+          <div
+            style={{
+              ...container,
+              display: "grid",
+              gridTemplateColumns: "minmax(0, 1fr) auto",
+              gap: "clamp(28px, 5vw, 56px)",
+              alignItems: "center",
+            }}
+            className="dd-quiz-cta-grid"
+          >
+            <div>
+              <p style={{ ...brutalEyebrow, color: colors.primary, marginBottom: "14px" }}>
+                Free 60-second quiz
+              </p>
+              <h2
+                style={{
+                  ...brutalHeading,
+                  fontSize: "clamp(1.9rem, 4vw, 3rem)",
+                  lineHeight: 1.02,
+                  color: colors.bone,
+                  margin: "0 0 16px",
+                }}
+              >
+                What&apos;s Your Digital Superpower?
+              </h2>
+              <p
+                style={{
+                  fontSize: "clamp(1rem, 2vw, 1.15rem)",
+                  lineHeight: 1.65,
+                  color: colors.boneMuted,
+                  maxWidth: "560px",
+                  margin: "0 0 18px",
+                }}
+              >
+                Take this quick quiz to find the digital path that fits your
+                strengths, your season of life, and the kind of work you actually
+                want to build.
+              </p>
+              <p
+                style={{
+                  fontSize: "1rem",
+                  lineHeight: 1.65,
+                  color: colors.boneMuted,
+                  maxWidth: "560px",
+                  margin: "0 0 28px",
+                }}
+              >
+                You do not need to be loud, young, on camera, or techy to build
+                something real online. You just need a path that fits you better
+                than the usual internet noise.
+              </p>
+              <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
+                <a href="/quiz" style={brutalButtonPrimary}>
+                  Find My Superpower <Sparkles size={16} />
+                </a>
+              </div>
+              <p
+                style={{
+                  marginTop: "14px",
+                  fontSize: "0.78rem",
+                  fontWeight: 900,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: colors.boneFaint,
+                }}
+              >
+                Free · No credit card · Takes 60 seconds
+              </p>
+            </div>
+
+
+            <div
+              className="dd-quiz-stat"
+              style={{
+                border: `1px solid ${colors.whiteBorderSoft}`,
+                padding: "clamp(24px, 4vw, 36px)",
+                display: "grid",
+                gap: "20px",
+                minWidth: "220px",
+                backgroundColor: "rgba(255,255,255,0.03)",
+              }}
+            >
+              {[
+                { emoji: "📝", label: "The Content Creator" },
+                { emoji: "⚙️", label: "The Systems Builder" },
+                { emoji: "📚", label: "The Digital Educator" },
+                { emoji: "🤝", label: "The Community Builder" },
+                { emoji: "📣", label: "The Brand Strategist" },
+              ].map(({ emoji, label }) => (
+                <div
+                  key={label}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    fontSize: "0.85rem",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                    color: colors.boneMuted,
+                  }}
+                >
+                  <span style={{ fontSize: "20px" }}>{emoji}</span>
+                  {label}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       </main>
 
-      <Footer year={year} />
+
+      <Footer
+        colors={colors}
+        containerStyle={container}
+        footerStyle={section}
+        routes={routes}
+        landing={landing}
+        contact={contact}
+        year={year}
+        showDashboardLink={false}
+      />
     </div>
   );
 };
+
 
 export default LandingPage;
