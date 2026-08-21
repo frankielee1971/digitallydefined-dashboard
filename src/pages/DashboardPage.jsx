@@ -27,6 +27,7 @@ import {
   brutalHeading,
   theme,
 } from "../theme";
+import { getSupabaseEdgeUrl, getSupabaseEdgeHeaders } from "../lib/supabase-edge";
 
 const dashboardConfig = CONFIG.dashboard;
 
@@ -53,7 +54,7 @@ const dashboardLabels = {
   },
 };
 
-const API_URL = "/api/hermes";
+const API_URL = getSupabaseEdgeUrl();
 
 const API_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "";
 const API_HEADERS = {

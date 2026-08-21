@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { callSupabaseEdge } from "../lib/supabase-edge";
 
 export default function NewsletterSignup() {
   const [email, setEmail] = useState("");
@@ -6,21 +7,14 @@ export default function NewsletterSignup() {
 
   async function subscribe(e) {
     e.preventDefault();
-    // Use current origin for frontend serverless function
-    const API_URL = `${window.location.origin}/api/subscribe`;
-    
+
     try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+      await callSupabaseEdge("subscribe", {
+        email,
+        source: "dashboard",
       });
-      if (res.ok) {
-        setStatus("success");
-        setEmail("");
-      } else {
-        setStatus("error");
-      }
+      setStatus("success");
+      setEmail("");
     } catch (err) {
       console.error("Newsletter subscription error:", err);
       setStatus("error");

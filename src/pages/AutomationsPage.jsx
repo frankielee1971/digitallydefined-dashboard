@@ -1,18 +1,16 @@
 import { useEffect, useState } from "react";
+import { getSupabaseEdgeUrl, getSupabaseEdgeHeaders } from "../lib/supabase-edge";
 
 export default function AutomationsPage() {
   const [automations, setAutomations] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const API_URL = "/api/hermes";
+    const API_URL = getSupabaseEdgeUrl();
 
     fetch(API_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": import.meta.env.VITE_DASHBOARD_API_KEY || ""
-      },
+      headers: getSupabaseEdgeHeaders(),
       body: JSON.stringify({
         message: "automation.list",
         context: {},
@@ -62,3 +60,4 @@ export default function AutomationsPage() {
     </div>
   );
 }
+

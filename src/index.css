@@ -2,38 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --bone: #fffcf9;
-  --ink: #2d3748;
-  --dd-orange: #f18b25;
-  --dd-blue: #47b7d4;
-  --dd-red: #8b1a0a;
-  --white-card: #ffffff;
-  --border-subtle: #000000;
+/* ============================================================
+   DigitallyDefined — Global Brand Reset
+   ============================================================ */
 
-  /* Backward-compatible aliases for existing pages and components. */
-  --brand-background: var(--bone);
-  --brand-panel: var(--white-card);
-  --brand-card: var(--white-card);
-  --brand-text-primary: var(--ink);
-  --brand-text-dark: var(--ink);
-  --brand-text-muted: var(--ink);
-  --brand-accent-orange: var(--dd-orange);
-  --brand-accent-aqua: var(--dd-blue);
-  --brand-accent-red: var(--dd-red);
-  --brand-border-width: 1px;
-  --brand-border-color: var(--border-subtle);
-  --brand-border-radius: 0;
-  --brand-spacing: 24px;
-  --brand-grid-gap: 32px;
-  --brand-container-max-width: 1100px;
-  --brand-shadow: none;
+:root {
+  --dd-background: #FFFCF9;
+  --dd-surface: #FFFFFF;
+  --dd-card: #FFFFFF;
+  --dd-text: #111111;
+  --dd-text-muted: #5F5F5F;
+  --dd-border: #111111;
+  --dd-orange: #F18B25;
+  --dd-aqua: #47B7D4;
+  --dd-red: #8B1A0A;
+  --dd-success: #16A34A;
+  --dd-font-heading: 'Inter', system-ui, sans-serif;
+  --dd-font-body: 'DM Sans', system-ui, sans-serif;
+  --dd-container: 1100px;
+  --dd-radius: 0px;
+  --dd-shadow: none;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  border-radius: var(--dd-radius) !important;
+  box-shadow: none !important;
 }
 
 html {
   min-height: 100%;
-  background: var(--bone);
-  color: var(--ink);
+  background: var(--dd-background);
+  color: var(--dd-text);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -41,59 +43,28 @@ html {
 body,
 #root {
   min-height: 100vh;
-}
-
-body {
   margin: 0;
-  background: var(--bone);
-  color: var(--ink);
-  font-family: "DM Sans", sans-serif;
+  background: var(--dd-background);
+  color: var(--dd-text);
+  font-family: var(--dd-font-body);
   line-height: 1.6;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  border-radius: 0 !important;
-  box-shadow: none !important;
+h1, h2, h3, h4, h5, h6,
+.dd-heading, .dd-hook, .dd-section-heading {
+  font-family: var(--dd-font-heading);
+  font-weight: 800;
+  color: var(--dd-text);
+  text-transform: none;
+  letter-spacing: -0.03em;
 }
 
-body *,
-body *::before,
-body *::after {
-  background-image: none !important;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-.dd-heading,
-.dd-hook,
-.dd-section-heading {
-  font-family: "Inter", sans-serif;
-  font-weight: 700;
-  color: var(--ink);
-}
-
-h1,
-h2,
-h3,
-.dd-hook,
-.dd-section-heading {
+h1, h2, h3, .dd-hook, .dd-section-heading {
   text-transform: uppercase;
 }
 
-p,
-li,
-label,
-input,
-select,
-textarea {
-  font-family: "DM Sans", sans-serif;
+p, li, label, input, select, textarea {
+  font-family: var(--dd-font-body);
 }
 
 a {
@@ -105,15 +76,15 @@ picture,
 video,
 canvas,
 svg.dd-image {
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--dd-border);
 }
 
 input,
 select,
 textarea {
-  background: var(--white-card);
-  color: var(--ink);
-  border: 1px solid var(--border-subtle);
+  background: var(--dd-surface);
+  color: var(--dd-text);
+  border: 1px solid var(--dd-border);
 }
 
 button,
@@ -124,9 +95,10 @@ button,
 .dd-btn {
   background: var(--dd-orange);
   color: #000000;
-  border: 1px solid var(--border-subtle);
-  font-family: "Inter", sans-serif;
+  border: 1px solid var(--dd-border);
+  font-family: var(--dd-font-heading);
   font-weight: 700;
+  transition: transform 0.15s ease, filter 0.2s ease;
 }
 
 button:hover,
@@ -136,6 +108,13 @@ button:hover,
 .dd-button:hover,
 .dd-btn:hover {
   filter: brightness(0.96);
+  transform: translateY(-1px);
+}
+
+button:active,
+.dd-button:active,
+.dd-btn:active {
+  transform: translateY(0);
 }
 
 button:focus-visible,
@@ -143,7 +122,7 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid var(--dd-blue);
+  outline: 3px solid var(--dd-aqua);
   outline-offset: 2px;
 }
 
@@ -152,19 +131,24 @@ button:disabled,
 .dd-btn:disabled {
   cursor: not-allowed;
   opacity: 0.6;
+  transform: none;
 }
+
+/* ============================================================
+   DigitallyDefined — Shared Page Structure
+   ============================================================ */
 
 .dd-page,
 .dd-page--assistant {
   min-height: 100vh;
-  background: var(--bone);
-  color: var(--ink);
-  font-family: "DM Sans", sans-serif;
+  background: var(--dd-background);
+  color: var(--dd-text);
+  font-family: var(--dd-font-body);
 }
 
 .dd-page__container,
 .dd-tool-page {
-  width: min(100% - 48px, var(--brand-container-max-width));
+  width: min(100% - 48px, var(--dd-container));
   margin-inline: auto;
   display: flex;
   flex-direction: column;
@@ -173,22 +157,19 @@ button:disabled,
 }
 
 .dd-page__hero {
-  background: var(--bone);
-  border-bottom: 1px solid var(--border-subtle);
+  background: var(--dd-background);
+  border-bottom: 1px solid var(--dd-border);
   padding: 32px 24px;
 }
 
 .dd-page__hero-inner {
-  width: min(100%, var(--brand-container-max-width));
+  width: min(100%, var(--dd-container));
   margin-inline: auto;
   display: grid;
   gap: 24px;
 }
 
-.dd-page__hero-meta,
-.dd-page__section-header,
-.dd-page__actions,
-.dd-page__footer-actions {
+.dd-page__section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -198,7 +179,6 @@ button:disabled,
 
 .dd-heading {
   margin: 0;
-  letter-spacing: 0;
 }
 
 .dd-heading--large {
@@ -211,20 +191,24 @@ button:disabled,
 
 .dd-text {
   margin: 0;
-  color: var(--ink);
+  color: var(--dd-text);
   line-height: 1.7;
 }
 
 .dd-text--muted {
-  color: var(--ink);
-  opacity: 0.78;
+  color: var(--dd-text-muted);
 }
 
 .dd-card,
 .dd-roi-calculator,
 .dd-chat-window {
-  background: var(--white-card) !important;
-  border: 1px solid var(--border-subtle) !important;
+  background: var(--dd-surface) !important;
+  border: 1px solid var(--dd-border) !important;
+  transition: transform 0.2s ease;
+}
+
+.dd-card:hover {
+  transform: translateY(-2px);
 }
 
 .dd-card {
@@ -244,30 +228,35 @@ button:disabled,
   padding: 16px 24px !important;
   background: var(--dd-orange) !important;
   color: #000000 !important;
-  border: 1px solid var(--border-subtle) !important;
-  font-family: "Inter", sans-serif !important;
+  border: 1px solid var(--dd-border) !important;
+  font-family: var(--dd-font-heading) !important;
   font-weight: 700 !important;
   cursor: pointer;
   text-decoration: none;
-  transition: filter 0.2s ease;
 }
 
 .dd-button--primary {
   background: var(--dd-orange);
   color: #000000;
-  border-color: var(--border-subtle);
+  border-color: var(--dd-border);
 }
 
 .dd-button--secondary,
 .dd-btn--secondary {
-  background: var(--dd-blue) !important;
+  background: var(--dd-aqua) !important;
   color: #000000 !important;
-  border-color: var(--border-subtle) !important;
+  border-color: var(--dd-border) !important;
+}
+
+.dd-button--outline {
+  background: var(--dd-background);
+  color: var(--dd-text);
+  border-color: var(--dd-border);
 }
 
 .dd-button--selected {
-  background: var(--dd-blue);
-  border-color: var(--border-subtle);
+  background: var(--dd-aqua);
+  border-color: var(--dd-border);
 }
 
 .dd-grid {
@@ -279,10 +268,13 @@ button:disabled,
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
-/* Shared calculator and auditor standard. */
+/* ============================================================
+   DigitallyDefined — Calculator / Tool Surfaces
+   ============================================================ */
+
 .dd-tool {
-  background: var(--white-card) !important;
-  border: 1px solid var(--border-subtle) !important;
+  background: var(--dd-surface) !important;
+  border: 1px solid var(--dd-border) !important;
   padding: 32px !important;
   display: flex;
   flex-direction: column;
@@ -291,28 +283,28 @@ button:disabled,
 
 .dd-input {
   width: 100%;
-  background: var(--white-card) !important;
-  color: var(--ink) !important;
-  border: 1px solid var(--border-subtle) !important;
+  background: var(--dd-surface) !important;
+  color: var(--dd-text) !important;
+  border: 1px solid var(--dd-border) !important;
   padding: 12px !important;
-  font-family: "DM Sans", sans-serif !important;
+  font-family: var(--dd-font-body) !important;
   font-weight: 500 !important;
 }
 
 .dd-label {
   display: block;
   margin-bottom: 8px;
-  color: var(--ink);
-  font-family: "DM Sans", sans-serif;
+  color: var(--dd-text);
+  font-family: var(--dd-font-body);
   font-weight: 700;
 }
 
 .dd-result {
-  background: var(--white-card) !important;
-  border: 1px solid var(--border-subtle) !important;
+  background: var(--dd-surface) !important;
+  border: 1px solid var(--dd-border) !important;
   padding: 24px !important;
   color: var(--dd-orange) !important;
-  font-family: "Inter", sans-serif !important;
+  font-family: var(--dd-font-heading) !important;
   font-size: clamp(2rem, 5vw, 2.5rem) !important;
   font-weight: 700 !important;
   text-align: center !important;
@@ -335,17 +327,21 @@ button:disabled,
 .dd-tool-section,
 .dd-cta {
   padding: 32px;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--dd-border);
 }
 
 .dd-reality {
-  background: var(--bone);
+  background: var(--dd-background);
 }
 
 .dd-tool-section,
 .dd-cta {
-  background: var(--white-card);
+  background: var(--dd-surface);
 }
+
+/* ============================================================
+   DigitallyDefined — Chat / Assistant Components
+   ============================================================ */
 
 .dd-chat-toggle {
   position: fixed;
@@ -358,6 +354,9 @@ button:disabled,
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  background: var(--dd-orange);
+  color: #000000;
+  border: 1px solid var(--dd-border);
 }
 
 .dd-chat-window {
@@ -370,18 +369,17 @@ button:disabled,
   max-height: 420px;
   flex-direction: column;
   overflow: hidden;
+  background: var(--dd-surface);
+  border: 1px solid var(--dd-border);
 }
 
 .dd-chat-header,
 .dd-assistant-header {
-  background: var(--dd-blue);
+  background: var(--dd-aqua);
   color: #000000;
-  border-bottom: 1px solid var(--border-subtle);
-  font-family: "Inter", sans-serif;
+  border-bottom: 1px solid var(--dd-border);
+  font-family: var(--dd-font-heading);
   font-weight: 700;
-}
-
-.dd-chat-header {
   padding: 16px;
 }
 
@@ -390,7 +388,7 @@ button:disabled,
   flex: 1;
   overflow-y: auto;
   display: grid;
-  background: var(--bone);
+  background: var(--dd-background);
 }
 
 .dd-chat-body {
@@ -417,15 +415,15 @@ button:disabled,
   display: inline-block;
   max-width: 80%;
   padding: 12px 14px;
-  border: 1px solid var(--border-subtle);
-  background: var(--white-card);
-  color: var(--ink);
+  border: 1px solid var(--dd-border);
+  background: var(--dd-surface);
+  color: var(--dd-text);
   line-height: 1.4;
 }
 
 .dd-chat-message--user .dd-chat-bubble,
 .dd-assistant-message-bubble--user {
-  background: var(--dd-blue);
+  background: var(--dd-aqua);
   color: #000000;
 }
 
@@ -433,8 +431,8 @@ button:disabled,
 .dd-assistant-input-row {
   display: flex;
   gap: 12px;
-  background: var(--white-card);
-  border-top: 1px solid var(--border-subtle);
+  background: var(--dd-surface);
+  border-top: 1px solid var(--dd-border);
 }
 
 .dd-chat-footer {
@@ -444,9 +442,9 @@ button:disabled,
 .dd-chat-input,
 .dd-assistant-input {
   flex: 1;
-  background: var(--white-card);
-  color: var(--ink);
-  border: 1px solid var(--border-subtle);
+  background: var(--dd-surface);
+  color: var(--dd-text);
+  border: 1px solid var(--dd-border);
   padding: 12px;
 }
 
@@ -464,10 +462,85 @@ button:disabled,
   padding: 14px;
 }
 
+/* ============================================================
+   DigitallyDefined — Interactive / CRO Utilities
+   ============================================================ */
+
+.dd-animate-in {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: ddFadeIn 0.45s ease forwards;
+}
+
+@keyframes ddFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dd-interactive-card {
+  position: relative;
+}
+
+.dd-interactive-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid transparent;
+  transition: border-color 0.2s ease;
+  pointer-events: none;
+}
+
+.dd-interactive-card:hover::after {
+  border-color: var(--dd-aqua);
+}
+
+.dd-pulse {
+  animation: ddPulse 2s ease-in-out infinite;
+}
+
+@keyframes ddPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.dd-tooltip {
+  position: relative;
+}
+
+.dd-tooltip::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 110%;
+  left: 0;
+  background: var(--dd-text);
+  color: var(--dd-background);
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+
+.dd-tooltip:hover::before {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================================
+   DigitallyDefined — Responsive Helpers
+   ============================================================ */
+
+html {
+  scroll-behavior: smooth;
+}
+
 @media (max-width: 640px) {
   .dd-page__container,
   .dd-tool-page {
-    width: min(100% - 32px, var(--brand-container-max-width));
+    width: min(100% - 32px, var(--dd-container));
     padding-block: 24px;
   }
 
@@ -488,4 +561,129 @@ button:disabled,
     right: 16px;
     bottom: 16px;
   }
+}
+
+/* ============================================================
+   DigitallyDefined — CRO / Interactive Enhancements
+   ============================================================ */
+
+/* Scroll progress bar */
+.dd-scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: var(--dd-orange);
+  z-index: 10000;
+  transition: width 0.1s linear;
+  pointer-events: none;
+}
+
+/* Enhanced focus states for forms */
+.dd-input:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--dd-orange) !important;
+  box-shadow: 0 0 0 3px rgba(241, 139, 37, 0.15);
+}
+
+/* Button active/loading states */
+.dd-button:active:not(:disabled),
+.dd-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+.dd-button.is-loading,
+.dd-btn.is-loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+
+.dd-button.is-loading::after,
+.dd-btn.is-loading::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #000000;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: ddSpin 0.6s linear infinite;
+}
+
+@keyframes ddSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* Enhanced card hover */
+.dd-card,
+.dd-interactive-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dd-card:hover,
+.dd-interactive-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Link hover underline animation */
+.dd-link {
+  position: relative;
+  text-decoration: none;
+  color: var(--dd-orange);
+  font-weight: 700;
+}
+
+.dd-link::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--dd-orange);
+  transition: width 0.2s ease;
+}
+
+.dd-link:hover::after {
+  width: 100%;
+}
+
+/* Form validation states */
+.dd-input.is-valid {
+  border-color: var(--dd-success) !important;
+}
+
+.dd-input.is-invalid {
+  border-color: var(--dd-red) !important;
+}
+
+/* Sticky CTA pulse on scroll */
+.dd-sticky-cta {
+  animation: ddCtaPulse 3s ease-in-out infinite;
+}
+
+@keyframes ddCtaPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(241, 139, 37, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(241, 139, 37, 0); }
+}
+
+/* Selection styling */
+::selection {
+  background: var(--dd-orange);
+  color: #000000;
+}
+
+/* Smooth image loading */
+img {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+img[loading] {
+  opacity: 0;
 }
