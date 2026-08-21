@@ -1,7 +1,7 @@
 import SuperpowerCard from "./SuperpowerCard";
 import PersonaCard from "./PersonaCard";
 import StrengthsList from "./StrengthsList";
-import BlindspotsList from "./BlindspotsList";
+import BlindspotsList from "./BlindSpotsList";
 import BusinessModelCard from "./BusinessModelCard";
 
 import RoadmapView from "./RoadmapView";
