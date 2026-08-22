@@ -827,19 +827,35 @@ const DashboardPage = () => {
         integrations,
       });
 
+      // Build a system prompt that grounds Hermes in live dashboard state
+      const dashboardSystemPrompt = [
+        "You are the DigitallyDefined Operations AI. You have access to the user's live dashboard data.",
+        `Last sync: ${snapshot.lastSync}`,
+        `Revenue: ${snapshot.stats?.revenue} | Leads: ${snapshot.stats?.leads} | Conversion: ${snapshot.stats?.conversionRate} | Asset Value: ${snapshot.stats?.assetValue}`,
+        snapshot.alerts?.length
+          ? `Active Alerts: ${snapshot.alerts.join(" | ")}`
+          : "No active alerts.",
+        snapshot.automations?.length
+          ? `Automations: ${snapshot.automations.join(" | ")}`
+          : "No automations running.",
+        snapshot.aiBrief?.nextActions?.length
+          ? `AI-Recommended Next Action: ${snapshot.aiBrief.nextActions[0]}`
+          : "",
+        "Be concise, specific, and actionable. Use the data above to ground your answers.",
+      ].filter(Boolean).join("\n");
+
       // Send to your Hermes backend
       const res = await fetch(API_URL, {
-          method: "POST",
-          headers: API_HEADERS,
-          body: JSON.stringify({
-            message: trimmedMessage,
-            messages: nextMessages,
-            snapshot,
-            context: {},
-            conversation: nextMessages,
-          }),
-        }
-      );
+        method: "POST",
+        headers: API_HEADERS,
+        body: JSON.stringify({
+          message: trimmedMessage,
+          messages: nextMessages,
+          conversation: nextMessages,
+          systemPrompt: dashboardSystemPrompt, // Hermes chat handler WILL use this
+          context: { snapshot },
+        }),
+      });
 
       const dataRes = await res.json();
 

@@ -1,16 +1,5 @@
 import React from "react";
-import {
-  BarChart3,
-  Facebook,
-  Instagram,
-  Mail,
-  MessageSquare,
-  Share2,
-  TrendingUp,
-  Twitter,
-  Users,
-  Youtube,
-} from "lucide-react";
+import { TrendingUp, Users } from "lucide-react"; // cleaned imports
 import {
   brutalBorder,
   brutalEyebrow,
@@ -19,7 +8,7 @@ import {
 } from "../theme";
 
 const cardStyle = {
-  ...brutalBorder,
+  border: brutalBorder, // FIXED: no spreading a string
   backgroundColor: theme.colors.card,
   padding: "0.9rem",
 };
@@ -46,7 +35,7 @@ const IntegrationCard = ({ title, description, status, cta, onConnect, children 
       type="button"
       onClick={onConnect}
       style={{
-        ...brutalBorder,
+        border: brutalBorder, // FIXED: no spread
         backgroundColor: status === "connected" ? theme.colors.card : theme.colors.orange,
         color: status === "connected" ? theme.colors.textPrimary : "#000000",
         padding: "0.55rem 0.7rem",

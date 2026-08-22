@@ -99,7 +99,7 @@ export default function AssistantPage() {
             style={{
               ...ddBrand.card,
               background: ddBrand.tokens.aquaBlue,
-              color: "#000000",
+              color: ddBrand.tokens.textDark,
               borderBottom: ddBrand.border,
               fontFamily: ddBrand.typography.heading.fontFamily,
               fontWeight: 800,
@@ -153,7 +153,7 @@ export default function AssistantPage() {
                     padding: "12px 14px",
                     border: ddBrand.border,
                     background: m.role === "user" ? ddBrand.tokens.aquaBlue : ddBrand.tokens.surface,
-                    color: m.role === "user" ? "#000000" : ddBrand.tokens.text,
+                    color: m.role === "user" ? ddBrand.tokens.textDark : ddBrand.tokens.text,
                     lineHeight: 1.4,
                     transition: "transform 0.2s ease",
                   }}
@@ -250,8 +250,8 @@ export default function AssistantPage() {
                     fontSize: "0.62rem",
                     padding: "4px 8px",
                     border: ddBrand.border,
-                    background: ddBrand.tokens.danger || "#8B1A0A",
-                    color: "#FFFFFF",
+                    background: ddBrand.tokens.danger || ddBrand.tokens.darkRed,
+                    color: ddBrand.tokens.background,
                   }}
                 >
                   error: {error}
@@ -305,18 +305,19 @@ export default function AssistantPage() {
             />
             <button
               onClick={sendMessage}
-              className="dd-button dd-button--primary"
-              type="button"
               style={{
-                transition: "transform 0.2s ease, filter 0.2s ease",
+                ...brutalButtonPrimary,
+                padding: '12px 20px',
+                transition: 'transform 0.2s ease, filter 0.2s ease',
               }}
+              type="button"
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-1px)";
-                e.currentTarget.style.filter = "brightness(0.96)";
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.filter = 'brightness(0.96)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.filter = "brightness(1)";
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.filter = 'brightness(1)';
               }}
             >
               Send

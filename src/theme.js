@@ -21,6 +21,11 @@ export const theme = {
     aquaBlue: tokenColors.accents.aquaBlue,
     darkRed: tokenColors.accents.darkRed,
     muted: CONFIG.colors.textMuted,
+
+    // ⭐ Added per Claude’s fix
+    success: CONFIG.colors.success,
+    warning: CONFIG.colors.warning,
+    danger: CONFIG.colors.danger,
   },
   geometry: {
     ...tokens.geometry,
@@ -89,6 +94,7 @@ export const brutalButtonSecondary = {
   backgroundColor: theme.colors.aquaBlue,
   color: theme.colors.textDark,
 };
+
 /* --- DD Design System additions (non-breaking upgrades) ---------- */
 
 export const brutalButtonOutline = {

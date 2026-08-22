@@ -3,7 +3,7 @@ import { ExternalLink, Plug } from "lucide-react";
 import { brutalBorder, brutalEyebrow, brutalHeading, theme } from "../theme";
 
 const cardStyle = {
-  ...brutalBorder,
+  border: brutalBorder, // FIXED: no spreading a string
   backgroundColor: theme.colors.card,
   padding: "0.9rem",
 };
@@ -33,6 +33,7 @@ const integrationMeta = {
 
 function IntegrationsTab({ integrations }) {
   const map = integrations || {};
+
   const sections = Object.keys(integrationMeta).map((key) => {
     const meta = integrationMeta[key];
     const payload = map[key] || {};
@@ -53,6 +54,7 @@ function IntegrationsTab({ integrations }) {
           {payload.error && (
             <span style={{ color: theme.colors.darkRed }}>Error: {payload.error}</span>
           )}
+
           {key === "googleAnalytics" && (
             <>
               <span>Users 30d: {payload.users30d != null ? payload.users30d.toLocaleString() : "—"}</span>
@@ -61,6 +63,7 @@ function IntegrationsTab({ integrations }) {
               <span>Revenue 30d: {payload.revenue30d != null ? `$${Number(payload.revenue30d).toLocaleString()}` : "—"}</span>
             </>
           )}
+
           {key === "social" && (
             <>
               <span>Followers: {payload.followers != null ? payload.followers.toLocaleString() : "—"}</span>
@@ -68,6 +71,7 @@ function IntegrationsTab({ integrations }) {
               <span>Impressions 30d: {payload.impressions30d != null ? payload.impressions30d.toLocaleString() : "—"}</span>
             </>
           )}
+
           {key === "email" && (
             <>
               <span>Subscribers: {payload.subscribers != null ? payload.subscribers.toLocaleString() : "—"}</span>
@@ -75,6 +79,7 @@ function IntegrationsTab({ integrations }) {
               <span>Click rate: {payload.clickRate != null ? `${(payload.clickRate * 100).toFixed(1)}%` : "—"}</span>
             </>
           )}
+
           {key === "community" && (
             <>
               <span>Members: {payload.members != null ? payload.members.toLocaleString() : "—"}</span>
@@ -90,7 +95,7 @@ function IntegrationsTab({ integrations }) {
             target="_blank"
             rel="noreferrer"
             style={{
-              ...brutalBorder,
+              border: brutalBorder, // FIXED: no spread
               backgroundColor: theme.colors.card,
               color: theme.colors.textPrimary,
               padding: "0.45rem 0.6rem",

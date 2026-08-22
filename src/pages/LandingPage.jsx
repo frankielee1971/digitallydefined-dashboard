@@ -188,7 +188,7 @@ const LandingPage = () => {
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <AlertCircle size={20} strokeWidth={2.5} />
               <span style={{ fontWeight: 700, fontSize: "0.95rem" }}>
-                Under Construction - New features coming soon!
+                Under Construction — New features coming soon!
               </span>
             </div>
             <button
@@ -524,7 +524,7 @@ const LandingPage = () => {
                   "Privacy: build without revealing your identity",
                   "Freedom: assets that run on autopilot",
                   "Passive visibility: found without being on 24/7",
-                  "Automated lead flow: systems that work while you sleep",
+                  "Automated lead flow: processes that run independently",
                 ].map((item) => (
                   <div key={item} style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
                     <CheckCircle2 size={18} color={colors.primary} style={{ marginTop: "3px", flexShrink: 0 }} />
@@ -827,12 +827,12 @@ const LandingPage = () => {
               }}
             >
               {[
-                { emoji: "📝", label: "The Content Creator" },
-                { emoji: "⚙️", label: "The Systems Builder" },
-                { emoji: "📚", label: "The Digital Educator" },
-                { emoji: "🤝", label: "The Community Builder" },
-                { emoji: "📣", label: "The Brand Strategist" },
-              ].map(({ emoji, label }) => (
+                { label: "The Content Creator" },
+                { label: "The Systems Builder" },
+                { label: "The Digital Educator" },
+                { label: "The Community Builder" },
+                { label: "The Brand Strategist" },
+              ].map(({ label }) => (
                 <div
                   key={label}
                   style={{
@@ -846,7 +846,9 @@ const LandingPage = () => {
                     color: colors.boneMuted,
                   }}
                 >
-                  <span style={{ fontSize: "20px" }}>{emoji}</span>
+                  <span style={{ fontSize: "20px" }}>
+                    <Sparkles size={18} style={{ color: colors.primary }} strokeWidth={1.5} />
+                  </span>
                   {label}
                 </div>
               ))}

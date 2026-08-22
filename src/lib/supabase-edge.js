@@ -3,7 +3,7 @@
 // Replaces all Vercel Serverless Function proxies
 
 const DEFAULT_SUPABASE_URL = 'https://dijjlppdljpcgyoakdnq.supabase.co';
-const DEFAULT_API_KEY = 'DigitallyDefined-OS-2026';
+// No hardcoded API key — fail loudly if env var missing
 
 export const getSupabaseEdgeUrl = (functionName = 'hermes') => {
   const baseUrl = import.meta.env.VITE_SUPABASE_URL ||
@@ -12,11 +12,17 @@ export const getSupabaseEdgeUrl = (functionName = 'hermes') => {
   return `${baseUrl.replace(/\/+$/, '')}/functions/v1/${functionName}`;
 };
 
-export const getSupabaseEdgeHeaders = (extra = {}) => ({
-  'Content-Type': 'application/json',
-  'x-api-key': import.meta.env.VITE_DASHBOARD_API_KEY || DEFAULT_API_KEY,
-  ...extra,
-});
+export const getSupabaseEdgeHeaders = (extra = {}) => {
+  const apiKey = import.meta.env.VITE_DASHBOARD_API_KEY;
+  if (!apiKey && import.meta.env.DEV) {
+    console.warn('[Hermes] VITE_DASHBOARD_API_KEY is not set. Dashboard API calls will fail.');
+  }
+  return {
+    'Content-Type': 'application/json',
+    ...(apiKey ? { 'x-api-key': apiKey } : {}),
+    ...extra,
+  };
+};
 
 export async function callSupabaseEdge(action, payload = {}, extraHeaders = {}) {
   const res = await fetch(getSupabaseEdgeUrl(), {
